@@ -11,6 +11,7 @@
     "apps/*"
   ],
   "dependencies": {
+    "@nestjs/axios": "^3.0.0",
     "axios": "^1.5.1"
   }
 }
