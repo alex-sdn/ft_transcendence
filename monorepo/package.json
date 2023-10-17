@@ -1,0 +1,16 @@
+{
+  "devDependencies": {
+    "turbo": "^1.10.15"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "node apps/api/dist/main"
+  },
+  "workspaces": [
+    "apps/*"
+  ],
+  "dependencies": {
+    "axios": "^1.5.1"
+  }
+}
