@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  monorepo:
+    build:
+      context: ./monorepo
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app/monorepo
+    ports:
+      - "3000:3000"
