@@ -1,0 +1,12 @@
+-- CreateTable
+CREATE TABLE "User" (
+    "id" SERIAL NOT NULL,
+    "login42" TEXT NOT NULL,
+    "nickname" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "win" INTEGER NOT NULL DEFAULT 0,
+    "loss" INTEGER NOT NULL DEFAULT 0,
+    "LP" INTEGER NOT NULL DEFAULT 100,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);

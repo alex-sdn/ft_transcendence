@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "start": "node apps/api/dist/main"
+    "start": "node apps/api/dist/main",
+	"db:start": "npm run db:start --workspace apps/api",
+	"db:stop": "npm run db:stop --workspace apps/api"
   },
   "workspaces": [
     "apps/*"
