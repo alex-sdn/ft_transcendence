@@ -1,7 +1,7 @@
 import { HttpService } from "@nestjs/axios";
-import { Injectable } from "@nestjs/common";
+import { ForbiddenException, Injectable } from "@nestjs/common";
 import axios, { AxiosResponse } from "axios";
-import { map } from "rxjs";
+import { Observable, catchError, lastValueFrom, map } from "rxjs";
 
 @Injectable()
 export class AuthService {
@@ -26,9 +26,14 @@ export class AuthService {
 			const refreshToken = tokenResponse.data.refresh_token; //pour pas avoir a relog
 
 			// GET USER INFO FROM 42API HERE
-			console.log('ACCESS:', accessToken, "\nREFRESH:", refreshToken);
 			const userInfo = await this.getUserInfo(accessToken);
 			console.log(userInfo);
+
+			// CHECK WITH DB IF EXISTS
+
+			// IF NOT -> First login page
+
+			// IF YES -> home page
 
 			response.redirect('/success');
 		} catch (error) {
@@ -37,38 +42,58 @@ export class AuthService {
 		}
 	}
 
-	async getUserInfo(accessToken: string) {
+	//Fetch user info from 42 api with access token
+	async getUserInfo(accessToken: string): Promise<UserInfo> {
 		const userEndpoint = "https://api.intra.42.fr/v2/me";
 
-		try {
-			const response = this.httpService.get(
-				userEndpoint, {
-					headers: {
-						Authorization: `Bearer ${accessToken}`,
-					},
-				}
-			);
+		const fullInfo = await lastValueFrom(this.httpService.get(
+			userEndpoint, {
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+				},
+			}
+		).pipe(
+			map(res => res.data)
+		).pipe(
+			catchError(() => {
+				// Revoir error handling
+				throw new ForbiddenException('Error fetching user info');
+			})
+		));
 
-			return response;
-			// ).pipe(
-			// 	map((response: AxiosResponse) => {
-			// 		console.log('TEST ${accesToken}');
-			// 		const fullInfo = response.data;
+		const userInfo: UserInfo = {
+			userId: fullInfo.id,
+			login: fullInfo.login,
+		};
 
-			// 		console.log(fullInfo);
+		return userInfo;
 
-			// 		const userInfo: UserInfo = {
-			// 			userId: fullInfo.id,
-			// 			login: fullInfo.login,
-			// 		};
+		// try {
+		// 	const response = this.httpService.get(
+		// 		userEndpoint, {
+		// 			headers: {
+		// 				Authorization: `Bearer ${accessToken}`,
+		// 			},
+		// 		}
+		// 	).pipe(
+		// 		map((response: AxiosResponse) => {
+		// 			console.log('TEST ${accesToken}');
+		// 			const fullInfo = response.data;
+
+		// 			console.log(fullInfo);
+
+		// 			const userInfo: UserInfo = {
+		// 				userId: fullInfo.id,
+		// 				login: fullInfo.login,
+		// 			};
 					
-			// 		return userInfo;
-			// 	})
-			// );
-		} catch (error) {
-			// handle error here
-			throw new Error('Failed to fetch user info');
-		}
+		// 			return userInfo;
+		// 		})
+		// 	);
+		// } catch (error) {
+		// 	// handle error here
+		// 	throw new Error('Failed to fetch user info');
+		// }
 	}
 }
 
