@@ -17,5 +17,11 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false
+  },
+  /* for --watch in docker (marche?) */
+  "watchOptions": { 
+	"watchFile": "dynamicprioritypolling", 
+	"watchDirectory": "dynamicprioritypolling", 
+	"fallbackPolling": "dynamicpriority"
   }
 }
