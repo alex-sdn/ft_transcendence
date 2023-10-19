@@ -13,7 +13,7 @@ datasource db {
 
 model User {
 	id			Int @id @default(autoincrement())
-	login42		String
+	login42		String @unique
 	nickname	String
 
 	createdAt	DateTime @default(now())
