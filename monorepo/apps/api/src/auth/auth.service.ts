@@ -1,11 +1,18 @@
 import { HttpService } from "@nestjs/axios";
 import { ForbiddenException, Injectable } from "@nestjs/common";
-import axios, { AxiosResponse } from "axios";
-import { Observable, catchError, lastValueFrom, map } from "rxjs";
+import axios from "axios";
+import { catchError, lastValueFrom, map } from "rxjs";
+import { PrismaService } from "../prisma/prisma.service";
+import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class AuthService {
-	constructor(private httpService: HttpService) {}
+	constructor(
+		private httpService: HttpService,
+		private prisma: PrismaService,
+		private jwt: JwtService,
+		private config: ConfigService) {}
 
 	async handleOAuthCallback(code: string, response) {
 		const tokenEndpoint = 'https://api.intra.42.fr/oauth/token';
@@ -25,17 +32,40 @@ export class AuthService {
 			const accessToken = tokenResponse.data.access_token;
 			const refreshToken = tokenResponse.data.refresh_token; //pour pas avoir a relog
 
-			// GET USER INFO FROM 42API HERE
+			// GET USER INFO FROM 42API
 			const userInfo = await this.getUserInfo(accessToken);
 			console.log(userInfo);
 
 			// CHECK WITH DB IF EXISTS
-
+			const user = await this.prisma.user.findUnique({
+				where: {
+					login42: userInfo.login,
+				},
+			});
 			// IF NOT -> First login page
+			if (!user) {
+				console.log('FIRST CONNECTION')
+				//tmp
+				await this.prisma.user.create({
+					data: {
+						login42: userInfo.login,
+						nickname: "temp"
+					},
+				});
 
+				response.redirect('/firstlogin'); //tmp
+			}
 			// IF YES -> home page
+			else {
+				console.log('USER FOUND');
 
-			response.redirect('/success');
+				response.redirect('/success');
+
+				// return token ?
+				return this.signToken(user.id, user.nickname);
+			}
+
+			// response.redirect('/success'); //tmp
 		} catch (error) {
 			console.error('Token exchange failed:', error);
 			response.redirect('/error');
@@ -94,6 +124,23 @@ export class AuthService {
 		// 	// handle error here
 		// 	throw new Error('Failed to fetch user info');
 		// }
+	}
+
+	async signToken(userId: number, nickname: string) {
+		const payload = {
+			sub: userId,
+			nickname
+		};
+		const secret = this.config.get('JWT_SECRET');
+
+		const token = await this.jwt.signAsync(
+			payload, {
+				expiresIn: '1h',
+				secret: secret
+			}
+		);
+
+		return token;
 	}
 }
 
