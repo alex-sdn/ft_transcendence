@@ -19,4 +19,5 @@ Root folder:
 - in monorepo/apps/api/.env set DATABASE_URL as DOCKER_URL
 - `docker-compose up --build -d` to launch all
 - `docker-compose stop` to stop or `docker-compose down` to delete
-(volume broken)
+
+(volume broken for live dev /!\)
