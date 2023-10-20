@@ -1,30 +1,38 @@
-import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+
+//import './App.css'
+
+import {
+  createBrowserRouter,
+  Route,
+  createRoutesFromElements,
+  RouterProvider
+} from 'react-router-dom'
+
+// pages
+import RootLayout from './layouts/RootLayouts'
+import Home from './pages/Home'
+import Game from './pages/Game'
+import Chat from './pages/Chat'
+import Profile from './pages/Profile'
+import NotFound from './pages/NotFound'
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+      <Route path='/' element={<RootLayout />}>
+          <Route index element={<Home />} />
+          <Route path="game" element={<Game />} />
+          <Route path="chat" element={<Chat />} />
+          <Route path="profile" element={<Profile />} />
+          
+          <Route path='*' element={<NotFound />}/>
+      </Route>
+  )
+)
 
 function App() {
-  const [greeting, setGreeting] = useState('');
-
-  useEffect(() => {
-	fetch('/api')
-		.then((res) => res.text())
-		.then(setGreeting);
-  }, []);
-
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>{greeting}</h1>
-    </>
-  )
+    <RouterProvider router={router} />
+  );
 }
 
 export default App

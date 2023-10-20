@@ -1,0 +1,24 @@
+/*:root {
+   define colors here
+   --red: #ff0f00;
+   
+   usage: 
+   color: var(--red);
+}*/
+
+* {
+    margin: 0;
+}
+
+body {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1em;
+    background-color: black;
+    color: white;
+}
+
+h2 {
+    /*font-family: 'Pixelify Sans', sans-serif;*/
+    color: white;
+    font-size: 2em;
+}
