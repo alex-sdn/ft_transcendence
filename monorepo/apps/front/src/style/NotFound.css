@@ -1,0 +1,14 @@
+.not_found h2 {
+    text-align: center;
+    margin-top: 10em;
+}
+
+.not_found p {
+    margin-top: 3em;
+    text-align: center;
+}
+
+.not_found a {
+    color: white;
+    text-decoration: underline;
+}
