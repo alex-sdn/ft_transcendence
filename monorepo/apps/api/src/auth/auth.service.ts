@@ -12,13 +12,14 @@ export class AuthService {
 		private httpService: HttpService,
 		private prisma: PrismaService,
 		private jwt: JwtService,
-		private config: ConfigService) {}
+		private config: ConfigService) { }
 
-	async handleOAuthCallback(code: string, response) {
+	async handleOAuthCallback(code: string) {
+		console.log("BACKEND CODE:" + code);
 		const tokenEndpoint = 'https://api.intra.42.fr/oauth/token';
 
-		const clientId = 'u-s4t2ud-5aa910e46806ef2878fcc39c28b29ced49eea2c7be64920d660e8ef997c748c0';
-		const clientSecret = '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';
+		const clientId = 'u-s4t2ud-1b7f717c58b58406ad4b2abe9145475069d66ace504146041932a899c47ff960';
+		const clientSecret = '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';
 
 		try {
 			const tokenResponse = await axios.post(tokenEndpoint, {
@@ -26,7 +27,7 @@ export class AuthService {
 				client_id: clientId,
 				client_secret: clientSecret,
 				code: code,
-				redirect_uri: 'http://localhost:3000/api/auth',
+				redirect_uri: 'http://localhost:3000/login',
 			});
 
 			const accessToken = tokenResponse.data.access_token;
@@ -46,20 +47,22 @@ export class AuthService {
 			if (!user) {
 				console.log('FIRST CONNECTION')
 				//tmp
-				await this.prisma.user.create({
-					data: {
-						login42: userInfo.login,
-						nickname: "temp"
-					},
-				});
+				// await this.prisma.user.create({
+				// 	data: {
+				// 		login42: userInfo.login,
+				// 		nickname: "temp"
+				// 	},
+				// });
 
-				response.redirect('/firstlogin'); //tmp
+				return 'notfound';
+				// response.redirect('/firstlogin'); //tmp
 			}
 			// IF YES -> home page
 			else {
 				console.log('USER FOUND');
 
-				response.redirect('/success');
+				// return 'user found!!';
+				// response.redirect('/success');
 
 				// return token ?
 				return this.signToken(user.id, user.nickname);
@@ -68,7 +71,8 @@ export class AuthService {
 			// response.redirect('/success'); //tmp
 		} catch (error) {
 			console.error('Token exchange failed:', error);
-			response.redirect('/error');
+			console.log('failed request');
+			// response.redirect('/error');
 		}
 	}
 
@@ -78,10 +82,10 @@ export class AuthService {
 
 		const fullInfo = await lastValueFrom(this.httpService.get(
 			userEndpoint, {
-				headers: {
-					Authorization: `Bearer ${accessToken}`,
-				},
-			}
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+			},
+		}
 		).pipe(
 			map(res => res.data)
 		).pipe(
@@ -116,7 +120,7 @@ export class AuthService {
 		// 				userId: fullInfo.id,
 		// 				login: fullInfo.login,
 		// 			};
-					
+
 		// 			return userInfo;
 		// 		})
 		// 	);
@@ -135,9 +139,9 @@ export class AuthService {
 
 		const token = await this.jwt.signAsync(
 			payload, {
-				expiresIn: '1h',
-				secret: secret
-			}
+			expiresIn: '1h',
+			secret: secret
+		}
 		);
 
 		return token;

@@ -6,7 +6,7 @@ export class AuthController {
 	constructor(private authService: AuthService) {}
 
 	@Get()
-	handleOAuthCallback(@Query('code') code: string, @Res() response) {
-		return this.authService.handleOAuthCallback(code, response);
+	handleOAuthCallback(@Query('code') code: string) {
+		return this.authService.handleOAuthCallback(code);
 	}
 }
