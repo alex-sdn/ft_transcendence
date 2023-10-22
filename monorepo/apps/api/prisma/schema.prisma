@@ -14,14 +14,18 @@ datasource db {
 model User {
 	id			Int @id @default(autoincrement())
 	login42		String @unique
-	nickname	String
+	nickname	String @unique
 
 	createdAt	DateTime @default(now())
 	//upatedAt	DateTime @updatedAt
+
+	has2fa		Boolean @default(false)
+	//code2fa   ???
 
 	win			Int @default(0)
 	loss		Int @default(0)
 	LP			Int @default(100)
 
 	//friends	User[] ?
+	//channels	Channel[]
 }
