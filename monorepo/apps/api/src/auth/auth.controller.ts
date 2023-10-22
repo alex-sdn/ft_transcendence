@@ -7,12 +7,19 @@ export class AuthController {
 	constructor(private authService: AuthService) {}
 
 	@Get()
-	handleOAuthCallback(@Query('code') code: string, @Res() response) {
-		return this.authService.handleOAuthCallback(code, response);
+	handleOAuthCallback(@Query('code') code: string) {
+		return this.authService.handleOAuthCallback(code);
 	}
 
-	@Post('signup')
-	signup(@Body() dto: AuthDto) {
-		return this.authService.signup(dto);
+	// Nickname selection for first login
+	// @Post('signup')
+	// signup(@Body() dto: AuthDto) {
+	// 	return this.authService.signup(dto);
+	// }
+
+	// 2FA
+	@Post('signin')
+	signin(@Body() dto: any) {
+		return this.authService.signin(dto);
 	}
 }
