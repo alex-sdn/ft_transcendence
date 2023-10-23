@@ -13,7 +13,7 @@ export class AuthService {
 		private httpService: HttpService,
 		private prisma: PrismaService,
 		private jwt: JwtService,
-		private config: ConfigService) {}
+		private config: ConfigService) { }
 
 	async handleOAuthCallback(code: string): Promise<{
 		access_token: string | undefined,
@@ -123,10 +123,10 @@ export class AuthService {
 
 		const fullInfo = await lastValueFrom(this.httpService.get(
 			userEndpoint, {
-				headers: {
-					Authorization: `Bearer ${accessToken}`,
-				},
-			}
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+			},
+		}
 		).pipe(
 			map(res => res.data)
 		).pipe(
@@ -135,7 +135,6 @@ export class AuthService {
 				throw new ForbiddenException('Error fetching user info');
 			})
 		));
-
 		// const userInfo: UserInfo = {
 		// 	userId: fullInfo.id,
 		// 	login: fullInfo.login,
@@ -153,9 +152,9 @@ export class AuthService {
 
 		const token = await this.jwt.signAsync(
 			payload, {
-				expiresIn: '1h',
-				secret: secret
-			}
+			expiresIn: '1h',
+			secret: secret
+		}
 		);
 		return token;
 	}
