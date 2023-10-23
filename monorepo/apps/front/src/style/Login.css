@@ -1,0 +1,9 @@
+.login {
+    margin-top: 10em;
+    text-align: center;
+}
+
+.login a {
+    text-decoration: none;
+    color: white;
+}
