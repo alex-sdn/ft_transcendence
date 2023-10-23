@@ -7,6 +7,7 @@ import App from './App.tsx'
 import './style/header.css';
 import './style/index.css';
 import './style/NotFound.css';
+import './style/Login.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root')!);
 root.render(
