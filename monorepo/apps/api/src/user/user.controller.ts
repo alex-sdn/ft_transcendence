@@ -1,7 +1,8 @@
-import { Controller, Get, Param, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { Request } from "express";
 import { UserService } from "./user.service";
+import { EditNicknameDto } from "./dto";
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('user')
@@ -18,5 +19,17 @@ export class UserController {
 		return this.userService.getUser(nickname);
 	}
 
-	//add patch requests ? (nickname / avatar / 2fa)
+	@Patch('me/editNickname')
+	editNickname(@Req() req: Request, @Body() dto: EditNicknameDto) {
+		return this.userService.editNickname(req.user, dto.nickname);
+	}
+
+	// @Patch('me/editAvatar')
+	// editAvatar() {}
+
+	@Post('me/2fa')
+	set2fa() { return 'set 2fa endpoint'; }
+
+	// @Delete('me/2fa')
+	// delete2fa() {}
 }
