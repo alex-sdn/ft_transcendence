@@ -5,7 +5,6 @@ import { catchError, lastValueFrom, map } from "rxjs";
 import { PrismaService } from "../prisma/prisma.service";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
-import { AuthDto } from "./dto";
 import { User } from "@prisma/client";
 
 @Injectable()
