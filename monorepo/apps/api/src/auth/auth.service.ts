@@ -21,7 +21,7 @@ export class AuthService {
 		newUser: boolean,
 		has2fa: boolean
 	}> {
-		console.log('Query=', code);
+		console.log('Query='+code);
 		const tokenEndpoint = 'https://api.intra.42.fr/oauth/token';
 
 		const clientId = 'u-s4t2ud-1b7f717c58b58406ad4b2abe9145475069d66ace504146041932a899c47ff960';
@@ -36,7 +36,7 @@ export class AuthService {
 				code: code,
 				redirect_uri: 'http://localhost:3000/login',
 			});
-
+			
 			const accessToken = tokenResponse.data.access_token;
 			const refreshToken = tokenResponse.data.refresh_token; //pour pas avoir a relog
 
