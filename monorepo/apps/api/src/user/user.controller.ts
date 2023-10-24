@@ -3,6 +3,7 @@ import { AuthGuard } from "@nestjs/passport";
 import { Request } from "express";
 import { UserService } from "./user.service";
 import { EditNicknameDto } from "./dto";
+import { TwoFactorDto } from "../auth/dto";
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('user')
@@ -27,9 +28,21 @@ export class UserController {
 	// @Patch('me/editAvatar')
 	// editAvatar() {}
 
-	@Post('me/2fa')
-	set2fa() { return 'set 2fa endpoint'; }
+	@Post('me/edit2fa')
+	generate2fa(@Req() req: Request) {
+		// Generate secret and return QR code
+		return this.userService.generate2fa(req.user);
+	}
 
-	// @Delete('me/2fa')
-	// delete2fa() {}
+	@Post('me/activate2fa')
+	activate2fa(@Req() req: Request, @Body() dto: TwoFactorDto) {
+		// Receive code and compare to newly generated secret
+		return this.userService.activate2fa(req.user, dto.code);
+	}
+
+	@Delete('me/edit2fa')
+	delete2fa(@Req() req: Request) {
+		return this.userService.delete2fa(req.user);
+	}
+
 }

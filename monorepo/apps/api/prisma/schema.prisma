@@ -20,7 +20,7 @@ model User {
 	//upatedAt	DateTime @updatedAt
 
 	has2fa		Boolean @default(false)
-	//code2fa   ???
+	secret2fa	String?
 
 	win			Int @default(0)
 	loss		Int @default(0)

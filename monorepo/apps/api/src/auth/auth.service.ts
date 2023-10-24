@@ -6,6 +6,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { User } from "@prisma/client";
+import * as speakeasy from "speakeasy";
 
 @Injectable()
 export class AuthService {
@@ -95,8 +96,21 @@ export class AuthService {
 	// }
 
 	// Finish signin with 2FA
-	signin(dto: any) {
-		// return jwt?
+	async signin(user: any, code: string) {
+		const secret = user.secret2fa;
+
+		const isValid = speakeasy.totp.verify({
+			secret,
+			encoding: 'base32',
+			token: code,
+		});
+
+		if (isValid) {
+			// return full access token
+			return await this.signToken(user.id, user.nickname, false);
+		}
+		// return value if wrong ??
+		throw new ForbiddenException('2FA_CODE_INCORRECT',);
 	}
 
 	async createUser(login42: string, nickname: string): Promise<User> {
