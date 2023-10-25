@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { Request } from "express";
 import { UserService } from "./user.service";
 import { EditNicknameDto } from "./dto";
 import { TwoFactorDto } from "../auth/dto";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('user')
@@ -25,8 +26,11 @@ export class UserController {
 		return this.userService.editNickname(req.user, dto.nickname);
 	}
 
-	// @Patch('me/editAvatar')
-	// editAvatar() {}
+	@UseInterceptors(FileInterceptor('avatar'))
+	@Patch('me/editAvatar')
+	editAvatar(@Req() req: Request, @UploadedFile() file) {
+		return this.userService.editAvatar(req.user, file.buffer);
+	}
 
 	@Post('me/edit2fa')
 	generate2fa(@Req() req: Request) {

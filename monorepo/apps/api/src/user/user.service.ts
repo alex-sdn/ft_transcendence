@@ -50,6 +50,24 @@ export class UserService {
 		};
 	}
 
+	async editAvatar(user, avatar) {
+		try {
+			await this.prisma.user.update({
+				where: {
+					id: user.id,
+				},
+				data: {
+					avatar: avatar,
+				}
+			});
+			// return value ?
+			return 'success';
+		} catch(error) {
+			throw new Error('Failed to change avatar');
+		}		
+	}
+
+
 	async generate2fa(user) {
 		if (user.has2fa === true)
 			throw new HttpException('2FA_ALREADY_ACTIVATED', HttpStatus.CONFLICT);
