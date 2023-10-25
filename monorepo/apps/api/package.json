@@ -31,11 +31,14 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/serve-static": "^4.0.0",
     "@prisma/client": "^5.4.2",
+    "@speakeasy-api/speakeasy-typescript-sdk": "^1.4.0",
     "class-validator": "^0.14.0",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
+    "qrcode": "^1.5.3",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "speakeasy": "^2.0.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

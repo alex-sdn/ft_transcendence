@@ -1,5 +1,8 @@
-import { Body, Controller, Get, Post, Query, Res } from "@nestjs/common";
+import { Body, Controller, Get, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
+import { Request } from "express";
 import { AuthService } from "./auth.service";
+import { TwoFactorDto } from "./dto";
+import { AuthGuard } from "@nestjs/passport";
 
 @Controller('auth')
 export class AuthController {
@@ -17,8 +20,9 @@ export class AuthController {
 	// }
 
 	// 2FA
-	@Post('signin')
-	signin(@Body() dto: any) {
-		return this.authService.signin(dto);
+	@UseGuards(AuthGuard('jwt-2fa'))
+	@Get('signin/2fa')
+	signin(@Req() req: Request, @Body() dto: TwoFactorDto) {
+		return this.authService.signin(req.user, dto.code);
 	}
 }
