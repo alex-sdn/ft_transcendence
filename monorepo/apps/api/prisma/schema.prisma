@@ -11,6 +11,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Statuses {
+	online
+	offline
+	ingame
+}
+
+enum GameType {
+	ranked
+	casual
+}
+
+enum ChatAccess {
+	public
+	private
+	protected
+}
+
 model User {
 	id			Int @id @default(autoincrement())
 	login42		String @unique
@@ -23,10 +40,67 @@ model User {
 	has2fa		Boolean @default(false)
 	secret2fa	String?
 
+	// status		Statuses  ???
+
 	win			Int @default(0)
 	loss		Int @default(0)
 	LP			Int @default(100)
 
-	//friends	User[] ?
-	//channels	Channel[]
+	// friendsId	Int[]
+	// friends		User[] @relation("Friends", references: [id])
+	// blocks		User[]
+
+	matches		Match[]
+
+	channels	Channel[]
+	admin		Admin?
+	banned		Banned?	
 }
+
+model Match {
+	id			Int @id @default(autoincrement())
+	date		DateTime @default(now())
+
+	players		User[]
+
+	// p1LP		Int    need ?
+	// p2LP		Int
+
+	p1score		Int
+	p2score		Int
+
+	type		GameType
+}
+
+model Channel {
+	id			Int @id @default(autoincrement())
+	name		String @unique
+
+	access		ChatAccess
+	password	String?
+
+	members		User[]
+	admins		Admin[]
+	bans		Banned[]
+	// bans		User[]
+	
+	// invites ???
+}
+
+model Admin {
+	id			Int @id @default(autoincrement())
+	userId		Int @unique
+
+	user		User @relation(fields: [userId], references: [id])
+	channel		Channel[]
+}
+
+model Banned {
+	id			Int @id @default(autoincrement())
+	userId		Int @unique
+
+	user		User @relation(fields: [userId], references: [id])
+	channel		Channel[]
+}
+
+// model Member {}
