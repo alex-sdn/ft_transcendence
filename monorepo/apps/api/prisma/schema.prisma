@@ -63,8 +63,8 @@ model Match {
 
 	players		User[]
 
-	// p1LP		Int    need ?
-	// p2LP		Int
+	p1LP		Int  //at start of game ? save gain/loss ?
+	p2LP		Int
 
 	p1score		Int
 	p2score		Int
@@ -79,10 +79,10 @@ model Channel {
 	access		ChatAccess
 	password	String?
 
+	// owner		User
 	members		User[]
 	admins		Admin[]
 	bans		Banned[]
-	// bans		User[]
 	
 	// invites ???
 }
