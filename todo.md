@@ -1,11 +1,11 @@
-## TO DO : 
+# TO DO : 
 
-# GENERAL :
+## GENERAL :
 
 - [ ] hashing
 
-# CHAT (Solene & Alex) :  
+## CHAT (Solene & Alex) :  
 
 
 
-# GAME (Yahui & Sacha) :
+## GAME (Yahui & Sacha) :
