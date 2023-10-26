@@ -21,6 +21,7 @@ export class UserService {
 		if (!user)
 			throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
 
+		delete user.secret2fa;
 		return user;
 	}
 
