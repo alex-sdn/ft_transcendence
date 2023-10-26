@@ -1,8 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { Request } from "express";
 import { UserService } from "./user.service";
 import { EditNicknameDto } from "./dto";
+import { TwoFactorDto } from "../auth/dto";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('user')
@@ -25,12 +27,27 @@ export class UserController {
 		return this.userService.editNickname(req.user, dto.nickname);
 	}
 
-	// @Patch('me/editAvatar')
-	// editAvatar() {}
+	@UseInterceptors(FileInterceptor('avatar'))
+	@Patch('me/editAvatar')
+	editAvatar(@Req() req: Request, @UploadedFile() file) {
+		return this.userService.editAvatar(req.user, file.buffer);
+	}
 
-	@Post('me/2fa')
-	set2fa() { return 'set 2fa endpoint'; }
+	@Post('me/edit2fa')
+	generate2fa(@Req() req: Request) {
+		// Generate secret and return QR code
+		return this.userService.generate2fa(req.user);
+	}
 
-	// @Delete('me/2fa')
-	// delete2fa() {}
+	@Post('me/activate2fa')
+	activate2fa(@Req() req: Request, @Body() dto: TwoFactorDto) {
+		// Receive code and compare to newly generated secret
+		return this.userService.activate2fa(req.user, dto.code);
+	}
+
+	@Delete('me/edit2fa')
+	delete2fa(@Req() req: Request) {
+		return this.userService.delete2fa(req.user);
+	}
+
 }
