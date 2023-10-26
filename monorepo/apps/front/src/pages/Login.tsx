@@ -8,11 +8,11 @@ const Login: React.FC = () => {
     const authURL = "/api/auth?code=" + code;
     const navigate = useNavigate();
     fetch(authURL)
-        .then(response => response.text()) // Ensure the response is treated as text
+        .then(response => response.json()) // Ensure the response is treated as text
         .then(data => {
             // 'data' will be the string returned by the backend
-            if (data === 'notfound')
-                return navigate('/username');
+            if (data.newUser === true)
+                return navigate('/nickname');
             console.log(data);
             // You can then set it in your component's state or use it as needed.
         })
