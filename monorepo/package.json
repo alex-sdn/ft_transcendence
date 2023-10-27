@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "@types/js-cookie": "^3.0.5",
     "turbo": "^1.10.15"
   },
   "scripts": {
@@ -16,7 +17,9 @@
   "dependencies": {
     "@nestjs/axios": "^3.0.0",
     "axios": "^1.5.1",
+    "cookie": "^0.5.0",
     "g": "^2.0.1",
+    "js-cookie": "^3.0.5",
     "qrcode": "^1.5.3",
     "speakeasy": "^2.0.0"
   }
