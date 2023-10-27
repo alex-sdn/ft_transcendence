@@ -1,0 +1,4 @@
+.ProfilePicture img {
+    width:200px;
+    clip-path:ellipse(50% 50%);
+}

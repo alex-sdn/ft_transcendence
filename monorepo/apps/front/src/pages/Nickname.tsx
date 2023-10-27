@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Form, redirect } from "react-router-dom";
 
-const Username: React.FC = () => {
-    const [formData, setFormData] = useState({ username: '' });
+const Nickname: React.FC = () => {
+    const [newNickname, setnewNickname] = useState({ nickname: '' });
 
-    const handleFormSubmit = async (event: React.FormEvent) => {
+    const handleNicknameSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         try {
             const response = await fetch('/api/user/me/editNickname', {
@@ -13,38 +13,38 @@ const Username: React.FC = () => {
                     'Content-Type': 'application/json',
                     //'Authorization': Bearer token,
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(newNickname),
             });
             if (response.ok) {
-                return redirect('/')
+                //if 2fa === true => redirect 2fa
+                return redirect('/profile_picture')
             } else {
-                return { error: 'Username already taken' };
+                return { error: 'Nickname already taken' };
             }
         } catch (error) {
-            console.error('Erreur lors de la requête:', error);
-            // Gérer les erreurs de requête ici
+            console.error('Error during request:', error);
         }
     };
 
-    const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({
-            ...formData,
-            username: event.target.value,
+    const handleNicknameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setnewNickname({
+            ...newNickname,
+            nickname: event.target.value,
         });
     };
 
     return (
         <div>
-            <Form method="post" action="/username" onSubmit={handleFormSubmit}>
+            <Form method="post" action="/username" onSubmit={handleNicknameSubmit}>
                 <label>
                     <p>
-                        <span>Username:</span>
+                        <span>Nickname:</span>
                     </p>
                     <p>
                         <input type="text"
-                            name="username"
-                            value={formData.username}
-                            onChange={handleUsernameChange}
+                            name="nickname"
+                            value={newNickname.nickname}
+                            onChange={handleNicknameChange}
                             required />
                     </p>
                 </label>
@@ -56,4 +56,4 @@ const Username: React.FC = () => {
     );
 }
 
-export default Username;
+export default Nickname;
