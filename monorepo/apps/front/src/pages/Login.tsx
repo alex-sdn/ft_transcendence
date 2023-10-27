@@ -1,4 +1,5 @@
 import React from 'react';
+import Cookies from 'js-cookie'
 import { useSearchParams, useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
@@ -7,18 +8,24 @@ const Login: React.FC = () => {
 
     const authURL = "/api/auth?code=" + code;
     const navigate = useNavigate();
-    fetch(authURL)
+    if (code) {
+        fetch(authURL)
         .then(response => response.json()) // Ensure the response is treated as text
         .then(data => {
             // 'data' will be the string returned by the backend
-            if (data.newUser === true)
+            // rajouter token dans cookie
+            Cookies.set("jwt-token", data.access_token, { expires: 1});
+            if (data.newUser)
                 return navigate('/nickname');
-            console.log(data);
+            else if (data.has2fa)
+                return navigate('/game');
+            return navigate('/');
             // You can then set it in your component's state or use it as needed.
         })
         .catch(error => {
             console.error('Error:', error);
         });
+    }
 
     return (
         <h2 className='login'>
