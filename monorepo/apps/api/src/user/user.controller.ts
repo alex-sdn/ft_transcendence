@@ -14,7 +14,6 @@ export class UserController {
 	@Get('me')
 	getMe(@Req() req: Request) {
 		return req.user;
-		//chercher le user dans la base de donnees a partir de l'uuid et le retourner en tant qu'objet (attention a pas renvoyer psswrd)
 	}
 
 	@Get(':nickname')
