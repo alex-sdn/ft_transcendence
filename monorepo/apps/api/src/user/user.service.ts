@@ -4,6 +4,8 @@ import { AuthService } from "../auth/auth.service";
 import { PrismaService } from "../prisma/prisma.service";
 import * as speakeasy from "speakeasy";
 import * as qrcode from "qrcode";
+import { Response } from "express";
+import * as path from "path";
 
 
 @Injectable()
@@ -21,6 +23,7 @@ export class UserService {
 		if (!user)
 			throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
 
+		delete user.secret2fa;
 		return user;
 	}
 
@@ -50,14 +53,22 @@ export class UserService {
 		};
 	}
 
-	async editAvatar(user, avatar) {
+	async getAvatar(filename: string, res: Response) {
+		const filePath = path.join(__dirname, '../../uploads/', filename);
+
+		res.download(filePath, filename, (err) => {
+			if (err) { res.status(500).send('Error downloading file') };
+		});
+	}
+
+	async editAvatar(user, filename: string) {
 		try {
 			await this.prisma.user.update({
 				where: {
 					id: user.id,
 				},
 				data: {
-					avatar: avatar,
+					avatar: filename,
 				}
 			});
 			// return value ?
@@ -66,7 +77,6 @@ export class UserService {
 			throw new Error('Failed to change avatar');
 		}		
 	}
-
 
 	async generate2fa(user) {
 		if (user.has2fa === true)
