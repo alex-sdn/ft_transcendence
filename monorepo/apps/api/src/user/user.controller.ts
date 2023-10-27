@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
-import { Request } from "express";
+import { Request, Response } from "express";
 import { UserService } from "./user.service";
 import { EditNicknameDto } from "./dto";
 import { TwoFactorDto } from "../auth/dto";
@@ -14,7 +14,6 @@ export class UserController {
 	@Get('me')
 	getMe(@Req() req: Request) {
 		return req.user;
-		//chercher le user dans la base de donnees a partir de l'uuid et le retourner en tant qu'objet (attention a pas renvoyer psswrd)
 	}
 
 	@Get(':nickname')
@@ -27,10 +26,15 @@ export class UserController {
 		return this.userService.editNickname(req.user, dto.nickname);
 	}
 
-	@UseInterceptors(FileInterceptor('avatar'))
+	@Get('avatar/:filename')
+	async getAvatar(@Param('filename') filename: string, @Res() res: Response) {
+		return this.userService.getAvatar(filename, res);
+	}
+
+	@UseInterceptors(FileInterceptor('avatar', {dest: 'uploads/'}))
 	@Patch('me/editAvatar')
 	editAvatar(@Req() req: Request, @UploadedFile() file) {
-		return this.userService.editAvatar(req.user, file.buffer);
+		return this.userService.editAvatar(req.user, file.filename);
 	}
 
 	@Post('me/edit2fa')

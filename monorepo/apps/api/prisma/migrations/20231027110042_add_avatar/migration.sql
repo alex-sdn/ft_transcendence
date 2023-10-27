@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "avatar" SET DEFAULT '2b0cbcccb65ab6401707972d3ca91db7',
+ALTER COLUMN "avatar" SET DATA TYPE TEXT;
