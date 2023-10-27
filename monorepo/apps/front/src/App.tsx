@@ -18,7 +18,8 @@ import Chat from './pages/Chat'
 import Profile from './pages/Profile'
 import NotFound from './pages/NotFound'
 import Login from './pages/Login'
-import Username from './pages/Username'
+import Nickname from './pages/Nickname'
+import ProfilePicture from './pages/ProfilePicture'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -28,7 +29,8 @@ const router = createBrowserRouter(
       <Route path="chat" element={<Chat />} />
       <Route path="profile" element={<Profile />} />
       <Route path="login" element={<Login />} />
-      <Route path="username" element={<Username />} />
+      <Route path="nickname" element={<Nickname />} />
+      <Route path="profile_picture" element={<ProfilePicture />} />
       <Route path='*' element={<NotFound />} />
     </Route>
   )
