@@ -34,7 +34,6 @@ export class UserController {
 	@UseInterceptors(FileInterceptor('avatar', {dest: 'uploads/'}))
 	@Patch('me/editAvatar')
 	editAvatar(@Req() req: Request, @UploadedFile() file) {
-		// verif file format + size etc ?
 		return this.userService.editAvatar(req.user, file.filename);
 	}
 
