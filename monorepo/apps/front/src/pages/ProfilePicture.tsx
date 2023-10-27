@@ -5,35 +5,38 @@ import Cookies from "js-cookie";
 
 const ProfilePicture: React.FC = () => {
     const jwtToken = Cookies.get('jwt-token');
-    const [imageUploaded, setImageUploaded] = useState<File>();
-    const [imageDisplayed, setImageDisplayed] = useState<string>();
+    const [image, setImage] = useState<File>();
     const navigate = useNavigate();
-
-    const defaultAvatar = async () => {
-        const res = await axios.get('/api/user/me', {
-            headers: {
-                'Authorization': 'Bearer ' + jwtToken,
-            },
-        },);
-        console.log('on entre dans DefautAvatar', res.data.avatar.data, 'type : ', typeof res.data.avatar.data);
-        const textDecoder = new TextDecoder('utf-8');
-        const imageText = textDecoder.decode(res.data.avatar.data);
-        console.log(imageText);
-        return imageText;
-    }
 
     useEffect(() => {
         const fetchDefaultAvatar = async () => {
-            const avatarString = await defaultAvatar();
-            setImageDisplayed(avatarString);
+            let response = await axios.get('/api/user/me', {
+                headers: {
+                    'Authorization': 'Bearer ' + jwtToken,
+                },
+            },);
+            const fileName = response.data.avatar;
+
+            response = await axios.get('api/user/avatar/' + fileName, {
+                headers: {
+                    'Authorization': 'Bearer ' + jwtToken,
+                },
+                responseType: 'arraybuffer',
+            });
+            if (response.status === 200) {
+                const blob = new Blob([response.data]);
+                const file = new File([blob], fileName);
+                setImage(file);
+            }
         };
         fetchDefaultAvatar();
     }, []);
 
     const selectImageHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files?.[0]) {
-            setImageDisplayed(URL.createObjectURL(event.target.files?.[0]));
+            setImage(event.target.files?.[0]);
         }
+        //check size of the image
     };
 
     const changeImageHandler = async (event: React.FormEvent) => {
@@ -60,11 +63,7 @@ const ProfilePicture: React.FC = () => {
     return (
         <div className='ProfilePicture'>
             <h2>Choose a profile picture:</h2>
-            {imageDisplayed ? (
-                <img src={imageDisplayed} alt='profile picture' />
-            ) : (
-                <img src={defaultAvatar()} alt='default avatar' />
-            )}
+            {image && <img src={URL.createObjectURL(image)} alt='profile picture' />}
             <Form encType='multipart/form-data' onSubmit={changeImageHandler}>
                 <p><input type="file" accept='image/*' onChange={selectImageHandler} /></p>
                 <p><button type='submit'>Save changes</button></p>
