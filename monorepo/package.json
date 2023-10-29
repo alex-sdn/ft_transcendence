@@ -1,5 +1,7 @@
 {
   "devDependencies": {
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
     "turbo": "^1.10.15"
   },
   "scripts": {
@@ -15,9 +17,11 @@
   ],
   "dependencies": {
     "@nestjs/axios": "^3.0.0",
+    "@nestjs/swagger": "^7.1.14",
     "axios": "^1.5.1",
     "g": "^2.0.1",
     "qrcode": "^1.5.3",
-    "speakeasy": "^2.0.0"
+    "speakeasy": "^2.0.0",
+    "swagger-ui-express": "^5.0.0"
   }
 }
