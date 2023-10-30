@@ -1,16 +1,42 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Form, useNavigate } from "react-router-dom"
-import DefaultProfilePicture from '../images/DefaultProfilePicture.jpg'
+import Cookies from "js-cookie";
 
 const ProfilePicture: React.FC = () => {
-    const [image, setImage] = useState<string | undefined>(DefaultProfilePicture);
+    const jwtToken = Cookies.get('jwt-token');
+    const [image, setImage] = useState<File>();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchDefaultAvatar = async () => {
+            let response = await axios.get('/api/user/me', {
+                headers: {
+                    'Authorization': 'Bearer ' + jwtToken,
+                },
+            },);
+            const fileName = response.data.avatar;
+
+            response = await axios.get('api/user/avatar/' + fileName, {
+                headers: {
+                    'Authorization': 'Bearer ' + jwtToken,
+                },
+                responseType: 'arraybuffer',
+            });
+            if (response.status === 200) {
+                const blob = new Blob([response.data]);
+                const file = new File([blob], fileName);
+                setImage(file);
+            }
+        };
+        fetchDefaultAvatar();
+    }, []);
 
     const selectImageHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files?.[0]) {
-            setImage(URL.createObjectURL(event.target.files?.[0]));
+            setImage(event.target.files?.[0]);
         }
+        //check size of the image
     };
 
     const changeImageHandler = async (event: React.FormEvent) => {
@@ -18,25 +44,26 @@ const ProfilePicture: React.FC = () => {
 
         if (image) {
             const formData = new FormData();
-            formData.append("file", image);
-        }
-        try {
-            const response = await axios.post('endpoint', FormData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            if (response.ok)
-                navigate('/');
-        } catch (error) {
-            //handle error here
+            formData.append("avatar", image);
+            try {
+                const response = await axios.patch('/api/user/me/editAvatar', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': 'Bearer ' + jwtToken,
+                    },
+                });
+                if (response.status === 200)
+                    navigate('/');
+            } catch (error) {
+                console.log(error);
+            }
         }
     };
 
     return (
         <div className='ProfilePicture'>
             <h2>Choose a profile picture:</h2>
-            {image && <img src={image} alt='profile picture'/>}
+            {image && <img src={URL.createObjectURL(image)} alt='profile picture' />}
             <Form encType='multipart/form-data' onSubmit={changeImageHandler}>
                 <p><input type="file" accept='image/*' onChange={selectImageHandler} /></p>
                 <p><button type='submit'>Save changes</button></p>

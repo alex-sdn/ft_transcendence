@@ -1,23 +1,27 @@
 import React, { useState } from "react";
-import { Form, redirect } from "react-router-dom";
+import Cookies from "js-cookie";
+import { Form, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Nickname: React.FC = () => {
     const [newNickname, setnewNickname] = useState({ nickname: '' });
+    const jwtToken = Cookies.get('jwt-token');
+    const navigate = useNavigate();
 
     const handleNicknameSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         try {
-            const response = await fetch('/api/user/me/editNickname', {
-                method: 'PATCH',
+            const response = await axios.patch('/api/user/me/editNickname',
+                JSON.stringify(newNickname), {
                 headers: {
                     'Content-Type': 'application/json',
-                    //'Authorization': Bearer token,
+                    'Authorization': 'Bearer ' + jwtToken,
                 },
-                body: JSON.stringify(newNickname),
             });
-            if (response.ok) {
+            console.log(response);
+            if (response.status === 200) {
                 //if 2fa === true => redirect 2fa
-                return redirect('/profile_picture')
+                return navigate('/profile_picture')
             } else {
                 return { error: 'Nickname already taken' };
             }
