@@ -3,6 +3,7 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
     "prisma-dbml-generator": "^0.10.0",
+    "@types/js-cookie": "^3.0.5",
     "turbo": "^1.10.15"
   },
   "scripts": {
@@ -20,7 +21,9 @@
     "@nestjs/axios": "^3.0.0",
     "@nestjs/swagger": "^7.1.14",
     "axios": "^1.5.1",
+    "cookie": "^0.5.0",
     "g": "^2.0.1",
+    "js-cookie": "^3.0.5",
     "qrcode": "^1.5.3",
     "speakeasy": "^2.0.0",
     "swagger-ui-express": "^5.0.0"
