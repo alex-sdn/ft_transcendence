@@ -29,7 +29,6 @@ Root folder:
 aim: visualize our database relationship diagrams
 - in monorepo/apps/api/ npx prisma generate (or if you're lazy make prisma)
 - copy paste the content of the generated file api/prisma/dbml/schema.dbml in https://dbdiagram.io/
-(IF "prisma-dbml-generator: not found" --> npm install -D prisma-dbml-generator)
 
 ### PRISMA STUDIO
 

@@ -107,7 +107,3 @@ model Banned {
 }
 
 // model Member {}
-
-generator dbml {
-  provider = "prisma-dbml-generator"
-}
