@@ -90,11 +90,6 @@ export class AuthService {
 		}
 	}
 
-	// Pick a nickname (or keep 42 login) // Do this in /user ???
-	// async signup(dto: AuthDto) {
-	// 	// const user = await this.prisma.user.create({})
-	// }
-
 	// Finish signin with 2FA
 	async signin(user: any, code: string) {
 		const secret = user.secret2fa;
@@ -149,13 +144,10 @@ export class AuthService {
 				throw new ForbiddenException('Error fetching user info');
 			})
 		));
-		// const userInfo: UserInfo = {
-		// 	userId: fullInfo.id,
-		// 	login: fullInfo.login,
-		// };
 		return fullInfo.login;
 	}
 
+	// create JWT
 	async signToken(userId: number, nickname: string, need2fa: boolean) {
 		const payload = {
 			userId,
@@ -168,14 +160,35 @@ export class AuthService {
 			payload, {
 			expiresIn: '6h',
 			secret: secret
-		}
+			}
 		);
 		return token;
 	}
-}
 
-//move elsewhere ?  // just login ?
-// interface UserInfo {
-// 	userId: string;
-// 	login: string;
-// }
+	// verify JWT (for chat websocket only)
+	async validateToken(bearerToken: string) {
+		try {
+			if (!bearerToken)
+				return null;
+
+			const token = bearerToken.split(' ')[1];
+			const secret = this.config.get('JWT_SECRET')
+			const decoded = this.jwt.verify(token, {secret: secret} );
+			
+			if (decoded.need2fa === true)
+				return null;
+
+			const user = await this.prisma.user.findUnique({
+				where: {
+					id: decoded.userId,
+				},
+			});
+
+			// delete unnecessary info
+			delete user.secret2fa;
+			return user;
+		} catch(error) {
+			console.log('ERROR VALIDATING WS TOKEN', error);
+		}
+	}
+}
