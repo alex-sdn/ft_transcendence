@@ -11,8 +11,8 @@ dev:
 prisma:
 	@cd apps/api && npx prisma generate
 
-dbml:
-	@cd monorepo/apps/api/ && npx prisma generate
+studio:
+	@cd apps/api && npx prisma studio
 
 clean:
 	@npm run db:stop

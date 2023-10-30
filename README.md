@@ -27,14 +27,20 @@ Root folder:
 ### DBDIAGRAM.IO 
 
 aim: visualize our database relationship diagrams
-- in monorepo/apps/api/ npx prisma generate (or if you're lazy make dbml)
-- go to https://dbdiagram.io/
+- in monorepo/apps/api/ npx prisma generate (or if you're lazy make prisma)
 - copy paste the content of the generated file api/prisma/dbml/schema.dbml in https://dbdiagram.io/
+(IF "prisma-dbml-generator: not found" --> npm install -D prisma-dbml-generator)
+
+### PRISMA STUDIO
+
+aim: visual editor of database
+- in monorepo/apps/api/ npx prisma studio (or make studio)
+(localhost:5555 in browser won't work)
 
 ### SWAGGER
 
-aim: visualize our API's resources
-- in your browser, type "http://localhost:3000/api"
+aim: visualize all our API's resources
+- in your browser, "http://localhost:3000/api"
 
 ### INSOMNIA
 
