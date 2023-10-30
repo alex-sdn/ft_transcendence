@@ -1,0 +1,29 @@
+.sidebar {
+    height: 100vh;
+    background-color: white;
+    position: fixed;
+    width: 200px;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar h2 {
+    color: black;
+}
+
+.sidebar a {
+    display: block;
+    color: black;
+    padding: 10px;
+    text-decoration: none;
+}
+
+.sidebar a.active {
+    color: white;
+    background-color: black;
+}
+
+.sidebar a:hover:not(.active) {
+    color: white;
+    background-color: black;
+}
