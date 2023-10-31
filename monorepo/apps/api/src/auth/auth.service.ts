@@ -191,4 +191,16 @@ export class AuthService {
 			console.log('ERROR VALIDATING WS TOKEN', error);
 		}
 	}
+
+
+	// FOR TESTING ! returns jwt for given nickname
+	async genToken(nickname: string) {
+		const user = await this.prisma.user.findUnique({
+			where: {nickname}
+		});
+		if (!user)
+			return null;
+
+		return await this.signToken(user.id, user.nickname, false);
+	}
 }
