@@ -1,0 +1,76 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id Int [pk, increment]
+  login42 String [unique, not null]
+  nickname String [unique, not null]
+  avatar String [not null, default: '2b0cbcccb65ab6401707972d3ca91db7']
+  createdAt DateTime [default: `now()`, not null]
+  has2fa Boolean [not null, default: false]
+  secret2fa String
+  win Int [not null, default: 0]
+  loss Int [not null, default: 0]
+  LP Int [not null, default: 100]
+  matches Match [not null]
+  channels Channel [not null]
+  admin Admin
+  banned Banned
+}
+
+Table Match {
+  id Int [pk, increment]
+  date DateTime [default: `now()`, not null]
+  players User [not null]
+  p1LP Int [not null]
+  p2LP Int [not null]
+  p1score Int [not null]
+  p2score Int [not null]
+  type GameType [not null]
+}
+
+Table Channel {
+  id Int [pk, increment]
+  name String [unique, not null]
+  access ChatAccess [not null]
+  password String
+  members User [not null]
+  admins Admin [not null]
+  bans Banned [not null]
+}
+
+Table Admin {
+  id Int [pk, increment]
+  userId Int [unique, not null]
+  user User [not null]
+  channel Channel [not null]
+}
+
+Table Banned {
+  id Int [pk, increment]
+  userId Int [unique, not null]
+  user User [not null]
+  channel Channel [not null]
+}
+
+Enum Statuses {
+  online
+  offline
+  ingame
+}
+
+Enum GameType {
+  ranked
+  casual
+}
+
+Enum ChatAccess {
+  public
+  private
+  protected
+}
+
+Ref: Admin.userId - User.id
+
+Ref: Banned.userId - User.id
