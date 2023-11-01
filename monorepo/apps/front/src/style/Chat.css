@@ -27,3 +27,12 @@
     color: white;
     background-color: black;
 }
+
+.searchBar ul li {
+    color: black;
+}
+
+.sidebar ul li:hover {
+    color: white;
+    background-color: black;
+}

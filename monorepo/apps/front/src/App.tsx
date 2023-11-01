@@ -21,6 +21,7 @@ import Login from './pages/Login'
 import Nickname from './pages/Nickname'
 import ProfilePicture from './pages/ProfilePicture'
 import Channel from './pages/chat/Channel'
+import CreateChannel from './pages/chat/createChannel'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -30,6 +31,7 @@ const router = createBrowserRouter(
       <Route path="chat" element={<ChatLayout />}>
         {/* <Route path=":channelName/:channelId" element={<Channel />}/> */}
         <Route path="channel/:channelId" element={<Channel />} />
+        <Route path="create-channel" element={<CreateChannel />} />
       </Route>
       <Route path="profile" element={<Profile />} />
       <Route path="login" element={<Login />} />
