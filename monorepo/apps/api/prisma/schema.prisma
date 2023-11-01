@@ -53,8 +53,8 @@ model User {
 	matches		Match[]
 
 	channels	Channel[]
-	admin		Admin?
-	banned		Banned?	
+	// admin		Admin?
+	// banned		Banned?	
 }
 
 model Match {
@@ -81,26 +81,29 @@ model Channel {
 
 	// owner		User
 	members		User[]
-	admins		Admin[]
-	bans		Banned[]
+	// admins		Admin[]
+	// bans		Banned[]
+
+	admins		Int[]
+	bans		Int[]
 	
 	// invites ???
 }
 
-model Admin {
-	id			Int @id @default(autoincrement())
-	userId		Int @unique
+// model Admin {
+// 	id			Int @id @default(autoincrement())
+// 	userId		Int @unique
 
-	user		User @relation(fields: [userId], references: [id])
-	channel		Channel[]
-}
+// 	user		User @relation(fields: [userId], references: [id])
+// 	channel		Channel[]
+// }
 
-model Banned {
-	id			Int @id @default(autoincrement())
-	userId		Int @unique
+// model Banned {
+// 	id			Int @id @default(autoincrement())
+// 	userId		Int @unique
 
-	user		User @relation(fields: [userId], references: [id])
-	channel		Channel[]
-}
+// 	user		User @relation(fields: [userId], references: [id])
+// 	channel		Channel[]
+// }
 
 // model Member {}
