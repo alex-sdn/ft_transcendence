@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import { Form, useNavigate } from "react-router-dom"
+import { Form, Route, createRoutesFromElements, } from "react-router-dom"
+import RootLayout from '../layouts/RootLayout';
 import Cookies from "js-cookie";
 
 const ProfilePicture: React.FC = () => {
     const jwtToken = Cookies.get('jwt-token');
     const [image, setImage] = useState<File>();
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     useEffect(() => {
         const fetchAvatar = async () => {
@@ -39,6 +40,13 @@ const ProfilePicture: React.FC = () => {
         //check size of the image
     };
 
+
+        createRoutesFromElements(
+          <Route path='/' element={<RootLayout />}>
+          <Route path="profile_picture" element={<ProfilePicture/>} />
+          </Route>
+        )
+
     const changeImageHandler = async (event: React.FormEvent) => {
         event.preventDefault();
 
@@ -52,8 +60,10 @@ const ProfilePicture: React.FC = () => {
                         'Authorization': 'Bearer ' + jwtToken,
                     },
                 });
-                if (response.status === 200)
-                    navigate('/');
+                // if (response.status === 200)
+                //     navigate('/');
+                    if (response.status === 200)
+                       window.location.assign('/profile');
             } catch (error) {
                 console.log(error);
             }

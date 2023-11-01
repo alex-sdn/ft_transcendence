@@ -13,6 +13,7 @@ export class UserController {
 
 	@Get('me')
 	getMe(@Req() req: Request) {
+		// console.log('\x1b[36m->GetMe', req.user, '\x1b[0m');
 		return req.user;
 	}
 
@@ -34,7 +35,6 @@ export class UserController {
 	@UseInterceptors(FileInterceptor('avatar', {dest: 'uploads/'}))
 	@Patch('me/editAvatar')
 	editAvatar(@Req() req: Request, @UploadedFile() file) {
-		// verif file format + size etc ?
 		return this.userService.editAvatar(req.user, file.filename);
 	}
 

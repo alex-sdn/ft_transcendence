@@ -21,3 +21,40 @@ Root folder:
 - `docker-compose stop` to stop or `docker-compose down` to delete
 
 (volume broken for live dev /!\)
+
+## TOOLS
+
+### DBDIAGRAM.IO 
+
+aim: visualize our database relationship diagrams
+- in monorepo/apps/api/ npx prisma generate (or if you're lazy make prisma)
+- copy paste the content of the generated file api/prisma/dbml/schema.dbml in https://dbdiagram.io/
+
+### PRISMA STUDIO
+
+aim: visual editor of database
+- in monorepo/apps/api/ npx prisma studio (or make studio)
+(localhost:5555 in browser won't work)
+
+### SWAGGER
+
+aim: visualize all our API's resources
+- in your browser, "http://localhost:3000/api"
+
+### INSOMNIA
+
+aim: send test requests
+
+### JWT.IO
+
+aim: decode JWT
+- go to https://jwt.io/ and copy paste your token
+
+### PRETTIER / ESLINT
+
+aim: code formatters
+- in vs code, on any .ts file, do "ctrl+shift+P" then "Format Document"
+
+### CADDY
+
+aim: caddy server can be used as a scalable reverse proxy
