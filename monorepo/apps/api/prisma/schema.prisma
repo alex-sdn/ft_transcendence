@@ -32,7 +32,7 @@ model User {
 	id			Int @id @default(autoincrement())
 	login42		String @unique
 	nickname	String @unique
-	avatar		String @default("2b0cbcccb65ab6401707972d3ca91db7")
+	avatar		String @default("default-avatar")
 
 	createdAt	DateTime @default(now())
 	//upatedAt	DateTime @updatedAt
