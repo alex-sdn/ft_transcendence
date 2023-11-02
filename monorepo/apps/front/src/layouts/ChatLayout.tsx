@@ -1,11 +1,30 @@
 import React, { useState } from "react";
+import Cookies from "js-cookie";
 import { NavLink, Outlet } from "react-router-dom";
 import Modal from "react-modal";
-import CreateChannel from "../pages/chat/CreateChannel";
+import createChannel from "../pages/chat/CreateChannel";
+import io from "socket.io-client"
 
 const ChatLayout: React.FC = () => {
     const channels = ["Chocolat", "Chien", "Chat", "Cafeine", "Cafe"];
     const [value, setValue] = useState("");
+    const jwtToken = Cookies.get('jwt-token');
+    const socket = io("http://localhost:3000/chat1", {
+        extraHeaders: {
+            'Authorization': 'Bearer ' + jwtToken,
+        }
+    });
+
+    if (!socket.active) {
+        console.log('pas socket');
+    }
+
+    socket.on('create', (data: JSON) => {
+        console.log(data);
+        // Handle incoming messages
+        // fonction ou tu passes le JSON
+        //   setReceivedMessages((prevMessages) => [...prevMessages, data]);
+    });
 
     const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setValue(event.target.value,);
@@ -72,7 +91,7 @@ const ChatLayout: React.FC = () => {
                         style={customStyles}
                     >
                         <button className="material-symbols-outlined" onClick={closeModal}>close</button>
-                        <CreateChannel />
+                        {createChannel(socket)}
                     </Modal>
                 </div>
 
