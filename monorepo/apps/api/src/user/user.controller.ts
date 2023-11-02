@@ -32,7 +32,7 @@ export class UserController {
 		return this.userService.getAvatar(filename, res);
 	}
 
-	@UseInterceptors(FileInterceptor('avatar', {dest: 'uploads/'}))
+	@UseInterceptors(FileInterceptor('avatar', {dest: 'uploads/custom/'}))
 	@Patch('me/editAvatar')
 	editAvatar(@Req() req: Request, @UploadedFile() file) {
 		return this.userService.editAvatar(req.user, file.filename);

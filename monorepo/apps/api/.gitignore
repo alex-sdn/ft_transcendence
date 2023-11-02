@@ -3,6 +3,7 @@
 /node_modules
 
 # add /uploads ?
+/uploads/custom
 
 # Logs
 logs
