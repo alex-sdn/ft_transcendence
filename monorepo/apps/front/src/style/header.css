@@ -1,11 +1,14 @@
 header {
     background-color: white;
     padding: 20px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 header h1 {
     /*font-family: 'Pixelify Sans', sans-serif;*/
-    display: flex;
+    display: inline-block;
     font-size: 3em;
     color: black;
     justify-content: flex-start;
@@ -17,6 +20,7 @@ header h1 {
     justify-content: space-around;
     padding: 0;
     margin: 0;
+    width: 60%;
 }
 
 .links a {
