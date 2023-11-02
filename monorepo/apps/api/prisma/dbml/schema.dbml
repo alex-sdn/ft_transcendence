@@ -34,8 +34,10 @@ Table Channel {
   access ChatAccess [not null]
   password String
   members User [not null]
+  owner Int
   admins Int[] [not null]
   bans Int[] [not null]
+  mutes Int[] [not null]
 }
 
 Enum Statuses {
