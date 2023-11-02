@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
+import Modal from "react-modal";
+import CreateChannel from "../pages/chat/CreateChannel";
 
 const ChatLayout: React.FC = () => {
     const channels = ["Chocolat", "Chien", "Chat", "Cafeine", "Cafe"];
@@ -9,23 +11,34 @@ const ChatLayout: React.FC = () => {
         setValue(event.target.value,);
     }
 
+    //MODALE start {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const openModal = () => {
+        setIsOpen(true);
+    };
+
+    const closeModal = () => {
+        window.location.reload();
+        setIsOpen(false);
+    };
+    // } MODALE end
+
+    const customStyles = {
+        content: {
+            top: '50%',
+            left: '50%',
+            right: 'auto',
+            bottom: 'auto',
+            transform: 'translate(-50%, -50%)',
+            width: '400px',
+            height: '400px',
+        },
+    };
+
     return (
         <div>
             <div className="sidebar">
-                {/* rajouter une barre de recherche Search */}
-                <nav>
-                    <ul>
-                        <li>
-                            <NavLink to={`/chat/channel/1`}>Channel1</NavLink>
-                        </li>
-                        <li>
-                            <NavLink to={`/chat/channel/2`}>Channel2</NavLink>
-                        </li>
-                        <li>
-                            <NavLink to="create-channel">Create new channel</NavLink>
-                        </li>
-                    </ul>
-                </nav>
                 <div className="searchBar">
                     <div>
                         <input type="text" value={value} onChange={handleValueChange} />
@@ -40,6 +53,29 @@ const ChatLayout: React.FC = () => {
                         }
                     </ul>
                 </div>
+                <nav>
+                    <ul>
+                        <li>
+                            <NavLink to={`/chat/channel/1`}>Channel1</NavLink>
+                        </li>
+                        <li>
+                            <NavLink to={`/chat/channel/2`}>Channel2</NavLink>
+                        </li>
+                    </ul>
+                </nav>
+                <div id="newChannel">
+                    <button className="button-59" onClick={openModal}>New channel</button>
+                    <Modal
+                        isOpen={isOpen}
+                        onRequestClose={closeModal}
+                        contentLabel="new channel"
+                        style={customStyles}
+                    >
+                        <button className="material-symbols-outlined" onClick={closeModal}>close</button>
+                        <CreateChannel />
+                    </Modal>
+                </div>
+
             </div>
 
             <main>
