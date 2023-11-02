@@ -1,10 +1,45 @@
+/* search button */
+@import url(https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200);
+
 .sidebar {
-    height: 100vh;
+    height: calc(100vh - 125px);
     background-color: white;
-    position: fixed;
-    width: 200px;
+    position: relative;
+    width: 300px;
     margin: 0;
     padding: 0;
+}
+
+.searchBar > div
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.searchBar > div input,
+.searchBar > div button
+{
+    padding: 0;
+    height: 30px;
+    border: solid 1px black;
+    background: white;
+}
+
+.searchBar > div input
+{
+    height: 28px;
+    display: inline-block;
+    width: calc(100% - 100px);   
+}
+
+.searchBar > div button
+{
+    width: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-left: none;
 }
 
 .sidebar h2 {
@@ -35,4 +70,24 @@
 .sidebar ul li:hover {
     color: white;
     background-color: black;
+}
+
+/* search button begin */
+.material-symbols-outlined {
+    font-variation-settings:
+      'FILL' 0,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 24
+}
+/* search button end */
+
+#newChannel {
+    display: flex;
+    /* flex-direction: column; */
+    align-content: flex-end;
+    position: absolute;
+    bottom: 0%;
+    left: 50%;
+    transform: translate(-50%, -30%);
 }
