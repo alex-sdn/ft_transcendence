@@ -4,7 +4,7 @@ const Channel: React.FC = () => {
     return (
         <h2>Channel</h2>
 
-        
+
     );
 }
 
