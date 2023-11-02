@@ -57,6 +57,9 @@ model User {
 	// banned		Banned?	
 }
 
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
 model Match {
 	id			Int @id @default(autoincrement())
 	date		DateTime @default(now())

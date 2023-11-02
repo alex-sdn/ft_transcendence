@@ -13,6 +13,7 @@ export class UserController {
 
 	@Get('me')
 	getMe(@Req() req: Request) {
+		// console.log('\x1b[36m->GetMe', req.user, '\x1b[0m');
 		return req.user;
 	}
 
