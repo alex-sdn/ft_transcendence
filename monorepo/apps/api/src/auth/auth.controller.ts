@@ -25,4 +25,10 @@ export class AuthController {
 	signin(@Req() req: Request, @Body() dto: TwoFactorDto) {
 		return this.authService.signin(req.user, dto.code);
 	}
+
+	// FOR TESTING !
+	@Get('generateToken')
+	genToken(@Query('nickname') nickname: string) {
+		return this.authService.genToken(nickname);
+	}
 }

@@ -4,6 +4,7 @@
     "eslint-plugin-prettier": "^5.0.1",
     "prisma-dbml-generator": "^0.10.0",
     "@types/js-cookie": "^3.0.5",
+    "@types/socket.io": "^3.0.2",
     "@types/react-modal": "^3.16.2",
     "turbo": "^1.10.15"
   },
@@ -20,12 +21,16 @@
   ],
   "dependencies": {
     "@nestjs/axios": "^3.0.0",
+    "@nestjs/platform-socket.io": "^10.2.7",
+    "@nestjs/websockets": "^10.2.7",
     "@nestjs/swagger": "^7.1.14",
     "axios": "^1.5.1",
     "cookie": "^0.5.0",
     "g": "^2.0.1",
     "js-cookie": "^3.0.5",
     "qrcode": "^1.5.3",
+    "socket.io": "^4.7.2",
+    "speakeasy": "^2.0.0"
     "react-modal": "^3.16.1",
     "react-popper": "^2.3.0",
     "speakeasy": "^2.0.0",
