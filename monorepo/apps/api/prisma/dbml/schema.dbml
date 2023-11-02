@@ -6,7 +6,7 @@ Table User {
   id Int [pk, increment]
   login42 String [unique, not null]
   nickname String [unique, not null]
-  avatar String [not null, default: '2b0cbcccb65ab6401707972d3ca91db7']
+  avatar String [not null, default: 'default-avatar']
   createdAt DateTime [default: `now()`, not null]
   has2fa Boolean [not null, default: false]
   secret2fa String
@@ -15,8 +15,6 @@ Table User {
   LP Int [not null, default: 100]
   matches Match [not null]
   channels Channel [not null]
-  admin Admin
-  banned Banned
 }
 
 Table Match {
@@ -36,22 +34,8 @@ Table Channel {
   access ChatAccess [not null]
   password String
   members User [not null]
-  admins Admin [not null]
-  bans Banned [not null]
-}
-
-Table Admin {
-  id Int [pk, increment]
-  userId Int [unique, not null]
-  user User [not null]
-  channel Channel [not null]
-}
-
-Table Banned {
-  id Int [pk, increment]
-  userId Int [unique, not null]
-  user User [not null]
-  channel Channel [not null]
+  admins Int[] [not null]
+  bans Int[] [not null]
 }
 
 Enum Statuses {
@@ -70,7 +54,3 @@ Enum ChatAccess {
   private
   protected
 }
-
-Ref: Admin.userId - User.id
-
-Ref: Banned.userId - User.id
