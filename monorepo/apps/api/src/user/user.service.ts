@@ -54,7 +54,11 @@ export class UserService {
 	}
 
 	async getAvatar(filename: string, res: Response) {
-		const filePath = path.join(__dirname, '../../uploads/', filename);
+		var filePath;
+		if (filename === 'default-avatar')
+			filePath = path.join(__dirname, '../../uploads/', filename);
+		else
+			filePath = path.join(__dirname, '../../uploads/custom/', filename);
 
 		res.download(filePath, filename, (err) => {
 			if (err) { res.status(500).send('Error downloading file') };
