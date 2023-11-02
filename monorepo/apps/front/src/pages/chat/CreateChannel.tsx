@@ -12,19 +12,21 @@ const createChannel: React.FC = () => {
                 <p>
                     <label>
                         Channel name:
-                        <input type="text"
-                            name="channel-name"
-                            //value={newNickname.nickname}
-                            //onChange={handleNicknameChange}
-                            required />
+                        <p>
+                            <input type="text"
+                                name="channel-name"
+                                //value={newNickname.nickname}
+                                //onChange={handleNicknameChange}
+                                required />
+                        </p>
                     </label>
                 </p>
                 <p>
                     <label>Access</label>
                     <select name="access"
-                    id="access"
-                    value={access}
-                    onChange={(e) => setAccess(e.target.value)}>
+                        id="access"
+                        value={access}
+                        onChange={(e) => setAccess(e.target.value)}>
                         <option value="public">public</option>
                         <option value="private">private</option>
                         <option value="protected">protected</option>
@@ -41,7 +43,7 @@ const createChannel: React.FC = () => {
                     </p>
                 )}
                 <p>
-                    <button type="submit">Create channel</button>
+                    <button className="button-59" type="submit">Create channel</button>
                 </p>
             </Form>
         </div>

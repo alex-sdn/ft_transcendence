@@ -21,7 +21,7 @@ import Login from './pages/Login'
 import Nickname from './pages/Nickname'
 import ProfilePicture from './pages/ProfilePicture'
 import Channel from './pages/chat/Channel'
-import CreateChannel from './pages/chat/createChannel'
+import CreateChannel from './pages/chat/CreateChannel'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
