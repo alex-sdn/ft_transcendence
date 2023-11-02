@@ -6,7 +6,7 @@ import { AuthGuard } from "@nestjs/passport";
 
 @Controller('auth')
 export class AuthController {
-	constructor(private authService: AuthService) {}
+	constructor(private authService: AuthService) { }
 
 	@Get()
 	handleOAuthCallback(@Query('code') code: string) {
