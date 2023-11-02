@@ -87,8 +87,10 @@ model Channel {
 	// admins		Admin[]
 	// bans		Banned[]
 
+	owner		Int?
 	admins		Int[]
 	bans		Int[]
+	mutes		Int[]
 	
 	// invites ???
 }
