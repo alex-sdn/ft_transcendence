@@ -14,15 +14,31 @@ export class UserService {
 		private prisma: PrismaService,
 		private authService: AuthService) {}
 
+	async getMe(user) {
+		const fullUser = await this.prisma.user.findUnique({
+			where: {id: user.id},
+			include: {
+				friends1: true,
+				matchesP1: true}
+		});
+
+		delete user.secret2fa;
+		return fullUser;
+	}
+
 	async getUser(nickname: string) {
 		const user = await this.prisma.user.findUnique({
 			where: {
 				nickname
+			},
+			include: {
+				matchesP1 : true,
 			}
 		});
 		if (!user)
 			throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
 
+		delete user.has2fa;
 		delete user.secret2fa;
 		return user;
 	}
@@ -53,6 +69,7 @@ export class UserService {
 		};
 	}
 
+	/**  AVATAR  **/
 	async getAvatar(filename: string, res: Response) {
 		var filePath;
 		if (filename === 'default-avatar')
@@ -82,6 +99,7 @@ export class UserService {
 		}		
 	}
 
+	/**  2FA  **/
 	async generate2fa(user) {
 		if (user.has2fa === true)
 			throw new HttpException('2FA_ALREADY_ACTIVATED', HttpStatus.CONFLICT);
@@ -149,5 +167,147 @@ export class UserService {
 		});
 		// return value ?
 		return 'success';
+	}
+
+	/**  FRIEND  **/
+	async addFriend(nickname: string, user) {
+		const target = await this.prisma.user.findUnique({
+			where: {nickname: nickname},
+			include: {
+				friends1: true,
+				blocked: true,
+				blockedBy: true}
+		});
+
+		if (!target) {
+			throw new HttpException('USER DOES NOT EXIST', HttpStatus.BAD_REQUEST);
+		}
+
+		// Check if already friends
+		if (target.friends1.some(friendship => friendship.user2Id === user.id)) {
+			throw new HttpException('YOU ARE ALREADY FRIENDS', HttpStatus.BAD_REQUEST);
+		}
+		// Check if blocked by you
+		if (target.blockedBy.some(blocked => blocked.blockerId === user.id)) {
+			throw new HttpException('YOU BLOCKED THIS USER', HttpStatus.BAD_REQUEST);
+		}
+		// // Check if blocked by them
+		if (target.blocked.some(blocked => blocked.blockedId === user.id)) {
+			throw new HttpException('THIS USER BLOCKED YOU', HttpStatus.BAD_REQUEST);
+		}
+
+		// OK, add friend
+		await this.prisma.friendship.create({
+			data: {
+				user1Id: user.id,
+				user2Id: target.id
+			}
+		})
+		await this.prisma.friendship.create({
+			data: {
+				user1Id: target.id,
+				user2Id: user.id
+			}
+		})
+	}
+
+	async deleteFriend(nickname: string, user) {
+		const target = await this.prisma.user.findUnique({
+			where: {nickname: nickname},
+			include: {
+				friends1: true }
+		});
+
+		if (!target) {
+			throw new HttpException('USER DOES NOT EXIST', HttpStatus.BAD_REQUEST);
+		}
+
+		// Check if not friends
+		if (!target.friends1.some(friendship => friendship.user2Id === user.id)) {
+			throw new HttpException('YOU ARE NOT FRIENDS WITH THIS USER', HttpStatus.BAD_REQUEST);
+		}
+
+		// OK, delete friend
+		await this.prisma.friendship.deleteMany({
+			where: {
+				user1Id: user.id,
+				user2Id: target.id
+			}
+		});
+		await this.prisma.friendship.deleteMany({
+			where: {
+				user1Id: target.id,
+				user2Id: user.id
+			}
+		});
+	}
+
+	/**  BLOCK  **/
+	async addBlock(nickname: string, user) {
+		const target = await this.prisma.user.findUnique({
+			where: {nickname: nickname},
+			include: {
+				friends1: true,
+				blockedBy: true}
+		});
+
+		if (!target) {
+			throw new HttpException('USER DOES NOT EXIST', HttpStatus.BAD_REQUEST);
+		}
+
+		// Check if blocked by you
+		if (target.blockedBy.some(blocked => blocked.blockerId === user.id)) {
+			throw new HttpException('ALREADY BLOCKED', HttpStatus.BAD_REQUEST);
+		}
+
+		// Check if already friends
+		if (target.friends1.some(friendship => friendship.user2Id === user.id)) {
+			// delete friend before blocking
+			await this.prisma.friendship.deleteMany({
+				where: {
+					user1Id: user.id,
+					user2Id: target.id
+				}
+			});
+			await this.prisma.friendship.deleteMany({
+				where: {
+					user1Id: target.id,
+					user2Id: user.id
+				}
+			});
+		}
+
+		// OK, add block
+		await this.prisma.blocked.create({
+			data: {
+				blockerId: user.id,
+				blockedId: target.id
+			}
+		});
+	}
+
+	async deleteBlock(nickname: string, user) {
+		const target = await this.prisma.user.findUnique({
+			where: {nickname: nickname},
+			include: {
+				blockedBy: true }
+		});
+
+		if (!target) {
+			throw new HttpException('USER DOES NOT EXIST', HttpStatus.BAD_REQUEST);
+		}
+
+		// Check if not blocked by you
+		if (!target.blockedBy.some(blocked => blocked.blockerId === user.id)) {
+			throw new HttpException('USER IS NOT BLOCKED BY YOU', HttpStatus.BAD_REQUEST);
+		}
+
+		// OK, delete block
+		await this.prisma.blocked.deleteMany({
+			where: {
+				blockerId: user.id,
+				blockedId: target.id
+			}
+		});
 	}
 }
