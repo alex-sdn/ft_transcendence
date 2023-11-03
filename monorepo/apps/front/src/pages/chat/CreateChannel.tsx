@@ -1,18 +1,20 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Form } from "react-router-dom";
-import { Socket } from "socket.io";
-import io from "socket.io-client"
+import { ChatLayoutProps } from "../../layouts/ChatLayoutProps";
+import SocketContext from "../../Socket";
 
-export const createChannel: React.FC<Socket> = (socket) => {
+const createChannel: React.FC<ChatLayoutProps> = ({ closeModal }) => {
     const [channelName, setChannelName] = useState("");
     const [access, setAccess] = useState('public');
     const [password, setPassword] = useState("");
+    const socket = useContext(SocketContext)
 
     const handleChannelSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        socket.emit("create", { target: channelName, access: access, password: password });
-        //fermer pop up
+        if (socket)
+            socket.emit("create", { target: channelName, access: access, password: password });
+        closeModal();
     }
 
     const handleChannelNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
