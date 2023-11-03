@@ -1,30 +1,38 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { NavLink, Outlet } from "react-router-dom";
 import Modal from "react-modal";
-import createChannel from "../pages/chat/CreateChannel";
-import io from "socket.io-client"
+import CreateChannel from "../pages/chat/CreateChannel";
+import SocketContext from "../Socket";
+import { ChatLayoutProps } from "./ChatLayoutProps"
 
-const ChatLayout: React.FC = () => {
+const customStyles = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        transform: 'translate(-50%, -50%)',
+        width: '400px',
+        height: '400px',
+    },
+};
+
+const ChatLayout: React.FC<ChatLayoutProps> = ({ closeModal }) => {
     const channels = ["Chocolat", "Chien", "Chat", "Cafeine", "Cafe"];
     const [value, setValue] = useState("");
     const jwtToken = Cookies.get('jwt-token');
-    const socket = io("http://localhost:3000/chat1", {
-        extraHeaders: {
-            'Authorization': 'Bearer ' + jwtToken,
+    const socket = useContext(SocketContext);
+
+    useEffect(() => {
+        if (socket) {
+            socket.on('create', (data: JSON) => {
+                console.log(data);
+                // fonction ou tu passes le JSON
+                // recharge les channels affiches
+            });
         }
-    });
-
-    if (!socket.active) {
-        console.log('pas socket');
-    }
-
-    socket.on('create', (data: JSON) => {
-        console.log(data);
-        // Handle incoming messages
-        // fonction ou tu passes le JSON
-        //   setReceivedMessages((prevMessages) => [...prevMessages, data]);
-    });
+    }, [socket]);
 
     const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setValue(event.target.value,);
@@ -37,32 +45,20 @@ const ChatLayout: React.FC = () => {
         setIsOpen(true);
     };
 
-    const closeModal = () => {
+    closeModal = () => {
         window.location.reload();
         setIsOpen(false);
     };
     // } MODALE end
-
-    const customStyles = {
-        content: {
-            top: '50%',
-            left: '50%',
-            right: 'auto',
-            bottom: 'auto',
-            transform: 'translate(-50%, -50%)',
-            width: '400px',
-            height: '400px',
-        },
-    };
 
     return (
         <div>
             <div className="sidebar">
                 <div className="searchBar">
                     <div>
-                        <input type="text" value={value} onChange={handleValueChange} />
+                        <input type="text" value={value} onChange={handleValueChange} placeholder="Join a channel" />
                         <button /*onClick={(renvoie sur la page du channel selectionne)}*/>
-                            <span className="material-symbols-outlined">search</span>
+                            <span className="material-symbols-outlined" /*onClick={}*/>add</span>
                         </button>
                     </div>
                     <ul>
@@ -91,7 +87,7 @@ const ChatLayout: React.FC = () => {
                         style={customStyles}
                     >
                         <button className="material-symbols-outlined" onClick={closeModal}>close</button>
-                        {createChannel(socket)}
+                        <CreateChannel closeModal={closeModal} />
                     </Modal>
                 </div>
 

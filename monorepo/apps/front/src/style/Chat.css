@@ -1,4 +1,6 @@
-/* search button */
+/* add button */
+@import url(https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200);
+/* send button */
 @import url(https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200);
 
 .sidebar {
@@ -10,31 +12,27 @@
     padding: 0;
 }
 
-.searchBar > div
-{
+.searchBar>div {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.searchBar > div input,
-.searchBar > div button
-{
+.searchBar>div input,
+.searchBar>div button {
     padding: 0;
     height: 30px;
     border: solid 1px black;
     background: white;
 }
 
-.searchBar > div input
-{
+.searchBar>div input {
     height: 28px;
     display: inline-block;
-    width: calc(100% - 100px);   
+    width: calc(100% - 100px);
 }
 
-.searchBar > div button
-{
+.searchBar>div button {
     width: 30px;
     display: flex;
     justify-content: center;
@@ -75,19 +73,54 @@
 /* search button begin */
 .material-symbols-outlined {
     font-variation-settings:
-      'FILL' 0,
-      'wght' 400,
-      'GRAD' 0,
-      'opsz' 24
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
 }
+
 /* search button end */
 
 #newChannel {
     display: flex;
-    /* flex-direction: column; */
     align-content: flex-end;
     position: absolute;
     bottom: 0%;
     left: 50%;
     transform: translate(-50%, -30%);
+}
+
+.channel h2 {
+    position: absolute;
+    display: flex;
+    left: 18%;
+    top: 15%;
+    /* transform: translate(); */
+}
+
+.channel #chat {
+    display: flex;
+    position: absolute;
+    background: white;
+    width: 50%;
+    height: 77%;
+    left: 18%;
+    bottom: 3%;
+}
+
+.channel input {
+    position: absolute;
+    display: flex;
+    width: 85%;
+    left: 50%;
+    bottom: 3%;
+    transform: translate(-50%, 0);
+}
+
+#send-button {
+    position: absolute;
+    display: flex;
+    left: 95%;
+    bottom: 3%;
+    transform: translate(-85%, 0);
 }

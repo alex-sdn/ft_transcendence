@@ -19,23 +19,23 @@ const Profile: React.FC = () => {
   const jwtToken = Cookies.get('jwt-token');
   useEffect(() => {
     const getProfileData = async () => {
-        console.log('token = ', jwtToken);
-        const response = await axios.get('/api/user/me', {
-            headers : {
-                'Authorization': 'Bearer ' + jwtToken,
-            },
-        },);
-       if (response.status === 200) {
-          const resp_profile = response.data;
-          setNickname(resp_profile.nickname);
-          setLoss(resp_profile.loss);
-          setWin(resp_profile.win);
-          setLp(resp_profile.LP);
-          setGameNb(resp_profile.loss + resp_profile.win);
-          setTwofa(resp_profile.twofa);
-          console.log(resp_profile);
-       }
-    } 
+      console.log('token = ', jwtToken);
+      const response = await axios.get('/api/user/me', {
+        headers: {
+          'Authorization': 'Bearer ' + jwtToken,
+        },
+      },);
+      if (response.status === 200) {
+        const resp_profile = response.data;
+        setNickname(resp_profile.nickname);
+        setLoss(resp_profile.loss);
+        setWin(resp_profile.win);
+        setLp(resp_profile.LP);
+        setGameNb(resp_profile.loss + resp_profile.win);
+        setTwofa(resp_profile.twofa);
+        console.log(resp_profile);
+      }
+    }
 
 
 
@@ -44,41 +44,52 @@ const Profile: React.FC = () => {
 
   useEffect(() => {
     const fetchDefaultAvatar = async () => {
-        let response = await axios.get('/api/user/me', {
-            headers: {
-                'Authorization': 'Bearer ' + jwtToken,
-            },
-        },);
-        const fileName = response.data.avatar;
+      let response = await axios.get('/api/user/me', {
+        headers: {
+          'Authorization': 'Bearer ' + jwtToken,
+        },
+      },);
+      const fileName = response.data.avatar;
 
-        response = await axios.get('api/user/avatar/' + fileName, {
-            headers: {
-                'Authorization': 'Bearer ' + jwtToken,
-            },
-            responseType: 'arraybuffer',
-        });
-        if (response.status === 200) {
-            const blob = new Blob([response.data]);
-            const file = new File([blob], fileName);
-            setImage(file);
-        }
+      response = await axios.get('api/user/avatar/' + fileName, {
+        headers: {
+          'Authorization': 'Bearer ' + jwtToken,
+        },
+        responseType: 'arraybuffer',
+      });
+      if (response.status === 200) {
+        const blob = new Blob([response.data]);
+        const file = new File([blob], fileName);
+        setImage(file);
+      }
     };
     fetchDefaultAvatar();
-}, []);
+  }, []);
 
 
-//MODALE start {
-  const [isOpen, setIsOpen] = useState(false);
+  //MODALE start {
+  const [isOpenpic, setIsOpenpic] = useState(false);
 
-  const openModal = () => {
-    setIsOpen(true);
+  const openModalpic = () => {
+    setIsOpenpic(true);
   };
 
-  const closeModal = () => {
+  const closeModalpic = () => {
     window.location.reload();
-    setIsOpen(false);
+    setIsOpenpic(false);
   };
-// } MODALE end
+  // } MODALE end
+
+  const [isOpennic, setIsOpennic] = useState(false);
+
+  const openModalnic = () => {
+    setIsOpennic(true);
+  };
+
+  const closeModalnic = () => {
+    window.location.reload();
+    setIsOpennic(false);
+  };
 
   const customStyles = {
     content: {
@@ -87,45 +98,47 @@ const Profile: React.FC = () => {
       right: 'auto',
       bottom: 'auto',
       transform: 'translate(-50%, -50%)',
-      width: '250px',
-      height: '350px',
+      width: 'auto',
+      height: 'auto',
+      background: 'black',
+      margin: '30px',
     },
   };
 
   return (
     <div className="_profile">
-       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-      {image && <img className="_avatar-img" src={URL.createObjectURL(image)} alt='profile picture' />}
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+        {image && <img className="_avatar-img" src={URL.createObjectURL(image)} alt='profile picture' />}
 
- {/* MODALE start */}
-{ <div>
-  <button className="button-29" onClick={openModal}>⚙️</button>
-  <Modal 
-    isOpen={isOpen}
-    onRequestClose={closeModal}
-    contentLabel='Pp change'
-    style={customStyles}>
-      <button onClick={closeModal}>x</button>
-      <ProfilePicture/>
-  </Modal>
-</div> } </div>
-{/* MODALE end*/}
+        {/* MODALE start */}
+        {<div>
+          <button className="button-29" onClick={openModalpic}>⚙️</button>
+          <Modal
+            isOpen={isOpenpic}
+            onRequestClose={closeModalpic}
+            contentLabel='Pp change'
+            style={customStyles}>
+            <button onClick={closeModalpic}>x</button>
+            <ProfilePicture />
+          </Modal>
+        </div>} </div>
+      {/* MODALE end*/}
 
-<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-     <h1>{nickname}</h1>&emsp;
-     { <div>
-  <button className="button-29" onClick={openModal}>⚙️</button>
-  <Modal 
-    isOpen={isOpen}
-    onRequestClose={closeModal}
-    contentLabel='Nick change'
-    style={customStyles}>
-      <button onClick={closeModal}>x</button>
-      <Nickname/>
-  </Modal>
-</div> } </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <h1>{nickname}</h1>&emsp;
+        {<div>
+          <button className="button-29" onClick={openModalnic}>⚙️</button>
+          <Modal
+            isOpen={isOpennic}
+            onRequestClose={closeModalnic}
+            contentLabel='Nick change'
+            style={customStyles}>
+            <button onClick={closeModalnic}>x</button>
+            <Nickname />
+          </Modal>
+        </div>} </div>
 
-      <div className="_info"> <p>Game played : <span className='_score'>{gameNb}</span></p> 
+      <div className="_info"> <p>Game played : <span className='_score'>{gameNb}</span></p>
         <p>Victory : <span className='_score'>{win} </span></p>
         <p>Loss : <span className='_score'>{loss}</span> </p>
         <p>Ladder Points : <span className='_score'>{lp}</span> </p>

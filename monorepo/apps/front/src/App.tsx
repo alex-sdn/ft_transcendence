@@ -5,6 +5,8 @@ import {
   RouterProvider
 } from 'react-router-dom'
 
+import SocketContext, { initializeSocket } from './Socket'
+
 // layouts
 import RootLayout from './layouts/RootLayout'
 import ChatLayout from './layouts/ChatLayout'
@@ -38,8 +40,12 @@ const router = createBrowserRouter(
 )
 
 function App() {
+  const socket = initializeSocket();
+
   return (
-    <RouterProvider router={router} />
+    <SocketContext.Provider value={socket}>
+      <RouterProvider router={router} />
+    </SocketContext.Provider>
   );
 }
 
