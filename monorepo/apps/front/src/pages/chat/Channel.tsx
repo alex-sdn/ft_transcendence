@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import SocketContext from '../../Socket';
+
 
 const Channel: React.FC = () => {
     const [message, setMessage] = useState("");
+    const socket = useContext(SocketContext);
 
     const handleMessageSubmit = (event: React.ChangeEvent<HTMLInputElement>) => {
         setMessage(event.target.value);
     }
+
+    // socket.on('message', (data: JSON)
+    //     //envoyer message a tous les users du channel (ou seulement ceux online ?)
+    // );
 
     return (
         <div className='channel'>

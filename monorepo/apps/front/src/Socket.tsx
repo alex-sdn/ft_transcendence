@@ -19,8 +19,3 @@ export function initializeSocket(): Socket {
 //     //maj affichage channels
 //     //ouvrir page nouveau channel
 // );
-
-// const socket.on('message', (data: JSON)
-//     //envoyer message a tous les users du channel (ou seulement ceux online ?)
-// );
-
