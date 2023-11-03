@@ -8,7 +8,7 @@ const createChannel: React.FC<ChatLayoutProps> = ({ closeModal }) => {
     const [channelName, setChannelName] = useState("");
     const [access, setAccess] = useState('public');
     const [password, setPassword] = useState("");
-    const socket = useContext(SocketContext)
+    const socket = useContext(SocketContext);
 
     const handleChannelSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
