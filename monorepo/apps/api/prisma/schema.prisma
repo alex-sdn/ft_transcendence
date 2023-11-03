@@ -6,6 +6,10 @@ generator client {
   binaryTargets = ["native", "debian-openssl-3.0.x", "debian-openssl-1.1.x"]
 }
 
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -52,21 +56,25 @@ model User {
 	blocked		Blocked[] @relation("Blocker")
 	blockedBy	Blocked[] @relation("Blocked")
 
-	matches		Match[]
+	matchesP1	Match[] @relation("UserMatchesP1")
+	matchesP2	Match[] @relation("UserMatchesP2")
 
 	channels	Channel[]
 	// admin		Admin?
 	// banned		Banned?	
 }
 
-generator dbml {
-  provider = "prisma-dbml-generator"
-}
 model Match {
 	id			Int @id @default(autoincrement())
 	date		DateTime @default(now())
 
-	players		User[]
+	user1     	User @relation("UserMatchesP1", fields: [user1Id], references: [id])
+	user1Id   	Int
+	user1nick	String
+
+	user2     	User @relation("UserMatchesP2", fields: [user2Id], references: [id])
+	user2Id   	Int
+	user2nick	String
 
 	p1LP		Int  //at start of game ? save gain/loss ?
 	p2LP		Int

@@ -19,7 +19,7 @@ export class UserService {
 			where: {id: user.id},
 			include: {
 				friends1: true,
-				matches: true}
+				matchesP1: true}
 		});
 
 		delete user.secret2fa;
@@ -32,7 +32,7 @@ export class UserService {
 				nickname
 			},
 			include: {
-				matches: true,
+				matchesP1 : true,
 			}
 		});
 		if (!user)
