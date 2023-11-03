@@ -13,14 +13,24 @@ Table User {
   win Int [not null, default: 0]
   loss Int [not null, default: 0]
   LP Int [not null, default: 100]
-  matches Match [not null]
+  friends1 Friendship [not null]
+  friends2 Friendship [not null]
+  blocked Blocked [not null]
+  blockedBy Blocked [not null]
+  matchesP1 Match [not null]
+  matchesP2 Match [not null]
   channels Channel [not null]
 }
 
 Table Match {
   id Int [pk, increment]
   date DateTime [default: `now()`, not null]
-  players User [not null]
+  user1 User [not null]
+  user1Id Int [not null]
+  user1nick String [not null]
+  user2 User [not null]
+  user2Id Int [not null]
+  user2nick String [not null]
   p1LP Int [not null]
   p2LP Int [not null]
   p1score Int [not null]
@@ -40,6 +50,30 @@ Table Channel {
   mutes Int[] [not null]
 }
 
+Table Friendship {
+  id Int [pk, increment]
+  user1 User [not null]
+  user1Id Int [not null]
+  user2 User [not null]
+  user2Id Int [not null]
+
+  indexes {
+    (user1Id, user2Id) [unique]
+  }
+}
+
+Table Blocked {
+  id Int [pk, increment]
+  blocker User [not null]
+  blockerId Int [not null]
+  blocked User [not null]
+  blockedId Int [not null]
+
+  indexes {
+    (blockerId, blockedId) [unique]
+  }
+}
+
 Enum Statuses {
   online
   offline
@@ -56,3 +90,15 @@ Enum ChatAccess {
   private
   protected
 }
+
+Ref: Match.user1Id > User.id
+
+Ref: Match.user2Id > User.id
+
+Ref: Friendship.user1Id > User.id
+
+Ref: Friendship.user2Id > User.id
+
+Ref: Blocked.blockerId > User.id
+
+Ref: Blocked.blockedId > User.id
