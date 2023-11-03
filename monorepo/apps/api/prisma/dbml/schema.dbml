@@ -17,14 +17,20 @@ Table User {
   friends2 Friendship [not null]
   blocked Blocked [not null]
   blockedBy Blocked [not null]
-  matches Match [not null]
+  matchesP1 Match [not null]
+  matchesP2 Match [not null]
   channels Channel [not null]
 }
 
 Table Match {
   id Int [pk, increment]
   date DateTime [default: `now()`, not null]
-  players User [not null]
+  user1 User [not null]
+  user1Id Int [not null]
+  user1nick String [not null]
+  user2 User [not null]
+  user2Id Int [not null]
+  user2nick String [not null]
   p1LP Int [not null]
   p2LP Int [not null]
   p1score Int [not null]
@@ -84,6 +90,10 @@ Enum ChatAccess {
   private
   protected
 }
+
+Ref: Match.user1Id > User.id
+
+Ref: Match.user2Id > User.id
 
 Ref: Friendship.user1Id > User.id
 
