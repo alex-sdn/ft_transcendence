@@ -39,9 +39,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	handleDisconnect(client: any) {
 		console.log(client.id, "disconnected");
-		// rm from maps
-		this.userToSocket.delete(this.idToUser.get(client.id).id);
-		this.idToUser.delete(client.id);
+		// rm from maps (if in)
+		if (this.idToUser.has(client.id)) {
+			this.userToSocket.delete(this.idToUser.get(client.id).id);
+			this.idToUser.delete(client.id);
+		}
 	}
 
 	@SubscribeMessage('message')  // ==channel
@@ -79,7 +81,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					message: message.message
 				});
 			}
-			console.log('looped');
 		}
 	}
 

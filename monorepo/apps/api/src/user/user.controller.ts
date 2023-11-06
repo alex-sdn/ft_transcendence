@@ -13,8 +13,7 @@ export class UserController {
 
 	@Get('me')
 	getMe(@Req() req: Request) {
-		// console.log('\x1b[36m->GetMe', req.user, '\x1b[0m');
-		return req.user;
+		return this.userService.getMe(req.user);
 	}
 
 	@Get(':nickname')
@@ -27,6 +26,7 @@ export class UserController {
 		return this.userService.editNickname(req.user, dto.nickname);
 	}
 
+	/**  AVATAR  **/
 	@Get('avatar/:filename')
 	async getAvatar(@Param('filename') filename: string, @Res() res: Response) {
 		return this.userService.getAvatar(filename, res);
@@ -38,6 +38,7 @@ export class UserController {
 		return this.userService.editAvatar(req.user, file.filename);
 	}
 
+	/**  2FA  **/
 	@Post('me/edit2fa')
 	generate2fa(@Req() req: Request) {
 		// Generate secret and return QR code
@@ -55,4 +56,25 @@ export class UserController {
 		return this.userService.delete2fa(req.user);
 	}
 
+	/**  FRIEND  **/
+	@Post('friend/:nickname')
+	addFriend(@Param('nickname') nickname: string, @Req() req: Request) {
+		return this.userService.addFriend(nickname, req.user);
+	}
+
+	@Delete('friend/:nickname')
+	deleteFriend(@Param('nickname') nickname: string, @Req() req: Request) {
+		return this.userService.deleteFriend(nickname, req.user);
+	}
+
+	/**  BLOCK  **/
+	@Post('block/:nickname')
+	addBlock(@Param('nickname') nickname: string, @Req() req: Request) {
+		return this.userService.addBlock(nickname, req.user);
+	}
+
+	@Delete('block/:nickname')
+	deleteBlock(@Param('nickname') nickname: string, @Req() req: Request) {
+		return this.userService.deleteBlock(nickname, req.user);
+	}
 }
