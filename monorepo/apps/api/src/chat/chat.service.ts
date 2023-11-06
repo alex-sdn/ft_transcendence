@@ -10,15 +10,13 @@ export class ChatService {
 	**   CONTROLLER   **
 	\*                */
 	async getMyChannels(user) {
-		const fullUser = await this.prisma.user.findUnique({
-			where: {id: user.id},
-			include: {channels: true}
+		const channels = await this.prisma.member.findMany({
+			where: { userId: user.id },
+			include: { channel: true }
 		});
-		var channels = fullUser.channels;
-		
-		// delete passwords
+
 		for (var i in channels) {
-			delete channels[i].password;
+			delete channels[i].channel.password;
 		}
 		return channels;
 	}
@@ -29,9 +27,6 @@ export class ChatService {
 		// delete passwords
 		for (var i in channels) {
 			delete channels[i].password;
-			delete channels[i].admins;
-			delete channels[i].bans
-			// + delete list of bans/admins/etc ?
 		}
 		return channels;
 	}
@@ -45,30 +40,26 @@ export class ChatService {
 		if (!chan)
 			throw new HttpException('CHANNEL_DOES_NOT_EXIST', HttpStatus.NOT_FOUND);
 
-		const members = chan.members;
-		var updatedMembers = [];
-		// filter returned data
+		const checkMember = await this.prisma.member.findMany({
+			where: {
+				chanId: chan.id,
+				userId: user.id
+			}
+		});
+		// check if calling user in channel
+		if (checkMember.length === 0)
+			throw new HttpException('NOT_IN_CHANNEL', HttpStatus.FORBIDDEN);
+
+		const members = await this.prisma.member.findMany({
+			where: { chanId: chan.id },
+			include: { user: true }
+		});
+		// delete secrets
 		for (var i in members) {
-			var updatedMember = {
-				id: members[i].id,
-				nickname: members[i].nickname,
-				avatar: members[i].avatar,
-				owner: false,
-				admin: false
-			};
-			// set owner & admin
-			if (chan.owner === members[i].id)
-				updatedMember.owner = true;
-			if (chan.admins.includes(members[i].id))
-				updatedMember.admin = true;
-			updatedMembers.push(updatedMember);
+			delete members[i].user.has2fa;
+			delete members[i].user.secret2fa;
 		}
-		// check if user is in, don't send info otherwise
-		for (var i in updatedMembers) {
-			if (updatedMembers[i].id === user.id)
-				return updatedMembers;
-		}
-		throw new HttpException('NOT_IN_CHANNEL', HttpStatus.FORBIDDEN);
+		return members;
 	}
 
 
@@ -81,16 +72,25 @@ export class ChatService {
 			throw new Error('channel does not exist, connection failed');
 		}
 		// IF USER IN CHANNEL
-		if (channel.members.find(member => {return member.id === user.id;})) {
+		if (channel.members.find(member => {return member.userId === user.id;})) {
 			throw new Error('you are already in this channel');
 		}
 		// IF CHANNEL PRIVATE AND NOT INVITED
 		if (channel.access === 'private') {
-			// check if invited here!!!!
-			throw new Error('channel private, (not invited)');
+			// If invited -> delete invite
+			if (await this.isInvited(channel.id, user.id)) {
+				await this.prisma.invited.deleteMany({
+					where: {
+						chanId: channel.id,
+						userId: user.id
+					}
+				});
+			}
+			else
+				throw new Error('channel private, you are not invited');
 		}
 		// IF BANNED FROM CHANNEL
-		else if (channel.bans.includes(user.id)) {
+		else if (await this.isBanned(channel.id, user.id)) {
 			throw new Error('you are banned from this channel');
 		}
 		// IF CHANNEL PROTECTED AND WRONG PASSWORD
@@ -98,14 +98,13 @@ export class ChatService {
 			throw new Error('channel protected, incorrect password');
 		}
 
-		// add User to channel users[]
-		await this.prisma.channel.update({
-			where: {id: channel.id},
+		// OK, Create new member
+		await this.prisma.member.create({
 			data: {
-				members: {
-					connect: {id: user.id}}
+				chanId: channel.id,
+				userId: user.id,
 			}
-		});
+		})
 	}
 
 	async createChannel(user: User, message) {
@@ -128,22 +127,49 @@ export class ChatService {
 			const channel = await this.prisma.channel.create({
 				data: {
 					name: message.target,
-					owner: user.id,
 					access: message.access,
-					password: message.password,
+					password: message.password
 				}
 			});
 			// Add user  (+set as owner! +admin)
-			await this.prisma.channel.update({
-				where: {id: channel.id},
+			await this.prisma.member.create({
 				data: {
-					members: {
-						connect: {id: user.id}
-					}
+					chanId: channel.id,
+					userId: user.id,
+					owner: true,
+					admin: true
 				}
-			});
+			})
 		} catch(error) {
 			throw new Error('Failed to create channel');
 		}
+	}
+
+
+	/*           *\
+	**   UTILS   **
+	\*           */
+	async isBanned(chanId: number, userId: number): Promise<boolean> {
+		const check = await this.prisma.banned.findMany({
+			where: {
+				chanId: chanId,
+				userId: userId
+			}
+		});
+		if (check.length > 0)
+			return true;
+		return false;
+	}
+
+	async isInvited(chanId: number, userId: number): Promise<boolean> {
+		const check = await this.prisma.invited.findMany({
+			where: {
+				chanId: chanId,
+				userId: userId
+			}
+		});
+		if (check.length > 0)
+			return true;
+		return false;
 	}
 }

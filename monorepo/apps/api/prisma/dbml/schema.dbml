@@ -19,7 +19,9 @@ Table User {
   blockedBy Blocked [not null]
   matchesP1 Match [not null]
   matchesP2 Match [not null]
-  channels Channel [not null]
+  channels Member [not null]
+  bans Banned [not null]
+  invites Invited [not null]
 }
 
 Table Match {
@@ -43,11 +45,9 @@ Table Channel {
   name String [unique, not null]
   access ChatAccess [not null]
   password String
-  members User [not null]
-  owner Int
-  admins Int[] [not null]
-  bans Int[] [not null]
-  mutes Int[] [not null]
+  members Member [not null]
+  bans Banned [not null]
+  invited Invited [not null]
 }
 
 Table Friendship {
@@ -71,6 +71,46 @@ Table Blocked {
 
   indexes {
     (blockerId, blockedId) [unique]
+  }
+}
+
+Table Member {
+  id Int [pk, increment]
+  channel Channel [not null]
+  chanId Int [not null]
+  user User [not null]
+  userId Int [not null]
+  owner Boolean [not null, default: false]
+  admin Boolean [not null, default: false]
+  muted Boolean [not null, default: false]
+  muteEnd DateTime
+
+  indexes {
+    (chanId, userId) [unique]
+  }
+}
+
+Table Banned {
+  id Int [pk, increment]
+  channel Channel [not null]
+  chanId Int [not null]
+  user User [not null]
+  userId Int [not null]
+
+  indexes {
+    (chanId, userId) [unique]
+  }
+}
+
+Table Invited {
+  id Int [pk, increment]
+  channel Channel [not null]
+  chanId Int [not null]
+  user User [not null]
+  userId Int [not null]
+
+  indexes {
+    (chanId, userId) [unique]
   }
 }
 
@@ -102,3 +142,15 @@ Ref: Friendship.user2Id > User.id
 Ref: Blocked.blockerId > User.id
 
 Ref: Blocked.blockedId > User.id
+
+Ref: Member.chanId > Channel.id
+
+Ref: Member.userId > User.id
+
+Ref: Banned.chanId > Channel.id
+
+Ref: Banned.userId > User.id
+
+Ref: Invited.chanId > Channel.id
+
+Ref: Invited.userId > User.id
