@@ -46,11 +46,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+
+	/**  EVENTS  **/
 	@SubscribeMessage('message')  // ==channel
 	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
-		console.log("[msg] ", this.idToUser.get(client.id).nickname + ":", message);
+		// console.log("[msg] ", this.idToUser.get(client.id).nickname + ":", message);
 	
-		const user = this.idToUser.get(client.id);
+		const user = await this.prisma.user.findUnique({
+			where: { id: this.idToUser.get(client.id).id }
+		});
 
 		const channel = await this.prisma.channel.findUnique({
 			where: {name: message.target},
@@ -62,7 +66,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			console.log('target channel does not exist'); return;
 		}
 
-		if (!channel.members.find(member => {return member.id === user.id;})) {
+		if (!channel.members.find(member => {return member.userId === user.id;})) {
 			//emit fail msg?
 			console.log('you are not in this channel'); return;
 		}
@@ -71,9 +75,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		//send to all connected members (including sender)
 		for (var i in channel.members) {
-			const socket = this.userToSocket.get(channel.members[i].id);
+			const socket = this.userToSocket.get(channel.members[i].userId);
 			// if channel member is connected -> emit message
-			// VERIFY IF SENDER NOT MUTED BY MEMBER
+			// VERIFY IF SENDER NOT BLOCKED BY MEMBER
 			if (socket) {
 				socket.emit('message', {
 					sender: user.nickname,
@@ -88,6 +92,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handlePrivMessage(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
 		// console.log("[msg] ", this.idToUser.get(client.id).nickname + ":", message);
 
+		const sender = await this.prisma.user.findUnique({
+			where: { id: this.idToUser.get(client.id).id }
+		});
 		// Get target user
 		const target = await this.prisma.user.findUnique({
 			where: { nickname: message.target }
@@ -104,14 +111,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			console.log('target not connected to ws'); return;
 		}
 		
-		const sender = this.idToUser.get(client.id).nickname;
 		// Send to target AND sender (?)
 		targetSocket.emit('privmsg', {
-			sender: sender,
+			sender: sender.nickname,
 			message: message.message
 		});
 		client.emit('privmsg', {
-			sender: sender,
+			sender: sender.nickname,
 			message: message.message
 		});
 	}
@@ -120,7 +126,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handleJoin(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
 		console.log("join", message);
 
-		const user = this.idToUser.get(client.id);
+		const user = await this.prisma.user.findUnique({
+			where: { id: this.idToUser.get(client.id).id }
+		});
 
 		const channel = await this.prisma.channel.findUnique({
 			where: {name: message.target},
@@ -137,7 +145,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			});
 			// send message to all users ?
 			for (var i in channel.members) {
-				const socket = this.userToSocket.get(channel.members[i].id);
+				const socket = this.userToSocket.get(channel.members[i].userId);
 				// if channel member is connected -> send JOIN message
 				if (socket) {
 					socket.emit('join', {
@@ -157,7 +165,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handleCreate(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
 		console.log("create", message);
 
-		const user = this.idToUser.get(client.id);
+		const user = await this.prisma.user.findUnique({
+			where: { id: this.idToUser.get(client.id).id }
+		});
 	
 		try {
 			await this.chatService.createChannel(user, message);
