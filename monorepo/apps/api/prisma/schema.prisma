@@ -6,6 +6,10 @@ generator client {
   binaryTargets = ["native", "debian-openssl-3.0.x", "debian-openssl-1.1.x"]
 }
 
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -46,25 +50,31 @@ model User {
 	loss		Int @default(0)
 	LP			Int @default(100)
 
-	// friendsId	Int[]
-	// friends		User[] @relation("Friends", references: [id])
-	// blocks		User[]
+	friends1	Friendship[] @relation("UserFriends1")
+	friends2	Friendship[] @relation("UserFriends2")
 
-	matches		Match[]
+	blocked		Blocked[] @relation("Blocker")
+	blockedBy	Blocked[] @relation("Blocked")
+
+	matchesP1	Match[] @relation("UserMatchesP1")
+	matchesP2	Match[] @relation("UserMatchesP2")
 
 	channels	Channel[]
 	// admin		Admin?
 	// banned		Banned?	
 }
 
-generator dbml {
-  provider = "prisma-dbml-generator"
-}
 model Match {
 	id			Int @id @default(autoincrement())
 	date		DateTime @default(now())
 
-	players		User[]
+	user1     	User @relation("UserMatchesP1", fields: [user1Id], references: [id])
+	user1Id   	Int
+	user1nick	String
+
+	user2     	User @relation("UserMatchesP2", fields: [user2Id], references: [id])
+	user2Id   	Int
+	user2nick	String
 
 	p1LP		Int  //at start of game ? save gain/loss ?
 	p2LP		Int
@@ -87,8 +97,10 @@ model Channel {
 	// admins		Admin[]
 	// bans		Banned[]
 
+	owner		Int?
 	admins		Int[]
 	bans		Int[]
+	mutes		Int[]  //doit etre table separee pour garder temps
 	
 	// invites ???
 }
@@ -110,3 +122,27 @@ model Channel {
 // }
 
 // model Member {}
+
+model Friendship {
+	id			Int @id @default(autoincrement())
+	
+	user1		User @relation("UserFriends1", fields: [user1Id], references: [id])
+	user1Id		Int
+	
+	user2		User @relation("UserFriends2", fields: [user2Id], references: [id])
+	user2Id		Int
+
+	@@unique([user1Id, user2Id])
+}
+
+model Blocked {
+	id        	Int      @id @default(autoincrement())
+
+	blocker   	User     @relation("Blocker", fields: [blockerId], references: [id])
+	blockerId 	Int
+
+	blocked   	User     @relation("Blocked", fields: [blockedId], references: [id])
+	blockedId 	Int
+
+	@@unique([blockerId, blockedId])
+}
