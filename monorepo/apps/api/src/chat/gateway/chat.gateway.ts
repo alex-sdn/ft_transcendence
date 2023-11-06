@@ -61,30 +61,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			include: {members: true}
 		});
 
-		if (!channel) {
-			//emit fail msg?
-			console.log('target channel does not exist'); return;
-		}
-
-		if (!channel.members.find(member => {return member.userId === user.id;})) {
-			//emit fail msg?
-			console.log('you are not in this channel'); return;
-		}
-
-		// VERIFY IF NOT MUTED IN CHANNEL
-
-		//send to all connected members (including sender)
-		for (var i in channel.members) {
-			const socket = this.userToSocket.get(channel.members[i].userId);
-			// if channel member is connected -> emit message
-			// VERIFY IF SENDER NOT BLOCKED BY MEMBER
-			if (socket) {
-				socket.emit('message', {
-					sender: user.nickname,
-					target: message.target,
-					message: message.message
-				});
+		try {
+			await this.chatService.messageChannel(channel, user);
+			//send to all connected members (including sender)
+			for (var i in channel.members) {
+				const socket = this.userToSocket.get(channel.members[i].userId);
+				// if channel member is connected && not blocked -> emit message
+				if (socket && !(await this.chatService.isBlocked(channel.members[i].userId, user.id))) {
+					socket.emit('message', {
+						sender: user.nickname,
+						target: message.target,
+						message: message.message
+					});
+				}
 			}
+		} catch(error) {  // maybe verify error type
+			//send error message to socket?
+			console.log(error.message);
 		}
 	}
 
@@ -99,27 +92,50 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const target = await this.prisma.user.findUnique({
 			where: { nickname: message.target }
 		});
-		if (!target) {
-			//emit fail msg?
-			console.log('target not found'); return;
-		}
 
-		// Get target socket
-		const targetSocket = this.userToSocket.get(target.id);
-		if (!targetSocket) {  //target not connected
-			//emit fail msg?
-			console.log('target not connected to ws'); return;
+		try {
+			await this.chatService.privMessage(sender, target);
+			
+			// Get target socket
+			const targetSocket = this.userToSocket.get(target.id);
+			if (!targetSocket) {
+				throw new Error('target not connected to ws');
+			}
+			// Send to target AND sender (?)
+			targetSocket.emit('privmsg', {
+				sender: sender.nickname,
+				message: message.message
+			});
+			client.emit('privmsg', {
+				sender: sender.nickname,
+				message: message.message
+			});
+		} catch(error) {  // maybe verify error type
+			//send error message to socket?
+			console.log(error.message);
 		}
-		
-		// Send to target AND sender (?)
-		targetSocket.emit('privmsg', {
-			sender: sender.nickname,
-			message: message.message
+	}
+	
+	@SubscribeMessage('create')
+	async handleCreate(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
+		console.log("create", message);
+
+		const user = await this.prisma.user.findUnique({
+			where: { id: this.idToUser.get(client.id).id }
 		});
-		client.emit('privmsg', {
-			sender: sender.nickname,
-			message: message.message
-		});
+	
+		try {
+			await this.chatService.createChannel(user, message);
+
+			client.emit('create', {
+				sender: user.nickname,
+				target: message.target,
+				message: 'has created the channel'
+			});
+		} catch(error) {  // maybe verify error type
+			//send error message to socket?
+			console.log(error.message);
+		}
 	}
 
 	@SubscribeMessage('join')
@@ -161,22 +177,73 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
-	@SubscribeMessage('create')
-	async handleCreate(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
-		console.log("create", message);
+	@SubscribeMessage('leave')
+	async handleLeave(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
+		console.log("leave", message);
 
 		const user = await this.prisma.user.findUnique({
 			where: { id: this.idToUser.get(client.id).id }
 		});
-	
-		try {
-			await this.chatService.createChannel(user, message);
 
-			client.emit('create', {
-				sender: user.nickname,
-				target: message.target,
-				message: 'has created the channel'
-			});
+		const channel = await this.prisma.channel.findUnique({
+			where: {name: message.target},
+			include: {members: true}
+		});
+
+		try {
+			await this.chatService.leaveChannel(channel, user);
+			// send message to client if successful  //dont need bc old member list here (verify)
+			// client.emit('leave', {
+			// 	sender: user.nickname,
+			// 	target: message.target,
+			// 	message: 'has left the channel'
+			// });
+			// send message to all users ?
+			for (var i in channel.members) {
+				const socket = this.userToSocket.get(channel.members[i].userId);
+				// if channel member is connected -> send leave message
+				if (socket) {
+					socket.emit('leave', {
+						sender: user.nickname,
+						target: message.target,
+						message: 'has left the channel'
+					});
+				}
+			}
+		} catch(error) {  // maybe verify error type
+			//send error message to socket?
+			console.log(error.message);
+		}
+	}
+
+	@SubscribeMessage('access')
+	async handleAccess(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
+		console.log("access", message);
+
+		const user = await this.prisma.user.findUnique({
+			where: { id: this.idToUser.get(client.id).id }
+		});
+
+		const channel = await this.prisma.channel.findUnique({
+			where: {name: message.target},
+			include: {members: true}
+		});
+
+		try {
+			await this.chatService.changeAccess(channel, user, message.access, message.password);
+
+			// send message to all users ?
+			for (var i in channel.members) {
+				const socket = this.userToSocket.get(channel.members[i].userId);
+				// if channel member is connected -> send leave message
+				if (socket) {
+					socket.emit('access', {
+						sender: user.nickname,
+						target: message.target,
+						access: message.access
+					});
+				}
+			}
 		} catch(error) {  // maybe verify error type
 			//send error message to socket?
 			console.log(error.message);
