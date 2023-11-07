@@ -27,9 +27,7 @@ const router = createBrowserRouter(
       <Route index element={<Home />} />
       <Route path="game" element={<Game />} />
       <Route path="chat" element={<ChatLayout />}>
-        {/* <Route path=":channelName/:channelId" element={<Channel />}/> */}
-        {/* <Route path=':userName' element={<PrivMsg />} /> */}
-        <Route path="channel/:channelId" element={<Channel />} />
+        <Route path="channel/:channelName" element={<Channel />} />
       </Route>
       <Route path="profile" element={<Profile />} />
       <Route path="login" element={<Login />} />

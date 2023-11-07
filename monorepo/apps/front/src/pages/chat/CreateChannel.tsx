@@ -1,7 +1,6 @@
 import axios from "axios";
 import React, { useContext, useState } from "react";
 import { Form } from "react-router-dom";
-// import { ChatLayoutProps } from "../../layouts/ChatLayoutProps";
 import SocketContext from "../../Socket";
 
 interface MyChannels {

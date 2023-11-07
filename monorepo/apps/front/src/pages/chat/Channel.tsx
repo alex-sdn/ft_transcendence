@@ -1,13 +1,13 @@
 import React, { useContext, useState } from 'react';
 import SocketContext from '../../Socket';
 
-
 const Channel: React.FC = () => {
     const [message, setMessage] = useState("");
     const socket = useContext(SocketContext);
 
     const handleMessageSubmit = (event: React.ChangeEvent<HTMLInputElement>) => {
         setMessage(event.target.value);
+        // socket?.emit("message", {target: selectedChannel.name, message:message});
     }
 
     // socket.on('message', (data: JSON)
