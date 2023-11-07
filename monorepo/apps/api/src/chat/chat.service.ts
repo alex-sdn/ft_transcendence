@@ -75,7 +75,7 @@ export class ChatService {
 			throw new Error('you are not in this channel');
 		}
 		// IF MUTED IN CHANNEL
-		if (await this.isMuted(channel.members.find(member => {return member.userId === user.id;}))) {
+		if (await this.isMuted(channel.id, user.id)) {
 			throw new Error('you are muted in this channel');
 		}
 	}
@@ -241,6 +241,223 @@ export class ChatService {
 			throw new Error('access type not recognized');
 	}
 
+	async kickUser(user: User, target: User, channel) {
+		// IF TARGET USER DOESN'T EXIST
+		if (!target) {
+			throw new Error('target user not found');
+		}
+		// IF CHANNEL DOESN'T EXIST
+		if (!channel) {
+			throw new Error('target channel not found');
+		}
+		// IF NOT IN CHANNEL
+		if (!channel.members.find(member => {return member.userId === user.id;})) {
+			throw new Error('you are not in this channel');
+		}
+		// IF USER NOT ADMIN
+		if (!(await this.isAdmin(channel.id, user.id))) {
+			throw new Error('you are not admin');
+		}
+		// IF TARGET NOT IN CHANNEL
+		if (!channel.members.find(member => {return member.userId === target.id;})) {
+			throw new Error('target is not in this channel');
+		}
+		// IF TARGET IS OWNER
+		if (await this.isOwner(channel.id, target.id)) {
+			throw new Error('target user is channel owner!');
+		}
+
+		// OK, kick user
+		await this.prisma.member.delete({
+			where: {
+				chanId_userId: {
+					chanId: channel.id,
+					userId: target.id
+				}
+			}
+		});
+	}
+
+	async banUser(user: User, target: User, channel) {
+		// IF TARGET USER DOESN'T EXIST
+		if (!target) {
+			throw new Error('target user not found');
+		}
+		// IF CHANNEL DOESN'T EXIST
+		if (!channel) {
+			throw new Error('target channel not found');
+		}
+		// IF NOT IN CHANNEL
+		if (!channel.members.find(member => {return member.userId === user.id;})) {
+			throw new Error('you are not in this channel');
+		}
+		// IF USER NOT ADMIN
+		if (!(await this.isAdmin(channel.id, user.id))) {
+			throw new Error('you are not admin');
+		}
+		// IF TARGET NOT IN CHANNEL  // Shouldn't have to verify if target already banned
+		if (!channel.members.find(member => {return member.userId === target.id;})) {
+			throw new Error('target is not in this channel');
+		}
+		// IF TARGET IS OWNER
+		if (await this.isOwner(channel.id, target.id)) {
+			throw new Error('target user is channel owner!');
+		}
+
+		// OK, ban user
+		await this.prisma.member.delete({
+			where: {
+				chanId_userId: {
+					chanId: channel.id,
+					userId: target.id
+				}
+			}
+		});
+		await this.prisma.banned.create({
+			data: {
+				chanId: channel.id,
+				userId: target.id
+			}
+		});
+	}
+
+	async muteUser(user: User, target: User, channel, time) {
+		// IF TARGET USER DOESN'T EXIST
+		if (!target) {
+			throw new Error('target user not found');
+		}
+		// IF CHANNEL DOESN'T EXIST
+		if (!channel) {
+			throw new Error('target channel not found');
+		}
+		// IF NOT IN CHANNEL
+		if (!channel.members.find(member => {return member.userId === user.id;})) {
+			throw new Error('you are not in this channel');
+		}
+		// IF USER NOT ADMIN
+		if (!(await this.isAdmin(channel.id, user.id))) {
+			throw new Error('you are not admin');
+		}
+		// IF TARGET NOT IN CHANNEL
+		if (!channel.members.find(member => {return member.userId === target.id;})) {
+			throw new Error('target is not in this channel');
+		}
+		// IF TARGET IS OWNER
+		if (await this.isOwner(channel.id, target.id)) {
+			throw new Error('target user is channel owner!');
+		}
+		// IF TARGET ALREADY MUTED
+		if (await this.isMuted(channel.id, target.id)) {
+			throw new Error('target is already muted');
+		}
+		// IF NO TIME SPECIFIED
+		if (!time) {
+			throw new Error('Missing mute time');
+		}
+		// IF WRONG TIME FORMAT
+		const timeNum = parseInt(time);
+		if (Number.isNaN(timeNum) || timeNum <= 0) {
+			throw new Error('Incorrect time format');
+		}
+
+		// OK, mute user
+		const currTime = new Date();
+		const endTime = new Date(currTime.getTime() + timeNum * 60000);
+		
+		await this.prisma.member.update({
+			where: {
+				chanId_userId: {
+					chanId: channel.id,
+					userId: target.id
+				}
+			},
+			data: {
+				muted: true,
+				muteEnd: endTime
+			}
+		});
+	}
+
+	async inviteUser(user: User, target: User, channel) {
+		// IF TARGET USER DOESN'T EXIST
+		if (!target) {
+			throw new Error('target user not found');
+		}
+		// IF CHANNEL DOESN'T EXIST
+		if (!channel) {
+			throw new Error('target channel not found');
+		}
+		// IF NOT IN CHANNEL
+		if (!channel.members.find(member => {return member.userId === user.id;})) {
+			throw new Error('you are not in this channel');
+		}
+
+		// CHANNEL HAS TO BE IN PRIVATE ??
+		
+		// HAVE TO BE ADMIN ??? IDK
+
+		// IF TARGET ALREADY IN CHANNEL
+		if (channel.members.find(member => {return member.userId === target.id;})) {
+			throw new Error('target is already in this channel');
+		}
+		// IF TARGET IS BANNED
+		if (await this.isBanned(channel.id, target.id)) {
+			throw new Error('target is banned from this channel');
+		}
+		// IF ALREADY INVITED
+		if (await this.isInvited(channel.id, target.id)) {
+			throw new Error('target already invited');
+		}
+
+		// OK, add invite
+		await this.prisma.invited.create({
+			data: {
+				chanId: channel.id,
+				userId: target.id
+			}
+		});
+	}
+
+	async addAdmin(user: User, target: User, channel) {
+		// IF TARGET USER DOESN'T EXIST
+		if (!target) {
+			throw new Error('target user not found');
+		}
+		// IF CHANNEL DOESN'T EXIST
+		if (!channel) {
+			throw new Error('target channel not found');
+		}
+		// IF NOT IN CHANNEL
+		if (!channel.members.find(member => {return member.userId === user.id;})) {
+			throw new Error('you are not in this channel');
+		}
+		// IF TARGET NOT IN CHANNEL
+		if (!channel.members.find(member => {return member.userId === target.id;})) {
+			throw new Error('target is not in this channel');
+		}
+		// IF NOT OWNER
+		if (!(await this.isOwner(channel.id, user.id))) {
+			throw new Error('you are not the channel owner');
+		}
+		// IF TARGET ALREADY ADMIN
+		if (await this.isAdmin(channel.id, target.id)) {
+			throw new Error('target is already an admin');
+		}
+
+		// OK, add admin
+		await this.prisma.member.update({
+			where: {
+				chanId_userId: {
+					chanId: channel.id,
+					userId: target.id
+				}
+			},
+			data: {
+				admin: true
+			}
+		});
+	}
+
 
 	/*           *\
 	**   UTILS   **
@@ -273,8 +490,17 @@ export class ChatService {
 		return false;
 	}
 
-	async isMuted(member: Member): Promise<boolean> {
-		if (!member)
+	async isMuted(chanId: number, userId: number): Promise<boolean> {
+		// get member
+		const member = await this.prisma.member.findUnique({
+			where: {
+				chanId_userId: {
+					chanId: chanId,
+					userId: userId
+				}
+			}
+		});
+		if (!member) //dont have to verify
 			console.log('PAS MEMBER?? IMPOSSIBLE');
 		if (member.muted === true) {
 			//check if still muted
@@ -324,5 +550,17 @@ export class ChatService {
 			}
 		});
 		return member.admin;
+	}
+
+	async isOwner(chanId: number, userId: number): Promise<boolean> {
+		const member = await this.prisma.member.findUnique({
+			where: {
+				chanId_userId: {
+					chanId: chanId,
+					userId: userId
+				}
+			}
+		});
+		return member.owner;
 	}
 }
