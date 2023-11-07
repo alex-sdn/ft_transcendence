@@ -70,7 +70,7 @@ model Match {
 
 	user1     	User @relation("UserMatchesP1", fields: [user1Id], references: [id])
 	user1Id   	Int
-	user1nick	String
+	user1nick	String  //necessaire?
 
 	user2     	User @relation("UserMatchesP2", fields: [user2Id], references: [id])
 	user2Id   	Int
