@@ -1,10 +1,14 @@
 import axios from "axios";
 import React, { useContext, useState } from "react";
 import { Form } from "react-router-dom";
-import { ChatLayoutProps } from "../../layouts/ChatLayoutProps";
+// import { ChatLayoutProps } from "../../layouts/ChatLayoutProps";
 import SocketContext from "../../Socket";
 
-const createChannel: React.FC<ChatLayoutProps> = ({ closeModal }) => {
+interface MyChannels {
+    name: string;
+}
+
+const createChannel: React.FC = () => {
     const [channelName, setChannelName] = useState("");
     const [access, setAccess] = useState('public');
     const [password, setPassword] = useState("");
@@ -14,7 +18,7 @@ const createChannel: React.FC<ChatLayoutProps> = ({ closeModal }) => {
         event.preventDefault();
         if (socket)
             socket.emit("create", { target: channelName, access: access, password: password });
-        closeModal();
+        window.location.assign('/chat');
     }
 
     const handleChannelNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {

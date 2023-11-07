@@ -4,7 +4,8 @@ import { NavLink, Outlet } from "react-router-dom";
 import Modal from "react-modal";
 import CreateChannel from "../pages/chat/CreateChannel";
 import SocketContext from "../Socket";
-import { ChatLayoutProps } from "./ChatLayoutProps"
+import { Socket } from "socket.io-client";
+import axios from "axios";
 
 const customStyles = {
     content: {
@@ -18,11 +19,35 @@ const customStyles = {
     },
 };
 
-const ChatLayout: React.FC<ChatLayoutProps> = ({ closeModal }) => {
-    const channels = ["Chocolat", "Chien", "Chat", "Cafeine", "Cafe"];
-    const [value, setValue] = useState("");
-    const jwtToken = Cookies.get('jwt-token');
+const ChatLayout: React.FC = () => {
+    // let channels = ["Chocolat", "Chien", "Chat", "Cafeine", "Cafe"];
+    const [value, setValue] = useState<string>("");
     const socket = useContext(SocketContext);
+
+    const jwtToken = Cookies.get('jwt-token');
+    const [allChannels, setAllChannels] = useState([]);
+
+    const getMyChannels = async (value: string) => {
+        await axios.get('/api/chat/channels/me', {
+            headers: {
+                'Authorization': 'Bearer ' + jwtToken,
+            },
+        },)
+            .then((response) => {
+                const results = response.data.filter((channel: any) => {
+                    return (value && channel && channel.name && channel.name.toLowerCase().includes(value.toLowerCase()));
+                })
+                console.log(results);
+                setAllChannels(results);
+                console.log(allChannels);
+            })
+            .catch((error) => console.log(error));
+    }
+
+    const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setValue(event.target.value,);
+        getMyChannels(event.target.value);
+    }
 
     useEffect(() => {
         if (socket) {
@@ -34,10 +59,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ closeModal }) => {
         }
     }, [socket]);
 
-    const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(event.target.value,);
-    }
-
     //MODALE start {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -45,7 +66,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ closeModal }) => {
         setIsOpen(true);
     };
 
-    closeModal = () => {
+    const closeModal = () => {
         window.location.reload();
         setIsOpen(false);
     };
@@ -56,15 +77,19 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ closeModal }) => {
             <div className="sidebar">
                 <div className="searchBar">
                     <div>
-                        <input type="text" value={value} onChange={handleValueChange} placeholder="Join a channel" />
+                        <input type="text"
+                            value={value}
+                            onChange={handleValueChange}
+                            placeholder="Join a channel" />
                         <button /*onClick={(renvoie sur la page du channel selectionne)}*/>
                             <span className="material-symbols-outlined" /*onClick={}*/>add</span>
                         </button>
                     </div>
                     <ul>
                         {
-                            value && (channels.filter((element) => element.toLowerCase().includes(value.toLowerCase()))
-                                .map((element, index) => <li onClick={() => setValue(element)} key={index}>{element}</li>))
+                            allChannels && allChannels.map((element, index) => <li key={index}>{element.name}</li>)
+                            // value && allChannels && (allChannels.filter((element) => typeof element === 'string' && element.toLowerCase().includes(value.toLowerCase()))
+                            //     .map((element, index) => <li onClick={() => setValue(element)} key={index}>{element}</li>))
                         }
                     </ul>
                 </div>
@@ -87,7 +112,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ closeModal }) => {
                         style={customStyles}
                     >
                         <button className="material-symbols-outlined" onClick={closeModal}>close</button>
-                        <CreateChannel closeModal={closeModal} />
+                        <CreateChannel />
                     </Modal>
                 </div>
 
