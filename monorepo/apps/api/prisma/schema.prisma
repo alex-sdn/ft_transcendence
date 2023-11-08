@@ -39,7 +39,7 @@ model User {
 	avatar		String @default("default-avatar")
 
 	createdAt	DateTime @default(now())
-	//upatedAt	DateTime @updatedAt
+	//updatedAt	DateTime @updatedAt
 
 	has2fa		Boolean @default(false)
 	secret2fa	String?
@@ -59,9 +59,9 @@ model User {
 	matchesP1	Match[] @relation("UserMatchesP1")
 	matchesP2	Match[] @relation("UserMatchesP2")
 
-	channels	Channel[]
-	// admin		Admin?
-	// banned		Banned?	
+	channels	Member[]
+	bans		Banned[]
+	invites		Invited[]	
 }
 
 model Match {
@@ -70,7 +70,7 @@ model Match {
 
 	user1     	User @relation("UserMatchesP1", fields: [user1Id], references: [id])
 	user1Id   	Int
-	user1nick	String
+	user1nick	String  //necessaire?
 
 	user2     	User @relation("UserMatchesP2", fields: [user2Id], references: [id])
 	user2Id   	Int
@@ -92,36 +92,10 @@ model Channel {
 	access		ChatAccess
 	password	String?
 
-	// owner		User
-	members		User[]
-	// admins		Admin[]
-	// bans		Banned[]
-
-	owner		Int?
-	admins		Int[]
-	bans		Int[]
-	mutes		Int[]  //doit etre table separee pour garder temps
-	
-	// invites ???
+	members		Member[]
+	bans		Banned[]
+	invited		Invited[]
 }
-
-// model Admin {
-// 	id			Int @id @default(autoincrement())
-// 	userId		Int @unique
-
-// 	user		User @relation(fields: [userId], references: [id])
-// 	channel		Channel[]
-// }
-
-// model Banned {
-// 	id			Int @id @default(autoincrement())
-// 	userId		Int @unique
-
-// 	user		User @relation(fields: [userId], references: [id])
-// 	channel		Channel[]
-// }
-
-// model Member {}
 
 model Friendship {
 	id			Int @id @default(autoincrement())
@@ -145,4 +119,45 @@ model Blocked {
 	blockedId 	Int
 
 	@@unique([blockerId, blockedId])
+}
+
+model Member {
+	id			Int @id @default(autoincrement())
+
+	channel		Channel @relation(fields: [chanId], references: [id])
+	chanId		Int
+
+	user		User @relation(fields: [userId], references: [id])
+	userId		Int
+
+	owner		Boolean @default(false)
+	admin		Boolean @default(false)
+	muted		Boolean @default(false)
+	muteEnd		DateTime?
+
+	@@unique([chanId, userId])
+}
+
+model Banned {
+	id			Int @id @default(autoincrement())
+
+	channel		Channel @relation(fields: [chanId], references: [id])
+	chanId		Int
+
+	user		User @relation(fields: [userId], references: [id])
+	userId		Int
+
+	@@unique([chanId, userId])
+}
+
+model Invited {
+	id			Int @id @default(autoincrement())
+
+	channel		Channel @relation(fields: [chanId], references: [id])
+	chanId		Int
+
+	user		User @relation(fields: [userId], references: [id])
+	userId		Int
+
+	@@unique([chanId, userId])
 }
