@@ -27,8 +27,13 @@ export class AuthController {
 	}
 
 	// FOR TESTING !
-	@Get('generateToken')
+	@Get('generateToken')  //get token of existing user
 	genToken(@Query('nickname') nickname: string) {
 		return this.authService.genToken(nickname);
+	}
+
+	@Get('fakelogin')  //create new user
+	fakelogin() {
+		return this.authService.fakelogin();
 	}
 }
