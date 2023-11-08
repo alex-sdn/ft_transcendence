@@ -203,4 +203,24 @@ export class AuthService {
 
 		return await this.signToken(user.id, user.nickname, false);
 	}
+
+	async fakelogin(): Promise<{
+		access_token: string | undefined,
+		newUser: boolean,
+		has2fa: boolean
+	}> {
+		let login42 = 'fakeuser';
+		let nickname = 'testuser';
+		let newUser = await this.createUser(login42, nickname);
+		while (!newUser) {
+			nickname += '_';
+			login42 += '_'
+			newUser = await this.createUser(login42, nickname);
+		}
+		return {
+			access_token: await this.signToken(newUser.id, newUser.nickname, false),
+			newUser: true,
+			has2fa: false
+		};
+	}
 }
