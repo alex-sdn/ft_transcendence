@@ -57,6 +57,11 @@ export class UserController {
 	}
 
 	/**  FRIEND  **/
+	@Get('me/friend')
+	myFriends(@Req() req: Request) {
+		return this.userService.myFriends(req.user);
+	}
+
 	@Post('friend/:nickname')
 	addFriend(@Param('nickname') nickname: string, @Req() req: Request) {
 		return this.userService.addFriend(nickname, req.user);
@@ -76,5 +81,16 @@ export class UserController {
 	@Delete('block/:nickname')
 	deleteBlock(@Param('nickname') nickname: string, @Req() req: Request) {
 		return this.userService.deleteBlock(nickname, req.user);
+	}
+
+	/**  MATCHES  **/
+	@Get('me/matches')
+	myMatches(@Req() req: Request) {
+		return this.userService.myMatches(req.user);
+	}
+
+	@Get('matches/:nickname')
+	getMatches(@Param('nickname') nickname: string, @Req() req: Request) {
+		return this.userService.getMatches(nickname);
 	}
 }
