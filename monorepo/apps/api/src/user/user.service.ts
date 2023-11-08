@@ -92,10 +92,10 @@ export class UserService {
 					avatar: filename,
 				}
 			});
-			// return value ?
-			return 'success';
+			return;
 		} catch(error) {
-			throw new Error('Failed to change avatar');
+			// do something with error ?
+			throw new HttpException('FAILED TO CHANGE AVATAR', HttpStatus.INTERNAL_SERVER_ERROR);
 		}		
 	}
 
@@ -122,7 +122,7 @@ export class UserService {
 			});
 			return qrCode;
 		} catch(error) {
-			throw new Error('Failed to generate QRcode');
+			throw new HttpException('FAILED TO GENERATE QR CODE', HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -147,9 +147,9 @@ export class UserService {
 				}
 			});
 			// change return values
-			return 'success';
+			return;
 		}
-		return 'wrong';
+		throw new HttpException('WRONG 2FA CODE', HttpStatus.UNAUTHORIZED);
 	}
 
 	async delete2fa(user) {
@@ -165,8 +165,7 @@ export class UserService {
 				secret2fa: null
 			}
 		});
-		// return value ?
-		return 'success';
+		return;
 	}
 
 	/**  FRIEND  **/
