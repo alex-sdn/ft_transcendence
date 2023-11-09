@@ -5,6 +5,6 @@ export class EditNicknameDto {
 	@IsNotEmpty()
 	@MinLength(2)
 	@MaxLength(20)
-	@Matches(/^[a-zA-Z0-9_-]*$/, { message: 'Channel name can only contain letters, numbers, hyphens, and underscores.' })
+	@Matches(/^[a-zA-Z0-9_-]*$/, { message: 'Nickname can only contain letters, numbers, hyphens, and underscores.' })
 	nickname: string;
 }
