@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { Channel, ChatAccess, Member, User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import * as argon from 'argon2';
+import { MinLength } from "class-validator";
 
 @Injectable()
 export class ChatService {
@@ -101,6 +102,8 @@ export class ChatService {
 	async createChannel(user: User, message) {
 		if (!message.target)
 			throw new Error('no channel name specified');
+		// IF BAD NAME FORMAT
+		this.validateName(message.target);
 
 		const checkTaken = await this.prisma.channel.findUnique({
 			where: {name: message.target}
@@ -577,5 +580,14 @@ export class ChatService {
 			}
 		});
 		return member.owner;
+	}
+
+	validateName(name: string) {
+		if (name.length < 2 || name.length > 20)
+			throw new Error('Channel name must be 2-20 characters');
+		
+		const pattern =  /^[a-zA-Z0-9_-]*$/;
+		if (!pattern.test(name))
+			throw new Error('Forbidden characters in channel name');
 	}
 }
