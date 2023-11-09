@@ -11,6 +11,7 @@ import './style/ProfilePicture.css';
 import './style/Chat.css';
 import './style/createChannel.css';
 import './style/Profile.css';
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 const root = ReactDOM.createRoot(document.getElementById('root')!);
 root.render(

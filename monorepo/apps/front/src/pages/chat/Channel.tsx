@@ -33,7 +33,7 @@ const Channel: React.FC = () => {
 
 
     return (
-        <div className='channel'>
+        <div className="channel">
             <h2>{channelName}</h2>
             <div id='chat' >
                 <p>
