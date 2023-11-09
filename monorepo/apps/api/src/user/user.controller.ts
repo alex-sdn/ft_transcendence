@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors, ValidationPipe } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { Request, Response } from "express";
 import { UserService } from "./user.service";
@@ -22,7 +22,7 @@ export class UserController {
 	}
 
 	@Patch('me/editNickname')
-	editNickname(@Req() req: Request, @Body() dto: EditNicknameDto) {
+	editNickname(@Req() req: Request, @Body(new ValidationPipe()) dto: EditNicknameDto) {
 		return this.userService.editNickname(req.user, dto.nickname);
 	}
 

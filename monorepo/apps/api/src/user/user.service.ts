@@ -45,7 +45,7 @@ export class UserService {
 	}
 
 	async editNickname(user, nickname: string) {
-		// check if nickname empty or invalid chars etc
+		// not necessary if validationPipe
 		if (!nickname)
 			throw new HttpException('MISSING_CREDENTIALS', HttpStatus.BAD_REQUEST);
 		try {
