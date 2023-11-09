@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { Channel, ChatAccess, Member, User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
+import * as argon from 'argon2';
 
 @Injectable()
 export class ChatService {
@@ -109,18 +110,27 @@ export class ChatService {
 			throw new Error('channel name already taken');
 		}
 		// IF MISSING PASSWORD
-		if (message.access === 'protected' && !message.password)
+		if (message.access === 'protected' && !message.password) {
 			throw new Error('missing password for protected access');
-		
-		// Verify if access in accessEnum ?
+		}
+		// IF WRONG ACCESS TYPE
+		if (!['public', 'private', 'protected'].includes(message.access)) {
+			throw new Error('access type not recognized');
+		}
 
 		try {
+			// Hash password
+			let pwHash;
+			if (message.password) // && access==protected ?
+				pwHash = await argon.hash(message.password);
+			else
+				pwHash = null;
 			// Create channel
 			const channel = await this.prisma.channel.create({
 				data: {
 					name: message.target,
 					access: message.access,
-					password: message.password
+					password: pwHash
 				}
 			});
 			// Add user  (+set as owner! +admin)
@@ -161,12 +171,14 @@ export class ChatService {
 				throw new Error('channel private, you are not invited');
 		}
 		// IF BANNED FROM CHANNEL
-		else if (await this.isBanned(channel.id, user.id)) {
+		if (await this.isBanned(channel.id, user.id)) {
 			throw new Error('you are banned from this channel');
 		}
 		// IF CHANNEL PROTECTED AND WRONG PASSWORD
-		else if (channel.access === 'protected' && password !== channel.password) {
-			throw new Error('channel protected, incorrect password');
+		if (channel.access === 'protected') {
+			const pwMatches = await argon.verify(channel.password, password);
+			if (!pwMatches)
+				throw new Error('channel protected, incorrect password');
 		}
 
 		// OK, Create new member
@@ -229,11 +241,14 @@ export class ChatService {
 		}
 		else if (access === 'protected') {
 			//check password format ?
+			if (!password)
+				throw new Error('Missing password for protected access');
+			const pwHash = await argon.hash(password);
 			await this.prisma.channel.update({
 				where: { id: channel.id },
 				data: {
 					access: 'protected',
-					password: password
+					password: pwHash
 				}
 			});
 		}

@@ -95,6 +95,8 @@ model Channel {
 	members		Member[]
 	bans		Banned[]
 	invited		Invited[]
+
+	// messages	Chanmsg[]
 }
 
 model Friendship {
@@ -161,3 +163,34 @@ model Invited {
 
 	@@unique([chanId, userId])
 }
+
+// WIP
+// model Chanmsg {
+// 	id			Int @id @default(autoincrement())
+// 	createdAt	DateTime @default(now())
+
+// 	channel		Channel @relation(fields: [chanId], references: [id])
+// 	chanId		Int
+
+// 	// Sender		User @relation(fields: [userId], references: [id])
+// 	// userId		Int
+// 	Sender		String  //just save nickname ? easier ?
+
+// 	message		String
+// }
+
+// RELOU???????
+// model Privmsg {
+// 	id			Int @id @default(autoincrement())
+// 	createdAt	DateTime @default(now())
+
+// 	friend1		Friendship @relation(fields: [friend1Id], references: [id])
+// 	friend1Id	Int
+// 	friend2		Friendship @relation(fields: [friend2Id], references: [id])
+// 	friend2Id	Int
+
+// 	Sender		User @relation(fields: [userId], references: [id])
+// 	userId		Int
+
+// 	message		String
+// }
