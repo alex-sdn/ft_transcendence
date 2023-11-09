@@ -1,10 +1,10 @@
 {
   "devDependencies": {
+    "@types/js-cookie": "^3.0.5",
+    "@types/react-modal": "^3.16.2",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
     "prisma-dbml-generator": "^0.10.0",
-    "@types/js-cookie": "^3.0.5",
-    "@types/react-modal": "^3.16.2",
     "turbo": "^1.10.15"
   },
   "scripts": {
@@ -28,7 +28,6 @@
     "qrcode": "^1.5.3",
     "react-modal": "^3.16.1",
     "react-popper": "^2.3.0",
-    "speakeasy": "^2.0.0",
     "speakeasy": "^2.0.0",
     "swagger-ui-express": "^5.0.0"
   }
