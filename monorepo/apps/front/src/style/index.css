@@ -1,24 +1,22 @@
 /* close window button */
 @import url(https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200);
 
-
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: 0;
+  margin: 0;
+  padding: 0;
+  box-sizing: 0;
 }
 
 body {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1em;
-    background-color: black;
-    color: black;
+  --bs-body-font-family: 'Orbitron', sans-serif;
+  font-size: 1em;
+  background-color: black;
+  color: black;
 }
 
 h2 {
-    /*font-family: 'Pixelify Sans', sans-serif;*/
-    color: white;
-    font-size: 2em;
+  color: white;
+  font-size: 2em;
 }
 
 /* button begin */
@@ -70,12 +68,13 @@ h2 {
     min-width: 170px;
   }
 }
+
 /* button end */
 
 .material-symbols-outlined {
-    font-variation-settings:
-      'FILL' 0,
-      'wght' 400,
-      'GRAD' 0,
-      'opsz' 24
-  }
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24
+}

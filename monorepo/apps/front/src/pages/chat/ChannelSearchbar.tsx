@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useContext, useState } from "react";
 import Cookies from "js-cookie";
 import Modal from "react-modal";
+// import { Modal, Alert, Button } from "react-bootstrap";
 
 import SocketContext from "../../Socket";
 
@@ -57,32 +58,25 @@ const ChannelSearchbar: React.FC = () => {
         if (res) {
             channelSelected = { name: res.name, access: res.access };
             if (channelSelected.access === 'protected') {
-                console.log(channelSelected.access);
-                openModal();
+                setIsOpen(true);
             }
         }
         else {
             channelSelected = { name: value, access: "" }
         }
-        if (socket) {
+        if (socket && !isOpen) {
             socket.emit("join", { target: channelSelected.name, password: password });
             socket.on('error', (data) => {
-                console.log(data.message);
                 alert(data.message);
             });
             socket.on('join', (data) => {
-                window.location.reload();
-                // pop-up pour confirmer le choix de rejoindre le channel et la reidrection vers le nouveau channel ?
+                window.location.assign(`/chat/channel/${data.target}`);
             });
         }
     }
 
     // MODALE Password start
     const [isOpen, setIsOpen] = useState(false);
-
-    const openModal = () => {
-        setIsOpen(true);
-    };
 
     const closeModal = () => {
         window.location.reload();
@@ -123,9 +117,7 @@ const ChannelSearchbar: React.FC = () => {
             </div>
             <div className="searchResults">
                 <ul>
-                    {
-                        searchChannels && searchChannels.map((element, index) => <li onClick={() => setValue(element.name)} key={index}>{element.name}</li>)
-                    }
+                    {searchChannels && searchChannels.map((element, index) => <li onClick={() => setValue(element.name)} key={index}>{element.name}</li>)}
                 </ul>
             </div>
         </div>
