@@ -6,23 +6,33 @@ Table User {
   id Int [pk, increment]
   login42 String [unique, not null]
   nickname String [unique, not null]
-  avatar String [not null, default: '2b0cbcccb65ab6401707972d3ca91db7']
+  avatar String [not null, default: 'default-avatar']
   createdAt DateTime [default: `now()`, not null]
   has2fa Boolean [not null, default: false]
   secret2fa String
   win Int [not null, default: 0]
   loss Int [not null, default: 0]
   LP Int [not null, default: 100]
-  matches Match [not null]
-  channels Channel [not null]
-  admin Admin
-  banned Banned
+  friends1 Friendship [not null]
+  friends2 Friendship [not null]
+  blocked Blocked [not null]
+  blockedBy Blocked [not null]
+  matchesP1 Match [not null]
+  matchesP2 Match [not null]
+  channels Member [not null]
+  bans Banned [not null]
+  invites Invited [not null]
 }
 
 Table Match {
   id Int [pk, increment]
   date DateTime [default: `now()`, not null]
-  players User [not null]
+  user1 User [not null]
+  user1Id Int [not null]
+  user1nick String [not null]
+  user2 User [not null]
+  user2Id Int [not null]
+  user2nick String [not null]
   p1LP Int [not null]
   p2LP Int [not null]
   p1score Int [not null]
@@ -35,23 +45,73 @@ Table Channel {
   name String [unique, not null]
   access ChatAccess [not null]
   password String
-  members User [not null]
-  admins Admin [not null]
+  members Member [not null]
   bans Banned [not null]
+  invited Invited [not null]
 }
 
-Table Admin {
+Table Friendship {
   id Int [pk, increment]
-  userId Int [unique, not null]
-  user User [not null]
+  user1 User [not null]
+  user1Id Int [not null]
+  user2 User [not null]
+  user2Id Int [not null]
+
+  indexes {
+    (user1Id, user2Id) [unique]
+  }
+}
+
+Table Blocked {
+  id Int [pk, increment]
+  blocker User [not null]
+  blockerId Int [not null]
+  blocked User [not null]
+  blockedId Int [not null]
+
+  indexes {
+    (blockerId, blockedId) [unique]
+  }
+}
+
+Table Member {
+  id Int [pk, increment]
   channel Channel [not null]
+  chanId Int [not null]
+  user User [not null]
+  userId Int [not null]
+  owner Boolean [not null, default: false]
+  admin Boolean [not null, default: false]
+  muted Boolean [not null, default: false]
+  muteEnd DateTime
+
+  indexes {
+    (chanId, userId) [unique]
+  }
 }
 
 Table Banned {
   id Int [pk, increment]
-  userId Int [unique, not null]
-  user User [not null]
   channel Channel [not null]
+  chanId Int [not null]
+  user User [not null]
+  userId Int [not null]
+
+  indexes {
+    (chanId, userId) [unique]
+  }
+}
+
+Table Invited {
+  id Int [pk, increment]
+  channel Channel [not null]
+  chanId Int [not null]
+  user User [not null]
+  userId Int [not null]
+
+  indexes {
+    (chanId, userId) [unique]
+  }
 }
 
 Enum Statuses {
@@ -71,6 +131,26 @@ Enum ChatAccess {
   protected
 }
 
-Ref: Admin.userId - User.id
+Ref: Match.user1Id > User.id
 
-Ref: Banned.userId - User.id
+Ref: Match.user2Id > User.id
+
+Ref: Friendship.user1Id > User.id
+
+Ref: Friendship.user2Id > User.id
+
+Ref: Blocked.blockerId > User.id
+
+Ref: Blocked.blockedId > User.id
+
+Ref: Member.chanId > Channel.id
+
+Ref: Member.userId > User.id
+
+Ref: Banned.chanId > Channel.id
+
+Ref: Banned.userId > User.id
+
+Ref: Invited.chanId > Channel.id
+
+Ref: Invited.userId > User.id

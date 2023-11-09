@@ -10,7 +10,7 @@ const ProfilePicture: React.FC = () => {
     // const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchDefaultAvatar = async () => {
+        const fetchAvatar = async () => {
             let response = await axios.get('/api/user/me', {
                 headers: {
                     'Authorization': 'Bearer ' + jwtToken,
@@ -30,7 +30,7 @@ const ProfilePicture: React.FC = () => {
                 setImage(file);
             }
         };
-        fetchDefaultAvatar();
+        fetchAvatar();
     }, []);
 
     const selectImageHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
