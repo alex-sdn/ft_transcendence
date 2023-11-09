@@ -5,8 +5,8 @@ const RootLayout: React.FC = () => {
   return (
     <div className='root-layout'>
       <header>
-        <nav>
-          <h1>Pong Game</h1>
+        <h1>Pong Game</h1>
+        <nav className="links">
           <NavLink to="/">Home</NavLink>
           <NavLink to="game">Game</NavLink>
           <NavLink to="chat">Chat</NavLink>
