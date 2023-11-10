@@ -61,7 +61,10 @@ model User {
 
 	channels	Member[]
 	bans		Banned[]
-	invites		Invited[]	
+	invites		Invited[]
+
+	chanmsg		Chanmsg[]
+	privmsg		Privmsg[]
 }
 
 model Match {
@@ -96,7 +99,7 @@ model Channel {
 	bans		Banned[]
 	invited		Invited[]
 
-	// messages	Chanmsg[]
+	messages	Chanmsg[]
 }
 
 model Friendship {
@@ -107,6 +110,9 @@ model Friendship {
 	
 	user2		User @relation("UserFriends2", fields: [user2Id], references: [id])
 	user2Id		Int
+
+	messages1	Privmsg[] @relation("Privmsg1")
+	messages2	Privmsg[] @relation("Privmsg2")
 
 	@@unique([user1Id, user2Id])
 }
@@ -165,32 +171,31 @@ model Invited {
 }
 
 // WIP
-// model Chanmsg {
-// 	id			Int @id @default(autoincrement())
-// 	createdAt	DateTime @default(now())
+model Chanmsg {
+	id			Int @id @default(autoincrement())
+	createdAt	DateTime @default(now())
 
-// 	channel		Channel @relation(fields: [chanId], references: [id])
-// 	chanId		Int
+	channel		Channel @relation(fields: [chanId], references: [id])
+	chanId		Int
 
-// 	// Sender		User @relation(fields: [userId], references: [id])
-// 	// userId		Int
-// 	Sender		String  //just save nickname ? easier ?
+	sender		User @relation(fields: [userId], references: [id])
+	userId		Int
 
-// 	message		String
-// }
+	message		String
+}
 
 // RELOU???????
-// model Privmsg {
-// 	id			Int @id @default(autoincrement())
-// 	createdAt	DateTime @default(now())
+model Privmsg {
+	id			Int @id @default(autoincrement())
+	createdAt	DateTime @default(now())
 
-// 	friend1		Friendship @relation(fields: [friend1Id], references: [id])
-// 	friend1Id	Int
-// 	friend2		Friendship @relation(fields: [friend2Id], references: [id])
-// 	friend2Id	Int
+	friend1		Friendship @relation("Privmsg1", fields: [friend1Id], references: [id])
+	friend1Id	Int
+	friend2		Friendship @relation("Privmsg2", fields: [friend2Id], references: [id])
+	friend2Id	Int
 
-// 	Sender		User @relation(fields: [userId], references: [id])
-// 	userId		Int
+	sender		User @relation(fields: [userId], references: [id])
+	userId		Int
 
-// 	message		String
-// }
+	message		String
+}

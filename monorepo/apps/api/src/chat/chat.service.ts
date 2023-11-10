@@ -35,22 +35,25 @@ export class ChatService {
 
 	async getMembers(channel: string, user) {
 		const chan = await this.prisma.channel.findUnique({
-			where: {name: channel},
-			include: {members: true}
+			where: { name: channel },
+			include: { members: true }
 		});
 		// check if channel exists
 		if (!chan)
 			throw new HttpException('CHANNEL_DOES_NOT_EXIST', HttpStatus.NOT_FOUND);
 
-		const checkMember = await this.prisma.member.findMany({
+		const checkMember = await this.prisma.member.findUnique({
 			where: {
-				chanId: chan.id,
-				userId: user.id
+				chanId_userId: {
+					chanId: chan.id,
+					userId: user.id
+				}
 			}
 		});
 		// check if calling user in channel
-		if (checkMember.length === 0)
+		if (!checkMember) {
 			throw new HttpException('NOT_IN_CHANNEL', HttpStatus.FORBIDDEN);
+		}
 
 		const members = await this.prisma.member.findMany({
 			where: { chanId: chan.id },
@@ -64,11 +67,100 @@ export class ChatService {
 		return members;
 	}
 
+	async getMessages(channel: string, user) {
+		const chan = await this.prisma.channel.findUnique({
+			where: { name: channel },
+			include: { members: true }
+		});
+		// check if channel exists
+		if (!chan)
+			throw new HttpException('CHANNEL_DOES_NOT_EXIST', HttpStatus.NOT_FOUND);
+
+		const checkMember = await this.prisma.member.findUnique({
+			where: {
+				chanId_userId: {
+					chanId: chan.id,
+					userId: user.id
+				}
+			}
+		});
+		// check if calling user in channel
+		if (!checkMember) {
+			throw new HttpException('NOT_IN_CHANNEL', HttpStatus.FORBIDDEN);
+		}
+
+		const messages = await this.prisma.chanmsg.findMany({
+			where: { chanId: chan.id },
+			include: { sender: true }
+		});
+		// delete info
+		for (var i in messages) {
+			delete messages[i].sender.has2fa;
+			delete messages[i].sender.secret2fa;
+		}
+
+		return messages;
+	}
+
+	async getPrivmessages(nickname: string, user) {
+		const target = await this.prisma.user.findUnique({
+			where: { nickname: nickname }
+		});
+		if (!target) {
+			throw new HttpException('USER DOES NOT EXIST', HttpStatus.NOT_FOUND);
+		}
+
+		// Check if friends
+		const friendship1 = await this.prisma.friendship.findUnique({
+			where: {
+				user1Id_user2Id: {
+					user1Id: user.id,
+					user2Id: target.id
+				}
+			}
+		});
+		const friendship2 = await this.prisma.friendship.findUnique({
+			where: {
+				user1Id_user2Id: {
+					user1Id: target.id,
+					user2Id: user.id
+				}
+			}
+		});
+		if (!friendship1) {
+			throw new HttpException('NOT FRIENDS WITH USER', HttpStatus.FORBIDDEN);
+		}
+		// aaaaaaaaaaaaaaaaaa
+		var id1: number;
+		var id2: number;
+		if (friendship1.id < friendship2.id) {
+			id1 = friendship1.id;
+			id2 = friendship2.id;
+		} else {
+			id1 = friendship2.id;
+			id2 = friendship1.id;
+		}
+		const messages = await this.prisma.privmsg.findMany({
+			where: {
+				friend1Id: id1,
+				friend2Id: id2
+			},
+			include: { sender: true }
+		})
+		// delete info
+		for (var i in messages) {
+			delete messages[i].sender.has2fa;
+			delete messages[i].sender.secret2fa;
+		}
+
+		return messages;
+	}
+
 
 	/*             *\
 	**   GATEWAY   **
 	\*             */
-	async messageChannel(channel, user: User) {
+	async messageChannel(channel, user: User, message: string) {
 		if (!channel) {
 			throw new Error('target channel does not exist');
 		}
@@ -80,14 +172,42 @@ export class ChatService {
 		if (await this.isMuted(channel.id, user.id)) {
 			throw new Error('you are muted in this channel');
 		}
+
+		// OK, add to history
+		await this.prisma.chanmsg.create({
+			data: {
+				chanId: channel.id,
+				userId: user.id,
+				message: message
+			}
+		});
 	}
 
-	async privMessage(sender: User, target: User) {
+	async privMessage(sender: User, target: User, message: string) {
 		if (!target) {
 			throw new Error('target not found');
 		}
 
-		// CHECK IF FRIENDS FOR PRIV MESSAGES ??
+		// CHECK IF FRIENDS
+		const friendship1 = await this.prisma.friendship.findUnique({
+			where: {
+				user1Id_user2Id: {
+					user1Id: sender.id,
+					user2Id: target.id
+				}
+			}
+		});
+		const friendship2 = await this.prisma.friendship.findUnique({
+			where: {
+				user1Id_user2Id: {
+					user1Id: target.id,
+					user2Id: sender.id
+				}
+			}
+		});
+		if (!friendship1) {
+			throw new Error('you are not friends with this user');
+		}
 
 		// IF SENDER BLOCKED TARGET
 		if (await this.isBlocked(sender.id, target.id)) {
@@ -97,6 +217,25 @@ export class ChatService {
 		if (await this.isBlocked(target.id, sender.id)) {
 			throw new Error('you are blocked by this user');
 		}
+		
+		// OK, add history
+		var id1: number;
+		var id2: number;
+		if (friendship1.id < friendship2.id) {
+			id1 = friendship1.id;
+			id2 = friendship2.id;
+		} else {
+			id1 = friendship2.id;
+			id2 = friendship1.id;
+		}
+		await this.prisma.privmsg.create({
+			data: {
+				friend1Id: id1,
+				friend2Id: id2,
+				userId: sender.id,
+				message: message
+			}
+		});
 	}
 
 	async createChannel(user: User, message) {
