@@ -22,6 +22,8 @@ Table User {
   channels Member [not null]
   bans Banned [not null]
   invites Invited [not null]
+  chanmsg Chanmsg [not null]
+  privmsg Privmsg [not null]
 }
 
 Table Match {
@@ -48,6 +50,7 @@ Table Channel {
   members Member [not null]
   bans Banned [not null]
   invited Invited [not null]
+  messages Chanmsg [not null]
 }
 
 Table Friendship {
@@ -56,6 +59,8 @@ Table Friendship {
   user1Id Int [not null]
   user2 User [not null]
   user2Id Int [not null]
+  messages1 Privmsg [not null]
+  messages2 Privmsg [not null]
 
   indexes {
     (user1Id, user2Id) [unique]
@@ -114,6 +119,28 @@ Table Invited {
   }
 }
 
+Table Chanmsg {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  channel Channel [not null]
+  chanId Int [not null]
+  sender User [not null]
+  userId Int [not null]
+  message String [not null]
+}
+
+Table Privmsg {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  friend1 Friendship [not null]
+  friend1Id Int [not null]
+  friend2 Friendship [not null]
+  friend2Id Int [not null]
+  sender User [not null]
+  userId Int [not null]
+  message String [not null]
+}
+
 Enum Statuses {
   online
   offline
@@ -154,3 +181,13 @@ Ref: Banned.userId > User.id
 Ref: Invited.chanId > Channel.id
 
 Ref: Invited.userId > User.id
+
+Ref: Chanmsg.chanId > Channel.id
+
+Ref: Chanmsg.userId > User.id
+
+Ref: Privmsg.friend1Id > Friendship.id
+
+Ref: Privmsg.friend2Id > Friendship.id
+
+Ref: Privmsg.userId > User.id
