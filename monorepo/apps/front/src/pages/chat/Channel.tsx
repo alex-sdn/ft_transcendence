@@ -2,21 +2,7 @@ import React, { useContext, useState } from 'react';
 import SocketContext from '../../Socket';
 import { useParams } from 'react-router-dom';
 
-interface users {
-    name: string;
-    avatar: File;
-    owner: boolean;
-    admin: boolean;
-}
-
-interface me {
-    owner: boolean;
-    admin: boolean;
-}
-
-interface channel {
-    members: users[];
-}
+import ChannelMembers from './ChannelMembers'
 
 const Channel: React.FC = () => {
     const [message, setMessage] = useState<string>("");
@@ -29,8 +15,6 @@ const Channel: React.FC = () => {
         setMessage(event.target.value);
         // socket?.emit("message", {target: selectedChannel.name, message:message});
     }
-
-
 
     return (
         <div className="channel">
@@ -53,9 +37,7 @@ const Channel: React.FC = () => {
                 </p>
             </div>
             <div id='users'>
-                <ul>
-
-                </ul>
+                <ChannelMembers />
             </div>
         </div>
 

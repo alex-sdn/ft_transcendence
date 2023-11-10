@@ -1,22 +1,20 @@
 import axios from "axios";
 import React, { useContext, useState } from "react";
 import Cookies from "js-cookie";
-import Modal from "react-modal";
-// import { Modal, Alert, Button } from "react-bootstrap";
+import {
+    Modal,
+    Alert,
+    ModalHeader,
+    ModalTitle,
+    ModalBody,
+    Form,
+    FormGroup,
+    FormLabel,
+    FormControl,
+    ModalFooter
+} from "react-bootstrap";
 
 import SocketContext from "../../Socket";
-
-const customStyles = {
-    content: {
-        top: '50%',
-        left: '50%',
-        right: 'auto',
-        bottom: 'auto',
-        transform: 'translate(-50%, -50%)',
-        width: '400px',
-        height: '400px',
-    },
-};
 
 interface channels {
     name: string;
@@ -25,6 +23,9 @@ interface channels {
 
 const ChannelSearchbar: React.FC = () => {
     const [searchChannels, setSearchChannels] = useState<channels[]>([]);
+    const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
+    const [showJoinModal, setShowJoinModal] = useState<boolean>(false);
+    const [password, setPassword] = useState<string>("");
     const [value, setValue] = useState<string>("");
     const jwtToken = Cookies.get('jwt-token');
     const socket = useContext(SocketContext);
@@ -36,7 +37,6 @@ const ChannelSearchbar: React.FC = () => {
             },
         },)
             .then((response) => {
-                console.log(response.data);
                 const results = response.data.filter((channel: any) => {
                     return (value && channel && channel.name && channel.name.toLowerCase().includes(value.toLowerCase()));
                 })
@@ -45,75 +45,110 @@ const ChannelSearchbar: React.FC = () => {
             .catch((error) => console.log(error));
     }
 
-    const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(event.target.value,);
-        getSearchChannels(event.target.value);
-    }
-
-    const [password, setPassword] = useState<string>("");
-    let channelSelected: channels = { name: "", access: "" };
-    const joinChannel = () => {
+    const isChannelProtected = () => {
         // recuperer le channel qui correspond a value:
         const res = searchChannels.find((item) => item.name === value);
         if (res) {
-            channelSelected = { name: res.name, access: res.access };
-            if (channelSelected.access === 'protected') {
-                setIsOpen(true);
+            if (res.access === 'protected') {
+                setShowPasswordModal(true);
             }
-        }
-        else {
-            channelSelected = { name: value, access: "" }
-        }
-        if (socket && !isOpen) {
-            socket.emit("join", { target: channelSelected.name, password: password });
-            socket.on('error', (data) => {
-                alert(data.message);
-            });
-            socket.on('join', (data) => {
-                window.location.assign(`/chat/channel/${data.target}`);
-            });
+            else {
+                setShowJoinModal(true);
+            }
         }
     }
 
-    // MODALE Password start
-    const [isOpen, setIsOpen] = useState(false);
+    const joinChannel = async () => {
+        const createPromise = new Promise<{ target: string }>((resolve, reject) => {
+            if (socket) {
+                socket.emit("join", { target: value, password: password });
+                socket.on("join", (data) => {
+                    resolve(data);
+                });
+                socket.on('error', (data) => {
+                    reject(data);
+                });
+            }
+        });
 
-    const closeModal = () => {
-        window.location.reload();
-        setIsOpen(false);
-    };
-    // MODALE Password end
+        createPromise
+            .then((data) => {
+                // setShowJoinModal(false);
+                window.location.assign(`/chat/channel/${data.target}`);
+            })
+            .catch((error) => {
+                // setShowJoinModal(false);
+                console.log(error.message);
+            });
+    }
 
     return (
         <div className="searchBar">
             <div>
                 <input type="text"
                     value={value}
-                    onChange={handleValueChange}
+                    onChange={(e) => {
+                        setValue(e.target.value);
+                        getSearchChannels(e.target.value);
+                    }}
                     placeholder="Join a channel" />
-                <button disabled={!value} onClick={joinChannel}>
+                <button disabled={value.length < 2} onClick={isChannelProtected}>
                     <span className="material-symbols-outlined">add</span>
-                    <Modal
-                        isOpen={isOpen}
-                        onRequestClose={closeModal}
-                        contentLabel="password"
-                        style={customStyles}
-                    >
-                        <button className="material-symbols-outlined" onClick={closeModal}>close</button>
-                        <p>
-                            <input type="password"
-                                placeholder="Enter password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)} />
-                        </p>
-                        <p>
-                            <button type="submit"
-                                onClick={closeModal}>
-                                submit
-                            </button>
-                        </p>
-                    </Modal>
                 </button>
+                <Modal show={showPasswordModal}
+                    onHide={() => {
+                        setShowPasswordModal(false);
+                    }}
+                    style={{ color: "black" }}
+                >
+                    <ModalHeader closeButton>
+                        <ModalTitle>This channel is protected</ModalTitle>
+                    </ModalHeader>
+                    <ModalBody>
+                        <Form onSubmit={() => {
+                            setShowPasswordModal(false);
+                            joinChannel();
+                        }}>
+                            <FormGroup controlId="password">
+                                <FormLabel>Enter the password to join {value}</FormLabel>
+                                <FormControl type="password"
+                                    name="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                            </FormGroup>
+                            <ModalFooter>
+                                <button className="button-59"
+                                    type="submit"
+                                >
+                                    Join
+                                </button>
+                            </ModalFooter>
+                        </Form>
+                    </ModalBody>
+                </Modal>
+                <Modal show={showJoinModal}
+                    onHide={() => setShowJoinModal(false)}
+                    style={{ color: "black" }}
+                >
+                    <ModalBody>
+                        <p>Do you want to join <strong>{value}</strong> ?</p>
+                    </ModalBody>
+                    <ModalFooter>
+                        <button className="button-59"
+                            onClick={() => setShowJoinModal(false)}>
+                            No
+                        </button>
+                        <button className="button-59"
+                            onClick={() => {
+                                setShowJoinModal(false);
+                                joinChannel()
+                            }}>
+                            Yes
+                        </button>
+                    </ModalFooter>
+                </Modal>
             </div>
             <div className="searchResults">
                 <ul>

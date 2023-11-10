@@ -8,9 +8,14 @@ import './style/index.css';
 import './style/NotFound.css';
 import './style/Login.css';
 import './style/ProfilePicture.css';
-import './style/Chat.css';
-import './style/createChannel.css';
 import './style/Profile.css';
+//chat
+import './style/chat/Chat.css';
+import './style/chat/Channel.css'
+import './style/chat/CreateChannel.css';
+import './style/chat/ChannelSearchbar.css'
+
+
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 const root = ReactDOM.createRoot(document.getElementById('root')!);
