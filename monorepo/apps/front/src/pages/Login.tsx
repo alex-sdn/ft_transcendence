@@ -10,21 +10,21 @@ const Login: React.FC = () => {
     const navigate = useNavigate();
     if (code) {
         fetch(authURL)
-        .then(response => response.json()) // Ensure the response is treated as text
-        .then(data => {
-            // 'data' will be the string returned by the backend
-            // rajouter token dans cookie
-            Cookies.set("jwt-token", data.access_token, { expires: 1});
-            if (data.newUser)
-                return navigate('/nickname');
-            else if (data.has2fa)
-                return navigate('/game');
-            return navigate('/');
-            // You can then set it in your component's state or use it as needed.
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+            .then(response => response.json()) // Ensure the response is treated as text
+            .then(data => {
+                // 'data' will be the string returned by the backend
+                // rajouter token dans cookie
+                Cookies.set("jwt-token", data.access_token, { expires: 1 });
+                if (data.newUser)
+                    return navigate('/nickname');
+                else if (data.has2fa)
+                    return navigate('/game');
+                return navigate('/');
+                // You can then set it in your component's state or use it as needed.
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     }
 
     return (
