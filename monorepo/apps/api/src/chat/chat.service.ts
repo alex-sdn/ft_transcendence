@@ -33,6 +33,24 @@ export class ChatService {
 		return channels;
 	}
 
+	async getAvailableChannels(user) {
+		var channels = await this.prisma.channel.findMany({
+			include: { members: true }
+		})
+
+		for (var i = 0; i < channels.length; i++) {
+			if (channels[i].members.find(member => {return member.userId === user.id})) {
+				channels.splice(i, 1);
+				i--;
+			}
+			else {
+				delete channels[i].members;
+				delete channels[i].password;
+			}
+		}
+		return channels;
+	}
+
 	async getMembers(channel: string, user) {
 		const chan = await this.prisma.channel.findUnique({
 			where: { name: channel },
