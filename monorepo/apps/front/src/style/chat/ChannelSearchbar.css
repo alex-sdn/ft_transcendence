@@ -1,0 +1,42 @@
+.searchBar>div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.searchBar>div input,
+.searchBar>div button {
+    padding: 0;
+    height: 30px;
+    border: solid 1px black;
+    background: white;
+}
+
+.searchBar>div input {
+    height: 30px;
+    display: inline-block;
+    width: calc(100% - 100px);
+}
+
+.searchBar>div button {
+    width: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-left: none;
+}
+
+
+.searchResults {
+    display: flex;
+    flex-direction: column;
+    max-height: 300px;
+    overflow-y: scroll;
+    margin-top: 1px;
+    margin-left: -50%;
+}
+
+.searchBar ul li {
+    list-style-type: none;
+    color: black;
+}
