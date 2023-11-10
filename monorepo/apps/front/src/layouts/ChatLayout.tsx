@@ -28,8 +28,6 @@ const ChatLayout: React.FC = () => {
         getMyChannels();
     }, []);
 
-    const [isOpen, setIsOpen] = useState(false);
-
     return (
         <div>
             <div className="sidebar">
@@ -43,19 +41,7 @@ const ChatLayout: React.FC = () => {
                         ))}
                     </ul>
                 </nav>
-                <div id="newChannel">
-                    {/* <button className="button-59"
-                        onClick={() => setIsOpen(true)}>
-                        New channel
-                    </button>
-                    <Modal show={isOpen}
-                        onHide={() => setIsOpen(false)}
-                        style={{ color: "black" }}>
-                        <ModalHeader closeButton>
-                            <ModalTitle>Create a new channel</ModalTitle>
-                        </ModalHeader>
-                        <ModalBody></ModalBody>
-                    </Modal> */}
+                <div /*id="newChannel"*/>
                     <CreateChannel />
                 </div>
 
