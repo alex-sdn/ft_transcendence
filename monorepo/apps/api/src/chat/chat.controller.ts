@@ -23,4 +23,13 @@ export class ChatController {
 		return this.chatService.getMembers(channel, req.user);
 	}
 
+	@Get('/:channel/messages')
+	getMessages(@Param('channel') channel: string, @Req() req: Request) {
+		return this.chatService.getMessages(channel, req.user);
+	}
+
+	@Get('/:nickname/privmsg')
+	getPrivmessages(@Param('nickname') nickname: string, @Req() req: Request) {
+		return this.chatService.getPrivmessages(nickname, req.user);
+	}
 }
