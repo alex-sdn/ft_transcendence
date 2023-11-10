@@ -45,7 +45,7 @@ export class UserService {
 	}
 
 	async editNickname(user, nickname: string) {
-		// check if nickname empty or invalid chars etc
+		// not necessary if validationPipe
 		if (!nickname)
 			throw new HttpException('MISSING_CREDENTIALS', HttpStatus.BAD_REQUEST);
 		try {
@@ -242,17 +242,35 @@ export class UserService {
 		}
 
 		// OK, delete friend
-		await this.prisma.friendship.deleteMany({
+		const friendship1 = await this.prisma.friendship.findUnique({
 			where: {
-				user1Id: user.id,
-				user2Id: target.id
+				user1Id_user2Id: {
+					user1Id: user.id,
+					user2Id: target.id
+				}
 			}
 		});
-		await this.prisma.friendship.deleteMany({
+		const friendship2 = await this.prisma.friendship.findUnique({
 			where: {
-				user1Id: target.id,
-				user2Id: user.id
+				user1Id_user2Id: {
+					user1Id: target.id,
+					user2Id: user.id
+				}
 			}
+		});
+		// delete messages first
+		await this.prisma.privmsg.deleteMany({
+			where: { friend1Id: friendship1.id }
+		});
+		await this.prisma.privmsg.deleteMany({
+			where: { friend1Id: friendship2.id }
+		})
+		// delete friendships
+		await this.prisma.friendship.delete({
+			where: { id: friendship1.id }
+		});
+		await this.prisma.friendship.delete({
+			where: { id: friendship2.id }
 		});
 	}
 
@@ -277,18 +295,7 @@ export class UserService {
 		// Check if already friends
 		if (target.friends1.some(friendship => friendship.user2Id === user.id)) {
 			// delete friend before blocking
-			await this.prisma.friendship.deleteMany({
-				where: {
-					user1Id: user.id,
-					user2Id: target.id
-				}
-			});
-			await this.prisma.friendship.deleteMany({
-				where: {
-					user1Id: target.id,
-					user2Id: user.id
-				}
-			});
+			this.deleteFriend(target.nickname, user);
 		}
 
 		// OK, add block
