@@ -18,6 +18,11 @@ export class ChatController {
 		return this.chatService.getAllChannels();
 	}
 
+	@Get('/channels/other')
+	getOtherChannels(@Req() req: Request) {
+		return this.chatService.getAvailableChannels(req.user);
+	}
+
 	@Get('/:channel/members')
 	getMembers(@Param('channel') channel: string, @Req() req: Request) {
 		return this.chatService.getMembers(channel, req.user);
