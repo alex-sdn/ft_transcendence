@@ -192,13 +192,7 @@ export class ChatService {
 		}
 
 		// OK, add to history
-		await this.prisma.chanmsg.create({
-			data: {
-				chanId: channel.id,
-				userId: user.id,
-				message: message
-			}
-		});
+		await this.saveChanmsg(channel.id, user.id, message, false);
 	}
 
 	async privMessage(sender: User, target: User, message: string) {
@@ -302,6 +296,7 @@ export class ChatService {
 					admin: true
 				}
 			})
+			await this.saveChanmsg(channel.id, user.id, 'has created the channel', true);
 		} catch(error) {
 			throw new Error('Failed to create channel');
 		}
@@ -348,6 +343,7 @@ export class ChatService {
 				userId: user.id,
 			}
 		})
+		await this.saveChanmsg(channel.id, user.id, 'has joined the channel', true);
 	}
 
 	async leaveChannel(channel, user: User) {
@@ -367,9 +363,12 @@ export class ChatService {
 				userId: user.id
 			}
 		});
-
-		// Delete channel if no members left ?
-
+		// Delete channel if no members left
+		if (channel.members.length === 1) {
+			await this.deleteChannel(channel.id);
+		} else {
+			await this.saveChanmsg(channel.id, user.id, 'has left the channel', true);
+		}
 	}
 
 	async changeAccess(channel, user: User, access: string, password: string) {
@@ -451,6 +450,7 @@ export class ChatService {
 				}
 			}
 		});
+		await this.saveChanmsg(channel.id, user.id, 'kicked '+target.nickname+' from the channel', true);
 	}
 
 	async banUser(user: User, target: User, channel) {
@@ -494,6 +494,7 @@ export class ChatService {
 				userId: target.id
 			}
 		});
+		await this.saveChanmsg(channel.id, user.id, 'banned '+target.nickname+' from the channel', true);
 	}
 
 	async muteUser(user: User, target: User, channel, time) {
@@ -551,6 +552,7 @@ export class ChatService {
 				muteEnd: endTime
 			}
 		});
+		await this.saveChanmsg(channel.id, user.id, 'muted '+target.nickname, true);
 	}
 
 	async inviteUser(user: User, target: User, channel) {
@@ -566,11 +568,18 @@ export class ChatService {
 		if (!channel.members.find(member => {return member.userId === user.id;})) {
 			throw new Error('you are not in this channel');
 		}
-
-		// CHANNEL HAS TO BE IN PRIVATE ??
-		
-		// HAVE TO BE ADMIN ??? IDK
-
+		// IF CHANNEL NOT PRIVATE
+		if (channel.access !== 'private') {
+			throw new Error('this channel is not private');
+		}
+		// IF USER NOT ADMIN
+		if (!(await this.isAdmin(channel.id, user.id))) {
+			throw new Error('you are not admin');
+		}
+		// IF NOT FRIENDS WITH TARGET
+		if (!(await this.isFriend(user.id, target.id))) {
+			throw new Error('you are not friends with this user');
+		}
 		// IF TARGET ALREADY IN CHANNEL
 		if (channel.members.find(member => {return member.userId === target.id;})) {
 			throw new Error('target is already in this channel');
@@ -591,6 +600,8 @@ export class ChatService {
 				userId: target.id
 			}
 		});
+
+		// + ADD TO PRIVMSG HISTORY
 	}
 
 	async addAdmin(user: User, target: User, channel) {
@@ -631,6 +642,7 @@ export class ChatService {
 				admin: true
 			}
 		});
+		await this.saveChanmsg(channel.id, user.id, 'made '+target.nickname+' an admin', true);
 	}
 
 
@@ -739,6 +751,20 @@ export class ChatService {
 		return member.owner;
 	}
 
+	async isFriend(userId: number, targetId: number): Promise<boolean> {
+		const friendship = await this.prisma.friendship.findUnique({
+			where: {
+				user1Id_user2Id: {
+					user1Id: userId,
+					user2Id: targetId
+				}
+			}
+		});
+		if (friendship)
+			return true;
+		return false;
+	}
+
 	validateName(name: string) {
 		if (name.length < 2 || name.length > 20)
 			throw new Error('Channel name must be 2-20 characters');
@@ -746,5 +772,39 @@ export class ChatService {
 		const pattern =  /^[a-zA-Z0-9_-]*$/;
 		if (!pattern.test(name))
 			throw new Error('Forbidden characters in channel name');
+	}
+
+	async deleteChannel(chanId: number) {
+		// delete invited
+		await this.prisma.invited.deleteMany({
+			where: {chanId: chanId}
+		});
+		// delete banned
+		await this.prisma.banned.deleteMany({
+			where: {chanId: chanId}
+		});
+		// delete messages
+		await this.prisma.chanmsg.deleteMany({
+			where: {chanId: chanId}
+		})
+		// delete members
+		await this.prisma.member.deleteMany({
+			where: {chanId: chanId}
+		});
+		// delete channel
+		await this.prisma.channel.delete({
+			where: {id: chanId}
+		});
+	}
+
+	async saveChanmsg(chanId: number, senderId: number, message: string, isCmd: boolean) {
+		await this.prisma.chanmsg.create({
+			data: {
+				chanId: chanId,
+				userId: senderId,
+				message: message,
+				isCommand: isCmd
+			}
+		});
 	}
 }
