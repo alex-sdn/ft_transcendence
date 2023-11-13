@@ -35,6 +35,7 @@
     "react-bootstrap": "^2.9.1",
     "react-modal": "^3.16.1",
     "react-popper": "^2.3.0",
+    "react-time-picker": "^6.5.2",
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.7.2",
     "speakeasy": "^2.0.0",

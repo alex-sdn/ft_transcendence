@@ -36,7 +36,7 @@ const Channel: React.FC = () => {
                     </button>
                 </p>
             </div>
-            <div id='users'>
+            <div id='members'>
                 <ChannelMembers />
             </div>
         </div>

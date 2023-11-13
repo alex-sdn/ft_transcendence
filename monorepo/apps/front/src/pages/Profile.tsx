@@ -50,6 +50,7 @@ const Profile: React.FC = () => {
         },
       },);
       const fileName = response.data.avatar;
+      console.log("response.data = " + response.data);
 
       response = await axios.get('api/user/avatar/' + fileName, {
         headers: {
