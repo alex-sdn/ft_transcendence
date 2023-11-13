@@ -32,3 +32,18 @@
     bottom: 3%;
     transform: translate(-85%, 0);
 }
+
+.channel #members {
+    display: flex;
+    position: absolute;
+    background: white;
+    color: black;
+    width: 25%;
+    height: 77%;
+    left: 1375px;
+    bottom: 3%;
+}
+
+.channel #members li {
+    list-style-type: none;
+}

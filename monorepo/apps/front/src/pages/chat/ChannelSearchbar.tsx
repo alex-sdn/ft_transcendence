@@ -31,7 +31,7 @@ const ChannelSearchbar: React.FC = () => {
     const socket = useContext(SocketContext);
 
     const getSearchChannels = async (value: string) => {
-        await axios.get('/api/chat/channels/all', {
+        await axios.get('/api/chat/channels/other', {
             headers: {
                 'Authorization': 'Bearer ' + jwtToken,
             },
