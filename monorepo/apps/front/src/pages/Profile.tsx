@@ -4,8 +4,10 @@
   import ProfilePicture from './ProfilePicture';
   import Modal from 'react-modal';
   import Nickname from './Nickname';
+  import Twofa from './2fa';
 
   const Profile: React.FC = () => {
+
 
     const [nickname, setNickname] = useState<string>('');
     const [image, setImage] = useState<File>();
@@ -13,8 +15,10 @@
     const [win, setWin] = useState<number>();
     const [lp, setLp] = useState<number>();
     const [twofa, setTwofa] = useState<boolean>();
-    const [stringTwofa, setStringTwofa] = useState<string>();
+    // const [stringTwofa, setStringTwofa] = useState<string>('');
     const [gameNb, setGameNb] = useState<number>();
+    // const [inputCode, setInputCode] = useState<string>('');
+    // const [inputCode, setInputCode] = useState<number>();
 
 //REQUETE PROFILE INFOS
     const jwtToken = Cookies.get('jwt-token');
@@ -92,24 +96,48 @@
   };
 
     // MODALE 2FA activation
-    useEffect(() => {
-      const ac2fa = async () => {
-          const response = await axios.post(
-            '/api/user/me/edit2fa', 
-            {}, 
-            {
-              headers: {
-                'Authorization': 'Bearer ' + jwtToken,
-              },
-            }
-          );
-          if (response.status === 201) {
-            const resp2fa = response.data;
-            setStringTwofa(resp2fa);
-          }
-      };
-      ac2fa(); 
-    }, []);
+    // useEffect(() => {
+    //   const ac2fa = async () => {
+    //       const response = await axios.post(
+    //         '/api/user/me/edit2fa', 
+    //         {}, 
+    //         {
+    //           headers: {
+    //             'Authorization': 'Bearer ' + jwtToken,
+    //           },
+    //         }
+    //       );
+    //       if (response.status === 201) {
+    //         const resp2fa = response.data;
+    //         setStringTwofa(resp2fa);
+    //       }
+    //   };
+    //   ac2fa(); 
+    // }, []);
+
+    // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //   setInputCode(e.target.value);
+    // }
+    // const handleValidation = () => {
+    //   ac2fabutton();
+    // }
+
+    // const ac2fabutton = async () => {
+
+    //     const responsesecret = await axios.post(
+    //         '/api/user/me/activate2fa', {code: inputCode},
+    //        {headers : {
+    //            'Authorization' : 'Bearer ' + jwtToken,
+    //        },});
+    //        console.log('**************' + responsesecret.status);
+    //        if (responsesecret.status === 200) {
+    //         console.log('2FA activated successfully'); 
+    //         window.location.reload();
+    //         setIsOpenfa(false);
+    //        }
+    //       else {
+    //       console.log('**************' + responsesecret.status);
+    //         console.log('2fa FAILED')}}
 
     const [isOpenfa, setIsOpenfa] = useState(false);
 
@@ -199,63 +227,16 @@
       onRequestClose={closeModalfa}
       style={customStyles}>
       <button onClick={closeModalfa}>x</button>
-      <img src={stringTwofa} alt="QR code" />
+      <Twofa/>
+      {/* <img src={stringTwofa} alt="QR code" />
+      <input type='text' name='code' id='code' value={inputCode} onChange={handleChange} placeholder='Enter OTP'/>
+      <button onClick={handleValidation}></button> */}
       </Modal>
         </div> } 
 
   </div>
 </div>
-
       )
-
-
   }
 
   export default Profile;
-
-
- {/* <Modal 
-      isOpen={isOpenfa} 
-      onRequestClose={closeModalfa}
-      style={customStyles}>
-      {stringTwofa && <img src={stringTwofa} alt="QR code" />}
-      <button onClick={closeModalfa}>x</button>
-    </Modal> */}
-    
-    
-
-    
-    {/* {twofa ? 
-    (<button className="button-29" onClick={deac2fa}>activated</button>) : 
-    ( <button className="button-29" onClick={openModalfa}>deactivated</button>)}
-   
-    <Modal 
-  isOpen={isOpenfa} 
-  onRequestClose={closeModalfa}
-  style={customStyles}>
-  {stringTwofa ? (
-    <img src={stringTwofa} alt="QR code" />
-  ) : (
-    <p>Aucune image disponible</p>
-  )}
-  <button onClick={closeModalfa}>x</button>
-</Modal> */}
-
-
-
-
-{/* <button className='button-29' onClick={twofa ? deac2fa : openModalfa}>
-  {twofa ? 'activated' : 'deactivated'}
-</button>
-<Modal 
-  isOpen={isOpenfa} 
-  onRequestClose={closeModalfa}
-  style={customStyles}
->
-  {stringTwofa ? (
-    <img src={stringTwofa} alt="QR code" />
-  ) : (
-    <p>Aucune image disponible</p>
-  )}
-  <button onClick={closeModalfa}>x</button>
-</Modal> */}
