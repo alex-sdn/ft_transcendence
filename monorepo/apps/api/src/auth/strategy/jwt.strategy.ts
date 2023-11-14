@@ -24,8 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 			},
 		});
 
-		// delete unnecessary info
-		delete user.secret2fa;
+		// delete unnecessary info ?
 		return user;
 	}
 }
