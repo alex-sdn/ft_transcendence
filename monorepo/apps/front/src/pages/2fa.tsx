@@ -40,6 +40,7 @@ const Twofa: React.FC = () => {
               '/api/user/me/activate2fa', {code: inputCode},
              {headers : {
                  'Authorization' : 'Bearer ' + jwtToken,
+                 'Content-Type': 'application/json',
              },});
              console.log('**************' + responsesecret.status);
              if (responsesecret.status === 200) {
