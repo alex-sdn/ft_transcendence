@@ -182,6 +182,7 @@ model Chanmsg {
 	userId		Int
 
 	message		String
+	isCommand	Boolean
 }
 
 // RELOU???????
