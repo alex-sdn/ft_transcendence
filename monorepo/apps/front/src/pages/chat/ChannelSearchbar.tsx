@@ -3,7 +3,6 @@ import React, { useContext, useState } from "react";
 import Cookies from "js-cookie";
 import {
     Modal,
-    Alert,
     ModalHeader,
     ModalTitle,
     ModalBody,
@@ -92,8 +91,11 @@ const ChannelSearchbar: React.FC = () => {
                         getSearchChannels(e.target.value);
                     }}
                     placeholder="Join a channel" />
-                <button disabled={value.length < 2} onClick={isChannelProtected}>
-                    <span className="material-symbols-outlined">add</span>
+                <button disabled={value.length < 2}
+                    onClick={isChannelProtected}
+                    className="material-symbols-outlined"
+                >
+                    add
                 </button>
                 <Modal show={showPasswordModal}
                     onHide={() => {
@@ -132,10 +134,12 @@ const ChannelSearchbar: React.FC = () => {
                     onHide={() => setShowJoinModal(false)}
                     style={{ color: "black" }}
                 >
+                    <ModalHeader>
+                        <ModalTitle>
+                            <div>Do you want to join <strong>{value}</strong> ?</div>
+                        </ModalTitle>
+                    </ModalHeader>
                     <ModalBody>
-                        <p>Do you want to join <strong>{value}</strong> ?</p>
-                    </ModalBody>
-                    <ModalFooter>
                         <button className="button-59"
                             onClick={() => setShowJoinModal(false)}>
                             No
@@ -147,7 +151,7 @@ const ChannelSearchbar: React.FC = () => {
                             }}>
                             Yes
                         </button>
-                    </ModalFooter>
+                    </ModalBody>
                 </Modal>
             </div>
             <div className="searchResults">
