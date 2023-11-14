@@ -1,0 +1,34 @@
+.channel h2 {
+    position: absolute;
+    display: flex;
+    left: 350px;
+    top: 15%;
+    /* transform: translate(); */
+}
+
+.channel #chat {
+    display: flex;
+    position: absolute;
+    background: white;
+    width: 50%;
+    height: 77%;
+    left: 350px;
+    bottom: 3%;
+}
+
+.channel input {
+    position: absolute;
+    display: flex;
+    width: 85%;
+    left: 50%;
+    bottom: 3%;
+    transform: translate(-50%, 0);
+}
+
+#send-button {
+    position: absolute;
+    display: flex;
+    left: 95%;
+    bottom: 3%;
+    transform: translate(-85%, 0);
+}
