@@ -1,33 +1,32 @@
 import React, { useContext, useState } from "react";
-import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
 import { user } from './Channel.tsx';
 import SocketContext from "../../Socket";
+import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 
-interface muteModalProps {
+interface banModalProps {
     selectedMember: user;
     selectedChannel: string | undefined;
-    muteModal: boolean;
+    banModal: boolean;
     onClose: () => void;
 }
 
-const Mute: React.FC<muteModalProps> = ({
+const Ban: React.FC<banModalProps> = ({
     selectedMember,
     selectedChannel,
-    muteModal,
+    banModal,
     onClose
 }) => {
     const socket = useContext(SocketContext);
-    const [duration, setDuration] = useState<string>("");
     const [error, setError] = useState<string>("");
 
-    const handleMute = async () => {
+    const handleBan = async () => {
         const createPromise = new Promise<{
             sender: string;
             target: string
         }>((resolve, reject) => {
             if (socket) {
-                socket.emit("mute", { target: selectedMember.name, channel: selectedChannel, time: duration });
-                socket.on("mute", (data) => {
+                socket.emit("ban", { target: selectedMember.name, channel: selectedChannel });
+                socket.on("ban", (data) => {
                     resolve(data);
                 });
                 socket.on("error", data => {
@@ -38,11 +37,11 @@ const Mute: React.FC<muteModalProps> = ({
 
         createPromise
             .then((data) => {
-                const message = data.sender + " muted " + data.target + " for " + duration + " minutes";
+                const message = data.sender + " banned " + data.target;
                 socket?.emit("message", { target: selectedChannel, message: message });
                 setError("");
-                setDuration("");
                 onClose();
+                window.location.reload();
             })
             .catch((error) => {
                 setError(error.message);
@@ -51,40 +50,30 @@ const Mute: React.FC<muteModalProps> = ({
 
     return (
         <div>
-            <Modal show={muteModal}
+            <Modal show={banModal}
                 onHide={() => onClose}
                 style={{ color: "black" }}
                 className="text-center"
             >
                 <ModalHeader>
                     <ModalTitle>
-                        For how long do you want you mute {selectedMember.name}?
+                        Do you really want to ban <strong>{selectedMember.name}</strong>?
                     </ModalTitle>
                 </ModalHeader>
                 <ModalBody>
-                    <input type="number"
-                        step={"any"}
-                        min={1}
-                        value={duration}
-                        onChange={(e) => setDuration(e.target.value)}
-                        placeholder="Duration in minutes"
-                        required />
-                    {error && <div className="text-danger">{error}</div>}
-                </ModalBody>
-                <ModalFooter>
-                    <button className="button-59" onClick={handleMute}>Mute</button>
+                    <button className="button-59" onClick={handleBan}>Yes</button>
                     <button className="button-59"
                         onClick={() => {
                             onClose();
                             setError("");
-                            setDuration("")
                         }}>
-                        Close
+                        No
                     </button>
-                </ModalFooter>
+                    {error && <div className="text-danger">{error}</div>}
+                </ModalBody>
             </Modal>
         </div>
-    );
+    )
 }
 
-export default Mute;
+export default Ban;
