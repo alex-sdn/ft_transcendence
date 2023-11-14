@@ -1,79 +1,48 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import Modal from "react-modal";
+import Cookies from "js-cookie";
+import axios from "axios";
+
 import CreateChannel from "../pages/chat/CreateChannel";
+import ChannelSearchbar from "../pages/chat/ChannelSearchbar";
 
 const ChatLayout: React.FC = () => {
-    const channels = ["Chocolat", "Chien", "Chat", "Cafeine", "Cafe"];
-    const [value, setValue] = useState("");
+    const jwtToken = Cookies.get('jwt-token');
+    const [myChannels, setMyChannels] = useState<string[]>([]);
+    //changer channels par list et requete sur channels ou friends
 
-    const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(event.target.value,);
-    }
-
-    //MODALE start {
-    const [isOpen, setIsOpen] = useState(false);
-
-    const openModal = () => {
-        setIsOpen(true);
-    };
-
-    const closeModal = () => {
-        window.location.reload();
-        setIsOpen(false);
-    };
-    // } MODALE end
-
-    const customStyles = {
-        content: {
-            top: '50%',
-            left: '50%',
-            right: 'auto',
-            bottom: 'auto',
-            transform: 'translate(-50%, -50%)',
-            width: '400px',
-            height: '400px',
-        },
-    };
+    useEffect(() => {
+        const getMyChannels = async () => {
+            const response = await axios.get('/api/chat/channels/me', {
+                headers: {
+                    'Authorization': 'Bearer ' + jwtToken,
+                },
+            },);
+            if (response.status === 200) {
+                if (Array.isArray(response.data)) {
+                    const channels = response.data.map((channel) => channel.channel.name);
+                    setMyChannels(channels);
+                }
+            }
+        }
+        getMyChannels();
+    }, []);
 
     return (
         <div>
             <div className="sidebar">
-                <div className="searchBar">
-                    <div>
-                        <input type="text" value={value} onChange={handleValueChange} />
-                        <button /*onClick={(renvoie sur la page du channel selectionne)}*/>
-                            <span className="material-symbols-outlined">search</span>
-                        </button>
-                    </div>
-                    <ul>
-                        {
-                            value && (channels.filter((element) => element.toLowerCase().includes(value.toLowerCase()))
-                                .map((element, index) => <li onClick={() => setValue(element)} key={index}>{element}</li>))
-                        }
-                    </ul>
-                </div>
+                <ChannelSearchbar />
                 <nav>
                     <ul>
-                        <li>
-                            <NavLink to={`/chat/channel/1`}>Channel1</NavLink>
-                        </li>
-                        <li>
-                            <NavLink to={`/chat/channel/2`}>Channel2</NavLink>
-                        </li>
+                        {myChannels.map((channelName, index) => (
+                            <li key={index}>
+                                <NavLink to={`/chat/channel/${channelName}`}>{channelName}</NavLink>
+                            </li>
+                        ))}
                     </ul>
                 </nav>
-                <div id="newChannel">
-                    <button className="button-59" onClick={openModal}>New channel</button>
-                    <Modal
-                        isOpen={isOpen}
-                        onRequestClose={closeModal}
-                        contentLabel="new channel"
-                        style={customStyles}
-                    >
-                        <button className="material-symbols-outlined" onClick={closeModal}>close</button>
-                        <CreateChannel />
-                    </Modal>
+                <div /*id="newChannel"*/>
+                    <CreateChannel />
                 </div>
 
             </div>

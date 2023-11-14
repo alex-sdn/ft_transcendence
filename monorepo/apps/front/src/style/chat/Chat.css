@@ -1,0 +1,46 @@
+/* add button */
+@import url(https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200);
+/* send button */
+@import url(https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200);
+
+.sidebar {
+    height: calc(100vh - 116px);
+    background-color: white;
+    position: relative;
+    width: 300px;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar a {
+    display: block;
+    color: black;
+    padding: 10px;
+    text-decoration: none;
+    border-left: 0;
+}
+
+.sidebar a.active {
+    color: white;
+    background-color: black;
+}
+
+.sidebar a:hover:not(.active) {
+    color: white;
+    background-color: black;
+}
+
+.sidebar ul li:hover {
+    color: white;
+    background-color: black;
+}
+
+/* search button begin */
+.material-symbols-outlined {
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
+}
+/* search button end */

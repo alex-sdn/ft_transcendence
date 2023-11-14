@@ -1,12 +1,11 @@
-
-//import './App.css'
-
 import {
   createBrowserRouter,
   Route,
   createRoutesFromElements,
   RouterProvider
 } from 'react-router-dom'
+
+import SocketContext, { initializeSocket } from './Socket'
 
 // layouts
 import RootLayout from './layouts/RootLayout'
@@ -21,7 +20,6 @@ import Login from './pages/Login'
 import Nickname from './pages/Nickname'
 import ProfilePicture from './pages/ProfilePicture'
 import Channel from './pages/chat/Channel'
-import CreateChannel from './pages/chat/CreateChannel'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -29,9 +27,7 @@ const router = createBrowserRouter(
       <Route index element={<Home />} />
       <Route path="game" element={<Game />} />
       <Route path="chat" element={<ChatLayout />}>
-        {/* <Route path=":channelName/:channelId" element={<Channel />}/> */}
-        <Route path="channel/:channelId" element={<Channel />} />
-        <Route path="create-channel" element={<CreateChannel />} />
+        <Route path="channel/:channelName" element={<Channel />} />
       </Route>
       <Route path="profile" element={<Profile />} />
       <Route path="login" element={<Login />} />
@@ -43,8 +39,12 @@ const router = createBrowserRouter(
 )
 
 function App() {
+  const socket = initializeSocket();
+
   return (
-    <RouterProvider router={router} />
+    <SocketContext.Provider value={socket}>
+      <RouterProvider router={router} />
+    </SocketContext.Provider>
   );
 }
 

@@ -5,7 +5,7 @@ import { AuthService } from "src/auth/auth.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { ChatService } from "../chat.service";
 
-@WebSocketGateway({namespace: 'chat'})
+@WebSocketGateway({namespace: 'chat1'})
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
 		private chatService: ChatService,
@@ -62,7 +62,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 
 		try {
-			await this.chatService.messageChannel(channel, user);
+			await this.chatService.messageChannel(channel, user, message.message);
 			//send to all connected members (including sender)
 			for (var i in channel.members) {
 				const socket = this.userToSocket.get(channel.members[i].userId);
@@ -93,18 +93,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 
 		try {
-			await this.chatService.privMessage(sender, target);
+			await this.chatService.privMessage(sender, target, message.message);
 			
 			// Get target socket
 			const targetSocket = this.userToSocket.get(target.id);
-			if (!targetSocket) {
-				throw new Error('target not connected to ws');
+			if (targetSocket) {
+				targetSocket.emit('privmsg', {
+					sender: sender.nickname,
+					message: message.message
+				});
 			}
 			// Send to target AND sender (?)
-			targetSocket.emit('privmsg', {
-				sender: sender.nickname,
-				message: message.message
-			});
 			client.emit('privmsg', {
 				sender: sender.nickname,
 				message: message.message
