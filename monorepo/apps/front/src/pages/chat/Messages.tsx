@@ -1,66 +1,62 @@
 import React, { useContext, useState, useEffect } from 'react';
-import SocketContext from '../../Socket';
 import { useParams } from 'react-router-dom';
+import SocketContext from '../../Socket';
 
 interface Message {
   sender: string;
-  target: string;
   content: string;
 }
 
-const Messages: React.FC = () => {
+const Messages: React.FC<{ channelName: string }> = ({ channelName }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const socket = useContext(SocketContext);
-  const { channelName } = useParams<{ channelName: string }>();
 
   useEffect(() => {
-    socket.on('message', (message: Message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    });
+    const handleMessage = (message: Message) => {
+      setMessages(prevMessages => [...prevMessages, message]);
+    };
+
+    socket.on('message', handleMessage);
 
     return () => {
-      socket.off('message');
+      socket.off('message', handleMessage);
     };
   }, [socket]);
 
-  const handleSendMessage = () => {
-    if (newMessage.trim()) {
+  const handleSendMessage = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (newMessage.trim() && socket) {
       socket.emit('message', {
-        target: channelName,
-        message: newMessage.trim()
+        sender: 'me', // Replace with the actual sender's information
+        content: newMessage.trim(),
+        target: channelName
       });
       setNewMessage('');
     }
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      handleSendMessage();
-    }
-  };
-
   return (
-    <div>
-      <div id="messages-list">
+    <div className="messages-container">
+      <div className="messages-list">
         {messages.map((msg, index) => (
-          <div key={index}>
+          <div key={index} className="message">
             <strong>{msg.sender}:</strong> {msg.content}
           </div>
         ))}
       </div>
-      <div id="message-input">
+      <form className="message-form" onSubmit={handleSendMessage}>
         <input
+          className="message-input"
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
           placeholder="Write a message..."
         />
-        <button onClick={handleSendMessage} disabled={!newMessage.trim()}>
+        <button className="send-button" type="submit" disabled={!newMessage.trim()}>
           Send
         </button>
-      </div>
+      </form>
     </div>
   );
 };

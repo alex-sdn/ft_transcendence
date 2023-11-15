@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import ChannelMembers from './ChannelMembers'
+import ChannelMembers from './ChannelMembers';
 import Cookies from "js-cookie";
 import axios from 'axios';
 import Settings from './Settings';
+import Messages from './Messages'; // Import the Messages component
 
-export interface user {
+export interface User {
     name: string;
     owner: boolean;
     admin: boolean;
@@ -13,9 +14,8 @@ export interface user {
 }
 
 const Channel: React.FC = () => {
-    const [message, setMessage] = useState<string>("");
-    const [members, setMembers] = useState<user[]>([]);
-    const [me, setMe] = useState<user>();
+    const [members, setMembers] = useState<User[]>([]);
+    const [me, setMe] = useState<User>();
     const [settingsModal, setSettingsModal] = useState<boolean>(false);
     const jwtToken = Cookies.get('jwt-token');
     const { channelName } = useParams<{ channelName: string }>();
@@ -51,46 +51,23 @@ const Channel: React.FC = () => {
             }
         }
         getChannelMembers();
-    }, [channelName, me, jwtToken]); // fonction appelee chaque fois que les elements entre [] changent
+    }, [channelName, jwtToken]); // fonction appelee chaque fois que les elements entre [] changent
 
     return (
         <div className="channel">
             <div className='name-settings'>
                 <h2>{channelName}</h2>
-                <button className="material-symbols-outlined"
-                    onClick={() => setSettingsModal(true)}
-                >
+                <button className="material-symbols-outlined" onClick={() => setSettingsModal(true)}>
                     settings
                 </button>
-                {me && channelName &&
-                    <Settings me={me}
-                        channelName={channelName}
-                        settingsModal={settingsModal}
-                        onClose={() => setSettingsModal(false)}
-                    />}
+                {me && channelName && <Settings me={me} channelName={channelName} settingsModal={settingsModal} onClose={() => setSettingsModal(false)} />}
             </div>
-            <div id='chat' >
-                <p>
-                    <input type='text'
-                        placeholder='Send a message'
-                        onChange={(e) => setMessage(e.target.value)} />
-                </p>
-                <p>
-                    <button
-                        className="material-symbols-outlined"
-                        id='send-button'
-                        type='submit'
-                        value={message}
-                        disabled={!message}
-                    >
-                        send
-                    </button>
-                </p>
-            </div>
+            
+            {/* Include the Messages component */}
+            {channelName && <Messages channelName={channelName} />}
+
             <div id='members'>
-                {members && me &&
-                    <ChannelMembers members={members} me={me} />
-                }
+                {members && me && <ChannelMembers members={members} me={me} />}
             </div>
         </div>
     );
