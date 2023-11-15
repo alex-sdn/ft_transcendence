@@ -20,6 +20,7 @@ import Login from './pages/Login'
 import Nickname from './pages/Nickname'
 import ProfilePicture from './pages/ProfilePicture'
 import Channel from './pages/chat/Channel'
+// import Disconnect from './pages/Disconnect'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -32,6 +33,7 @@ const router = createBrowserRouter(
       <Route path="profile" element={<Profile />} />
       <Route path="login" element={<Login />} />
       <Route path="nickname" element={<Nickname />} />
+      {/* <Route path="disconnect" element={<Disconnect />} /> */}
       <Route path="profile_picture" element={<ProfilePicture />} />
       <Route path='*' element={<NotFound />} />
     </Route>
