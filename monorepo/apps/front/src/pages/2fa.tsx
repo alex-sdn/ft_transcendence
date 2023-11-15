@@ -35,7 +35,6 @@ const Twofa: React.FC = () => {
       }
   
       const ac2fabutton = async () => {
-  
           const responsesecret = await axios.post(
               '/api/user/me/activate2fa', {code: inputCode},
              {headers : {
