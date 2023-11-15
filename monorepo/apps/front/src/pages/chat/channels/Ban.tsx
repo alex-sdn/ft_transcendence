@@ -1,32 +1,32 @@
 import React, { useContext, useState } from "react";
 import { user } from './Channel.tsx';
-import SocketContext from "../../Socket";
+import SocketContext from "../../../Socket.js";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 
-interface kickModalProps {
+interface banProps {
     selectedMember: user;
     selectedChannel: string | undefined;
-    kickModal: boolean;
+    banModal: boolean;
     onClose: () => void;
 }
 
-const Kick: React.FC<kickModalProps> = ({
+const Ban: React.FC<banProps> = ({
     selectedMember,
     selectedChannel,
-    kickModal,
+    banModal,
     onClose
 }) => {
     const socket = useContext(SocketContext);
     const [error, setError] = useState<string>("");
 
-    const handleKick = async () => {
+    const handleBan = async () => {
         const createPromise = new Promise<{
             sender: string;
             target: string
         }>((resolve, reject) => {
             if (socket) {
-                socket.emit("kick", { target: selectedMember.name, channel: selectedChannel });
-                socket.on("kick", (data) => {
+                socket.emit("ban", { target: selectedMember.name, channel: selectedChannel });
+                socket.on("ban", (data) => {
                     resolve(data);
                 });
                 socket.on("error", data => {
@@ -37,7 +37,7 @@ const Kick: React.FC<kickModalProps> = ({
 
         createPromise
             .then((data) => {
-                const message = data.sender + " kicked " + data.target;
+                const message = data.sender + " banned " + data.target;
                 socket?.emit("message", { target: selectedChannel, message: message });
                 setError("");
                 onClose();
@@ -50,18 +50,18 @@ const Kick: React.FC<kickModalProps> = ({
 
     return (
         <div>
-            <Modal show={kickModal}
+            <Modal show={banModal}
                 onHide={() => onClose}
                 style={{ color: "black" }}
                 className="text-center"
             >
                 <ModalHeader>
                     <ModalTitle>
-                        Do you really want to kick <strong>{selectedMember.name}</strong>?
+                        Do you really want to ban <strong>{selectedMember.name}</strong>?
                     </ModalTitle>
                 </ModalHeader>
                 <ModalBody>
-                    <button className="button-59" onClick={handleKick}>Yes</button>
+                    <button className="button-59" onClick={handleBan}>Yes</button>
                     <button className="button-59"
                         onClick={() => {
                             onClose();
@@ -76,4 +76,4 @@ const Kick: React.FC<kickModalProps> = ({
     )
 }
 
-export default Kick;
+export default Ban;

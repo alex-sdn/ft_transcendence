@@ -59,7 +59,7 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ members, me }) => {
                 {selectedMember &&
                     <ModalHeader className="justify-content-center">
                         <ModalTitle className="text-center">
-                            {selectedMember.name}
+                            {selectedMember.name} {/* remplacer le nom du user par un lien vers son profile */}
                             {selectedMember.owner &&
                                 <span className="material-symbols-outlined">
                                     family_star
