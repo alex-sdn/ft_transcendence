@@ -1,0 +1,46 @@
+.messages-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+  
+.messages-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ccc; /* Light grey border */
+}
+  
+.message {
+    padding: 5px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee; /* Light grey line under each message */
+}
+  
+.message-form {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    gap: 10px; /* Space between input and button */
+}
+  
+.message-input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+  
+.send-button {
+    padding: 10px 20px;
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+  
+.send-button:disabled {
+    background-color: #aaa; /* Disabled button color */
+}
