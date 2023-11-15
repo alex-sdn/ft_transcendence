@@ -1,32 +1,32 @@
 import React, { useContext, useState } from "react";
 import { user } from './Channel.tsx';
-import SocketContext from "../../Socket";
+import SocketContext from "../../../Socket.js";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 
-interface banModalProps {
+interface adminProps {
     selectedMember: user;
     selectedChannel: string | undefined;
-    banModal: boolean;
+    adminModal: boolean;
     onClose: () => void;
 }
 
-const Ban: React.FC<banModalProps> = ({
+const Admin: React.FC<adminProps> = ({
     selectedMember,
     selectedChannel,
-    banModal,
+    adminModal,
     onClose
 }) => {
     const socket = useContext(SocketContext);
     const [error, setError] = useState<string>("");
 
-    const handleBan = async () => {
+    const handleAdmin = async () => {
         const createPromise = new Promise<{
             sender: string;
             target: string
         }>((resolve, reject) => {
             if (socket) {
-                socket.emit("ban", { target: selectedMember.name, channel: selectedChannel });
-                socket.on("ban", (data) => {
+                socket.emit("admin", { target: selectedMember.name, channel: selectedChannel });
+                socket.on("admin", (data) => {
                     resolve(data);
                 });
                 socket.on("error", data => {
@@ -37,11 +37,10 @@ const Ban: React.FC<banModalProps> = ({
 
         createPromise
             .then((data) => {
-                const message = data.sender + " banned " + data.target;
+                const message = data.sender + " made " + data.target + " an admin";
                 socket?.emit("message", { target: selectedChannel, message: message });
                 setError("");
                 onClose();
-                window.location.reload();
             })
             .catch((error) => {
                 setError(error.message);
@@ -50,18 +49,22 @@ const Ban: React.FC<banModalProps> = ({
 
     return (
         <div>
-            <Modal show={banModal}
+            <Modal show={adminModal}
                 onHide={() => onClose}
                 style={{ color: "black" }}
                 className="text-center"
             >
                 <ModalHeader>
                     <ModalTitle>
-                        Do you really want to ban <strong>{selectedMember.name}</strong>?
+                        Do you really want to make <strong>{selectedMember.name}</strong> an admin?
                     </ModalTitle>
                 </ModalHeader>
                 <ModalBody>
-                    <button className="button-59" onClick={handleBan}>Yes</button>
+                    <button className="button-59"
+                        onClick={handleAdmin}
+                    >
+                        Yes
+                    </button>
                     <button className="button-59"
                         onClick={() => {
                             onClose();
@@ -76,4 +79,4 @@ const Ban: React.FC<banModalProps> = ({
     )
 }
 
-export default Ban;
+export default Admin;

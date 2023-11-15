@@ -8,12 +8,12 @@
   color: black;
 }
 
-.btn-new-channel {
-  display: flex;
-  padding: 50px;
-  position: relative;
-  align-items: center;
-  justify-content: center;
+.new-channel-button {
+  position: absolute;
+  bottom: 68px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 268px;
 }
 
 #newChannel {

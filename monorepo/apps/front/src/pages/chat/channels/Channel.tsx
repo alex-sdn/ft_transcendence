@@ -31,7 +31,7 @@ const Channel: React.FC = () => {
                 headers: {
                     'Authorization': 'Bearer ' + jwtToken,
                 },
-            },)
+            },);
             if (membersResponse.status === 200 && meResponse.status === 200) {
                 const currentUserName = meResponse.data.nickname;
 

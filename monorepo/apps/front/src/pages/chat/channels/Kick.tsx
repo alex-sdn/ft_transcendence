@@ -1,32 +1,32 @@
 import React, { useContext, useState } from "react";
 import { user } from './Channel.tsx';
-import SocketContext from "../../Socket";
+import SocketContext from "../../../Socket.js";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 
-interface adminModalProps {
+interface kickProps {
     selectedMember: user;
     selectedChannel: string | undefined;
-    adminModal: boolean;
+    kickModal: boolean;
     onClose: () => void;
 }
 
-const Admin: React.FC<adminModalProps> = ({
+const Kick: React.FC<kickProps> = ({
     selectedMember,
     selectedChannel,
-    adminModal,
+    kickModal,
     onClose
 }) => {
     const socket = useContext(SocketContext);
     const [error, setError] = useState<string>("");
 
-    const handleAdmin = async () => {
+    const handleKick = async () => {
         const createPromise = new Promise<{
             sender: string;
             target: string
         }>((resolve, reject) => {
             if (socket) {
-                socket.emit("admin", { target: selectedMember.name, channel: selectedChannel });
-                socket.on("admin", (data) => {
+                socket.emit("kick", { target: selectedMember.name, channel: selectedChannel });
+                socket.on("kick", (data) => {
                     resolve(data);
                 });
                 socket.on("error", data => {
@@ -37,10 +37,11 @@ const Admin: React.FC<adminModalProps> = ({
 
         createPromise
             .then((data) => {
-                const message = data.sender + " made " + data.target + " an admin";
+                const message = data.sender + " kicked " + data.target;
                 socket?.emit("message", { target: selectedChannel, message: message });
                 setError("");
                 onClose();
+                window.location.reload();
             })
             .catch((error) => {
                 setError(error.message);
@@ -49,22 +50,18 @@ const Admin: React.FC<adminModalProps> = ({
 
     return (
         <div>
-            <Modal show={adminModal}
+            <Modal show={kickModal}
                 onHide={() => onClose}
                 style={{ color: "black" }}
                 className="text-center"
             >
                 <ModalHeader>
                     <ModalTitle>
-                        Do you really want to make <strong>{selectedMember.name}</strong> an admin?
+                        Do you really want to kick <strong>{selectedMember.name}</strong>?
                     </ModalTitle>
                 </ModalHeader>
                 <ModalBody>
-                    <button className="button-59"
-                        onClick={handleAdmin}
-                    >
-                        Yes
-                    </button>
+                    <button className="button-59" onClick={handleKick}>Yes</button>
                     <button className="button-59"
                         onClick={() => {
                             onClose();
@@ -79,4 +76,4 @@ const Admin: React.FC<adminModalProps> = ({
     )
 }
 
-export default Admin;
+export default Kick;
