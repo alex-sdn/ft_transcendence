@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import Cookies from "js-cookie";
 import {
     Modal,
@@ -26,13 +26,14 @@ interface channelSearchBarProps {
 
 const ChannelSearchbar: React.FC<channelSearchBarProps> = ({ myChannels }) => {
     const [searchChannels, setSearchChannels] = useState<channel[]>([]);
-    const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
-    const [showJoinModal, setShowJoinModal] = useState<boolean>(false);
     const [password, setPassword] = useState<string>("");
     const [error, setError] = useState<string>("");
+    const [errorName, setErrorName] = useState<string>("");
     const [value, setValue] = useState<string>("");
     const jwtToken = Cookies.get('jwt-token');
     const socket = useContext(SocketContext);
+    const [passwordModal, setPasswordModal] = useState<boolean>(false);
+    const [joinModal, setJoinModal] = useState<boolean>(false);
 
     const getSearchChannels = async (value: string) => {
         await axios.get('/api/chat/channels/other', {
@@ -55,28 +56,30 @@ const ChannelSearchbar: React.FC<channelSearchBarProps> = ({ myChannels }) => {
         const joined = myChannels.find((item) => item === value);
         if (res) {
             if (res.access === 'protected') {
-                setShowPasswordModal(true);
+                setPasswordModal(true);
             }
             else {
-                setShowJoinModal(true);
+                setJoinModal(true);
             }
         }
         else if (joined) {
-            setError("You are already in this channel");
+            setErrorName("You are already in this channel");
         }
         else {
-            setError("This channel doesn't exist");
+            setErrorName("This channel doesn't exist");
         }
     }
 
-    const joinChannel = async () => {
+    const joinChannel = async (event: React.FormEvent) => {
+        event.preventDefault();
+
         const createPromise = new Promise<{ target: string }>((resolve, reject) => {
             if (socket) {
                 socket.emit("join", { target: value, password: password });
                 socket.on("join", (data) => {
                     resolve(data);
                 });
-                socket.on('error', (data) => {
+                socket.on("error", (data) => {
                     reject(data);
                 });
             }
@@ -84,12 +87,11 @@ const ChannelSearchbar: React.FC<channelSearchBarProps> = ({ myChannels }) => {
 
         createPromise
             .then((data) => {
-                setShowJoinModal(false);
-                window.location.assign(`/chat/channel/${data.target}`);
+                window.location.assign(`/chat/channels/${data.target}`);
             })
             .catch((error) => {
                 setError(error.message);
-                console.log(error.message);
+                setPassword("");
             });
     }
 
@@ -97,11 +99,12 @@ const ChannelSearchbar: React.FC<channelSearchBarProps> = ({ myChannels }) => {
         <div className="searchBar">
             <div>
                 <input type="text"
+                    name="channel-research"
                     value={value}
                     onChange={(e) => {
                         setValue(e.target.value);
                         getSearchChannels(e.target.value);
-                        setError("");
+                        setErrorName("");
                     }}
                     placeholder="Join a channel" />
                 <button disabled={value.length < 2}
@@ -111,67 +114,91 @@ const ChannelSearchbar: React.FC<channelSearchBarProps> = ({ myChannels }) => {
                     add
                 </button>
             </div>
-            {error && <div className="text-danger">{error}</div>}
+            {errorName && <div className="text-danger">{errorName}</div>}
             <div className="searchResults">
                 <ul>
-                    {searchChannels && searchChannels.map((element, index) => <li onClick={() => setValue(element.name)} key={index}>{element.name}</li>)}
+                    {searchChannels && searchChannels.map((element, index) => <li onClick={() => {
+                        setValue(element.name);
+                        setErrorName("");
+                    }} key={index}>{element.name}</li>)}
                 </ul>
             </div>
-            <Modal show={showPasswordModal}
-                onHide={() => {
-                    setShowPasswordModal(false);
-                }}
+            <Modal show={passwordModal}
+                onHide={() => { setPasswordModal(false) }}
                 style={{ color: "black" }}
             >
-                <ModalHeader closeButton>
+                <ModalHeader>
                     <ModalTitle>This channel is protected</ModalTitle>
                 </ModalHeader>
                 <ModalBody>
-                    <Form onSubmit={() => {
-                        setShowPasswordModal(false);
-                        joinChannel();
-                    }}>
-                        <FormGroup controlId="password">
-                            <FormLabel>Enter the password to join {value}</FormLabel>
-                            <FormControl type="password"
-                                name="password"
+                    <Form onSubmit={joinChannel}>
+                        <FormGroup controlId="channel-password">
+                            <FormLabel>
+                                Enter the password to join {value}
+                            </FormLabel>
+                            <FormControl
+                                type="password"
+                                name="channel-password"
+                                id="channel-password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                             />
                         </FormGroup>
+                        {error && <div className="text-danger">{error}</div>}
                         <ModalFooter>
                             <button className="button-59"
                                 type="submit"
                             >
                                 Join
                             </button>
+                            <button className="button-59"
+                                type="button"
+                                onClick={() => {
+                                    setPasswordModal(false);
+                                    setError("");
+                                }}
+                            >
+                                Cancel
+                            </button>
                         </ModalFooter>
                     </Form>
                 </ModalBody>
             </Modal>
-            <Modal show={showJoinModal}
-                onHide={() => setShowJoinModal(false)}
+
+            <Modal show={joinModal}
+                onHide={() => setJoinModal(false)}
                 style={{ color: "black" }}
             >
                 <ModalHeader>
                     <ModalTitle>
-                        <div>Do you want to join <strong>{value}</strong> ?</div>
+                        <div>
+                            Do you want to join <strong>{value}</strong>?
+                        </div>
                     </ModalTitle>
                 </ModalHeader>
                 <ModalBody>
                     <button className="button-59"
-                        onClick={() => setShowJoinModal(false)}>
+                        onClick={() => {
+                            setJoinModal(false);
+                            setError("");
+                        }}>
                         No
                     </button>
                     <button className="button-59"
-                        onClick={() => {
-                            setShowJoinModal(false);
-                            joinChannel()
-                        }}>
+                        onClick={joinChannel}>
                         Yes
                     </button>
+                    {error && <div className="text-danger">{error}</div>}
                 </ModalBody>
+                <ModalFooter>
+                    <button onClick={() => {
+                        setError("");
+                        setJoinModal(false);
+                    }}>
+                        Cancel
+                    </button>
+                </ModalFooter>
             </Modal>
         </div>
     );
