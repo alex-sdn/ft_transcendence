@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import ChannelMembers from './ChannelMembers'
 import Cookies from "js-cookie";
 import axios from 'axios';
+
 import Settings from './Settings';
 
 export interface user {
@@ -72,6 +73,7 @@ const Channel: React.FC = () => {
             <div id='chat' >
                 <p>
                     <input type='text'
+                        name='message'
                         placeholder='Send a message'
                         onChange={(e) => setMessage(e.target.value)} />
                 </p>

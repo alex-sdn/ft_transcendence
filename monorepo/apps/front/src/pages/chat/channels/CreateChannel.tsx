@@ -34,7 +34,7 @@ const createChannel: React.FC = () => {
                 });
                 socket.on("error", (data) => {
                     reject(data);
-                })
+                });
             }
         });
 
@@ -106,6 +106,7 @@ const createChannel: React.FC = () => {
                                 Create channel
                             </button>
                             <button className="button-59"
+                                type="button"
                                 onClick={() => {
                                     setChannelName("");
                                     setAccess("public");
