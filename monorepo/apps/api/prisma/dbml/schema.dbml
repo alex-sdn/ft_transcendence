@@ -127,6 +127,7 @@ Table Chanmsg {
   sender User [not null]
   userId Int [not null]
   message String [not null]
+  isCommand Boolean [not null]
 }
 
 Table Privmsg {
