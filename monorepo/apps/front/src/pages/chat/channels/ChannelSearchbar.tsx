@@ -14,11 +14,7 @@ import {
 } from "react-bootstrap";
 
 import SocketContext from "../../../Socket";
-
-interface channel {
-    name: string;
-    access: string;
-}
+import { channel } from "../../../layouts/ChannelsLayout";
 
 interface channelSearchBarProps {
     myChannels: string[];
@@ -192,10 +188,11 @@ const ChannelSearchbar: React.FC<channelSearchBarProps> = ({ myChannels }) => {
                     {error && <div className="text-danger">{error}</div>}
                 </ModalBody>
                 <ModalFooter>
-                    <button onClick={() => {
-                        setError("");
-                        setJoinModal(false);
-                    }}>
+                    <button className="button-59"
+                        onClick={() => {
+                            setError("");
+                            setJoinModal(false);
+                        }}>
                         Cancel
                     </button>
                 </ModalFooter>

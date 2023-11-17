@@ -4,17 +4,20 @@ import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bo
 
 import SocketContext from "../../../Socket.js";
 import Access from "./Access.tsx";
+import { channel } from "../../../layouts/ChannelsLayout.tsx";
+import Invite from "./Invite.tsx";
 
 interface settingsProps {
     me: user;
-    channelName: string;
+    currentChannel: channel;
     settingsModal: boolean;
     onClose: () => void;
 }
 
-const Settings: React.FC<settingsProps> = ({ me, channelName, settingsModal, onClose }) => {
+const Settings: React.FC<settingsProps> = ({ me, currentChannel, settingsModal, onClose }) => {
     const [leaveModal, setLeaveModal] = useState<boolean>(false);
     const [accessModal, setAccessModal] = useState<boolean>(false);
+    const [inviteModal, setInviteModal] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
     const socket = useContext(SocketContext);
 
@@ -25,7 +28,7 @@ const Settings: React.FC<settingsProps> = ({ me, channelName, settingsModal, onC
             target: string
         }>((resolve, reject) => {
             if (socket) {
-                socket.emit("leave", { target: channelName });
+                socket.emit("leave", { target: currentChannel.name });
                 socket.on("leave", (data) => {
                     resolve(data);
                 });
@@ -38,7 +41,7 @@ const Settings: React.FC<settingsProps> = ({ me, channelName, settingsModal, onC
         createPromise
             .then((data) => {
                 const message = data.target + " left the channel";
-                socket?.emit("message", { target: channelName, message: message });
+                socket?.emit("message", { target: currentChannel.name, message: message });
                 setError("");
                 setLeaveModal(false);
                 onClose();
@@ -58,7 +61,7 @@ const Settings: React.FC<settingsProps> = ({ me, channelName, settingsModal, onC
             >
                 <ModalHeader>
                     <ModalTitle>
-                        <strong>{channelName}</strong>'s settings
+                        <strong>{currentChannel.name}</strong>'s settings
                     </ModalTitle>
                 </ModalHeader>
                 <ModalBody>
@@ -67,6 +70,13 @@ const Settings: React.FC<settingsProps> = ({ me, channelName, settingsModal, onC
                     >
                         Leave channel
                     </button>
+                    {me.admin &&
+                        <button className="button-59"
+                            onClick={() => setInviteModal(true)}
+                        >
+                            Invite
+                        </button>
+                    }
                     {me.owner &&
                         <p>
                             <button className="button-59"
@@ -90,7 +100,7 @@ const Settings: React.FC<settingsProps> = ({ me, channelName, settingsModal, onC
                 style={{ color: "black" }}>
                 <ModalHeader>
                     <ModalTitle>
-                        Do you really want to leave <strong>{channelName}</strong>?
+                        Do you really want to leave <strong>{currentChannel.name}</strong>?
                     </ModalTitle>
                 </ModalHeader>
                 <ModalBody>
@@ -111,7 +121,14 @@ const Settings: React.FC<settingsProps> = ({ me, channelName, settingsModal, onC
                 </ModalBody>
             </Modal>
             {socket &&
-                <Access channelName={channelName}
+                <Invite currentChannel={currentChannel}
+                    inviteModal={inviteModal}
+                    socket={socket}
+                    onClose={() => setInviteModal(false)}
+                />
+            }
+            {socket &&
+                <Access currentChannel={currentChannel}
                     accessModal={accessModal}
                     socket={socket}
                     onClose={() => setAccessModal(false)}

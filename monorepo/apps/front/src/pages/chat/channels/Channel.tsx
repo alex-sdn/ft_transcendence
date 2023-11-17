@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import axios from 'axios';
 
 import Settings from './Settings';
+import { channel } from '../../../layouts/ChannelsLayout';
 
 export interface user {
     name: string;
@@ -16,13 +17,14 @@ export interface user {
 const Channel: React.FC = () => {
     const [message, setMessage] = useState<string>("");
     const [members, setMembers] = useState<user[]>([]);
+    const [currentChannel, setCurrentChannel] = useState<channel>();
     const [me, setMe] = useState<user>();
     const [settingsModal, setSettingsModal] = useState<boolean>(false);
     const jwtToken = Cookies.get('jwt-token');
     const { channelName } = useParams<{ channelName: string }>();
 
     useEffect(() => {
-        const getChannelMembers = async () => {
+        const getChannelInfos = async () => {
             const membersResponse = await axios.get(`/api/chat/${channelName}/members`, {
                 headers: {
                     'Authorization': 'Bearer ' + jwtToken,
@@ -50,8 +52,24 @@ const Channel: React.FC = () => {
                     setMembers(otherUsers);
                 }
             }
+
+            const channelsResponse = await axios.get('/api/chat/channels/me', {
+                headers: {
+                    'Authorization': 'Bearer ' + jwtToken,
+                },
+            },);
+            if (channelsResponse.status === 200) {
+                if (Array.isArray(channelsResponse.data)) {
+                    const channels: channel[] = channelsResponse.data.map((channel: any) => ({
+                        name: channel.channel.name,
+                        access: channel.channel.access,
+                    }))
+                    const res = channels.find((channel) => channel.name === channelName);
+                    setCurrentChannel(res);
+                }
+            }
         }
-        getChannelMembers();
+        getChannelInfos();
     }, [channelName, me, jwtToken]); // fonction appelee chaque fois que les elements entre [] changent
 
     return (
@@ -63,9 +81,9 @@ const Channel: React.FC = () => {
                 >
                     settings
                 </button>
-                {me && channelName &&
+                {me && channelName && currentChannel &&
                     <Settings me={me}
-                        channelName={channelName}
+                        currentChannel={currentChannel}
                         settingsModal={settingsModal}
                         onClose={() => setSettingsModal(false)}
                     />}
@@ -90,9 +108,11 @@ const Channel: React.FC = () => {
                 </p>
             </div>
             <div id='members'>
-                {members && me &&
-                    <ChannelMembers members={members} me={me} />
-                }
+                {members && me && currentChannel &&
+                    <ChannelMembers me={me}
+                        members={members}
+                        currentChannel={currentChannel}
+                    />}
             </div>
         </div>
     );

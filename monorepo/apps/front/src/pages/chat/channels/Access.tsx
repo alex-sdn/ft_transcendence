@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Form } from "react-router-dom";
 import { Socket } from "socket.io-client";
-import Cookies from "js-cookie";
 import {
     FormControl,
     FormGroup,
@@ -12,47 +11,24 @@ import {
     ModalHeader,
     ModalTitle
 } from "react-bootstrap";
-import axios from "axios";
+import { channel } from "../../../layouts/ChannelsLayout";
 
 interface accessProps {
-    channelName: string;
+    currentChannel: channel;
     accessModal: boolean;
     socket: Socket;
     onClose: () => void;
 }
 
-interface channel {
-    name: string;
-    access: string;
-}
-
-const Access: React.FC<accessProps> = ({ channelName, accessModal, socket, onClose }) => {
+const Access: React.FC<accessProps> = ({
+    currentChannel,
+    accessModal,
+    socket,
+    onClose
+}) => {
     const [password, setPassword] = useState<string>("");
     const [error, setError] = useState<string>("");
     const [access, setAccess] = useState<string>("");
-    const [currentChannel, setCurrentChannel] = useState<channel>();
-    const jwtToken = Cookies.get('jwt-token');
-
-    useEffect(() => {
-        const getMyChannels = async () => {
-            const response = await axios.get('/api/chat/channels/me', {
-                headers: {
-                    'Authorization': 'Bearer ' + jwtToken,
-                },
-            },);
-            if (response.status === 200) {
-                if (Array.isArray(response.data)) {
-                    const channels: channel[] = response.data.map((channel: any) => ({
-                        name: channel.channel.name,
-                        access: channel.channel.access,
-                    }))
-                    const res = channels.find((channel) => channel.name === channelName);
-                    setCurrentChannel(res);
-                }
-            }
-        }
-        getMyChannels();
-    }, [channelName]);
 
     const handleAccessChange = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -63,7 +39,7 @@ const Access: React.FC<accessProps> = ({ channelName, accessModal, socket, onClo
             access: string;
         }>((resolve, reject) => {
             if (socket) {
-                socket.emit("access", { target: channelName, access: access, password: password });
+                socket.emit("access", { target: currentChannel.name, access: access, password: password });
                 socket.on("access", (data) => {
                     resolve(data);
                 });
@@ -90,13 +66,13 @@ const Access: React.FC<accessProps> = ({ channelName, accessModal, socket, onClo
     return (
         <div>
             <Modal show={accessModal}
-                onHide={() => onClose()}
+                onHide={() => onClose}
                 style={{ color: "black" }}
                 className="text-center"
             >
                 <ModalHeader>
                     <ModalTitle>
-                        Change access of <strong>{channelName}</strong>
+                        Change access of <strong>{currentChannel.name}</strong>
                     </ModalTitle>
                 </ModalHeader>
                 <ModalBody>
