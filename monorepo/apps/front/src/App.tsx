@@ -10,6 +10,8 @@ import SocketContext, { initializeSocket } from './Socket'
 // layouts
 import RootLayout from './layouts/RootLayout'
 import ChatLayout from './layouts/ChatLayout'
+import ChannelsLayout from './layouts/ChannelsLayout'
+import MeLayout from './layouts/FriendsLayout'
 
 //pages
 import Home from './pages/Home'
@@ -19,7 +21,8 @@ import NotFound from './pages/NotFound'
 import Login from './pages/Login'
 import Nickname from './pages/Nickname'
 import ProfilePicture from './pages/ProfilePicture'
-import Channel from './pages/chat/Channel'
+import Channel from './pages/chat/channels/Channel'
+import Friend from './pages/chat/friend/Friend'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -27,7 +30,12 @@ const router = createBrowserRouter(
       <Route index element={<Home />} />
       <Route path="game" element={<Game />} />
       <Route path="chat" element={<ChatLayout />}>
-        <Route path="channel/:channelName" element={<Channel />} />
+        <Route path='channels' element={<ChannelsLayout />}>
+          <Route path=":channelName" element={<Channel />} />
+        </Route>
+        <Route path="@me" element={<MeLayout />}>
+          <Route path=":userName" element={<Friend />} />
+        </Route>
       </Route>
       <Route path="profile" element={<Profile />} />
       <Route path="login" element={<Login />} />
