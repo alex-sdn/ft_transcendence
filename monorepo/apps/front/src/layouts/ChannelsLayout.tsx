@@ -6,6 +6,11 @@ import Cookies from "js-cookie";
 import CreateChannel from "../pages/chat/channels/CreateChannel";
 import ChannelSearchbar from "../pages/chat/channels/ChannelSearchbar";
 
+export interface channel {
+    name: string;
+    access: string;
+}
+
 const ChannelsLayout: React.FC = () => {
     const jwtToken = Cookies.get('jwt-token');
     const [myChannels, setMyChannels] = useState<string[]>([]);

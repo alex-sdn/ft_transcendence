@@ -3,7 +3,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import Cookies from "js-cookie";
 import axios from "axios";
 
-const MeLayout: React.FC = () => {
+const FriendsLayout: React.FC = () => {
     const jwtToken = Cookies.get('jwt-token');
     const [myFriends, setMyFriends] = useState<string[]>([]);
 
@@ -16,17 +16,17 @@ const MeLayout: React.FC = () => {
             },);
             if (response.status === 200) {
                 if (Array.isArray(response.data)) {
-                    const friends = response.data.map((channel) => channel.channel.name);
+                    const friends = response.data.map((user) => user.user2.nickname);
                     setMyFriends(friends);
                 }
             }
         }
         getMyFriends();
-    }, []);
+    }, [jwtToken]);
 
     return (
         <div>
-            <div>
+            <div className="sidebar">
                 <nav>
                     <ul>
                         {myFriends.map((userName, index) => (
@@ -44,4 +44,4 @@ const MeLayout: React.FC = () => {
     )
 }
 
-export default MeLayout;
+export default FriendsLayout;
