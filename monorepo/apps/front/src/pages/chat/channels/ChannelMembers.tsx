@@ -25,7 +25,7 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
     const [adminModal, setAdminModal] = useState<boolean>(false);
 
     return (
-        <div className="members">
+        <div>
             <div className="members-list">
                 <ul>
                     {members.map((member, index) => (

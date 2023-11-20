@@ -59,9 +59,11 @@ const ChannelSearchbar: React.FC<channelSearchBarProps> = ({ myChannels }) => {
             }
         }
         else if (joined) {
+            setSearchChannels([]);
             setErrorName("You are already in this channel");
         }
         else {
+            setSearchChannels([]);
             setErrorName("This channel doesn't exist");
         }
     }
@@ -93,7 +95,7 @@ const ChannelSearchbar: React.FC<channelSearchBarProps> = ({ myChannels }) => {
 
     return (
         <div className="searchBar">
-            <div>
+            <div className="input-and-button">
                 <input type="text"
                     name="channel-research"
                     value={value}
@@ -110,15 +112,13 @@ const ChannelSearchbar: React.FC<channelSearchBarProps> = ({ myChannels }) => {
                     add
                 </button>
             </div>
-            {errorName && <div className="text-danger">{errorName}</div>}
-            <div className="searchResults">
-                <ul>
-                    {searchChannels && searchChannels.map((element, index) => <li onClick={() => {
-                        setValue(element.name);
-                        setErrorName("");
-                    }} key={index}>{element.name}</li>)}
-                </ul>
-            </div>
+            {errorName && <div className="text-danger research-error">{errorName}</div>}
+            <ul className="searchResults">
+                {searchChannels && searchChannels.map((element, index) => <li onClick={() => {
+                    setValue(element.name);
+                    setErrorName("");
+                }} key={index}>{element.name}</li>)}
+            </ul>
             <Modal show={passwordModal}
                 onHide={() => { setPasswordModal(false) }}
                 style={{ color: "black" }}
