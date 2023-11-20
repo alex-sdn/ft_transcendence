@@ -136,7 +136,10 @@ const Profile: React.FC = () => {
                   'Authorization': 'Bearer ' + jwtToken,
               },
           },);
-        if (response.status === 200) {console.log('2FA successfully deactivated');}}
+        if (response.status === 200) {
+          console.log('2FA successfully deactivated');
+          window.location.reload();
+        }}
         catch (error) {console.log('Error encountered when deactivating 2FA');}
       } 
       console.log('token = ', jwtToken);
@@ -201,12 +204,14 @@ const Profile: React.FC = () => {
         {twofa ? 
 <div>
             <button className="button-29" onClick={openModalNofa}> ⚙️ </button>
+
             <Modal 
               isOpen={isOpenNofa}
               onRequestClose={closeModalNofa}
               style={customStyles}>
+             <div>Are you sure you want to deactivate 2fa ?</div>
             <button className='button-29' onClick={handleClic}>YES</button>
-            <button onClick={closeModalNofa}>NO</button>
+            <button onClick={closeModalNofa} className='button-29'>NO</button>
             </Modal>
           </div>
           :          <div>
