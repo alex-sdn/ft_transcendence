@@ -26,7 +26,7 @@ const FriendsLayout: React.FC = () => {
 
     return (
         <div>
-            <div className="sidebar">
+            <div>
                 <nav>
                     <ul>
                         {myFriends.map((userName, index) => (

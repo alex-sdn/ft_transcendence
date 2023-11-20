@@ -12,30 +12,47 @@
     background: white;
 }
 
-.searchBar>div input {
-    height: 30px;
-    display: inline-block;
-    width: calc(100% - 100px);
+.input-and-button {
+    position: absolute;
+    width: 268px;
+    left: 50%;
+    transform: translate(-50%);
 }
 
 .searchBar>div button {
     width: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     border-left: none;
 }
 
 .searchResults {
-    display: flex;
-    flex-direction: column;
+    position: absolute;
+    top: 40px;
+    background: white;
+    width: 268px;
+    background-color: white;
     max-height: 300px;
-    overflow-y: scroll;
-    margin-top: 1px;
-    margin-left: -50%;
+    overflow-y: auto;
+    left: 50%;
+    transform: translate(-50%);
+    z-index: 1;
+}
+
+.searchBar ul {
+    padding: 0;
 }
 
 .searchBar ul li {
     list-style-type: none;
     color: black;
+    width: 268px;
+}
+
+.research-error {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translate(-50%);
+    width: 270px;
+    z-index: 1;
+    background: white;
 }
