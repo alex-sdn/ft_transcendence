@@ -23,7 +23,7 @@ export class UserService {
 			}
 		});
 
-		delete user.secret2fa;
+		delete fullUser.secret2fa;
 		return fullUser;
 	}
 
@@ -59,7 +59,7 @@ export class UserService {
 				}
 			});
 			// returns new JWT (necessaire?)
-			return this.authService.signToken(updatedUser.id, updatedUser.nickname, false);
+			return this.authService.signToken(updatedUser.id, updatedUser.nickname);
 		} catch(error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {
 				if (error.code === 'P2002') {
