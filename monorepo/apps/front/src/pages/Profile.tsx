@@ -20,16 +20,6 @@ const Profile: React.FC = () => {
 
 
   const jwtToken = Cookies.get('jwt-token');
-  
-  // const logincheck = async () => 
-  // {
-  //   const navigate = useNavigate();
-  //   if (!jwtToken)
-  //     navigate('/Login');
-  // }
-
-  // logincheck;
-
 
   useEffect(() => {
     const getProfileData = async () => {
@@ -148,7 +138,7 @@ const Profile: React.FC = () => {
         if (response.status === 200) {console.log('2FA successfully deactivated');}}
         catch (error) {console.log('Error encountered when deactivating 2FA');}
       } 
-
+      console.log('token = ', jwtToken);
   const customStyles = {
     content: {
       top: '50%',
