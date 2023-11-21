@@ -15,6 +15,11 @@ export class UserController {
 	getMe(@Req() req: Request) {
 		return this.userService.getMe(req.user);
 	}
+	
+	@Get('all')
+	getAllUsers() {
+		return this.userService.getAllUsers();
+	}
 
 	@Get(':nickname')
 	getUser(@Param('nickname') nickname: string) {
