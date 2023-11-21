@@ -1,7 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import SocketContext from '../../Socket';
-
+import SocketContext from '../../../Socket';
+import axios from "axios";
 
 interface Message {
   sender: string;
@@ -14,24 +13,24 @@ const Messages: React.FC<{ channelName: string }> = ({ channelName }) => {
   const socket = useContext(SocketContext);
 
   useEffect(() => {
-    const handleMessage = (message: Message) => {
+    const handleMessageReceive = (message: Message) => {
       setMessages(prevMessages => [...prevMessages, message]);
     };
 
-    socket.on('message', handleMessage);
+    socket.on('message', handleMessageReceive);
 
     return () => {
-      socket.off('message', handleMessage);
+      socket.off('message', handleMessageReceive);
     };
   }, [socket]);
 
-  const handleSendMessage = (event: React.FormEvent) => {
+  const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (newMessage.trim() && socket) {
       socket.emit('message', {
-        sender: 'me', // Replace with the actual sender's information
+        sender: 'me', 
         content: newMessage.trim(),
-        target: channelName
+        target: channelName,
       });
       setNewMessage('');
     }
@@ -42,11 +41,22 @@ const Messages: React.FC<{ channelName: string }> = ({ channelName }) => {
       <div className="messages-list">
         {messages.map((msg, index) => (
           <div key={index} className="message">
-            <strong>{msg.sender}:</strong> {msg.content}
+            <strong>{msg.sender}:</strong> <span>{msg.content}</span>
           </div>
         ))}
       </div>
-      <form className="message-form" onSubmit={handleSendMessage}>
+          <form className="message-form" onSubmit={handleSendMessage}>
+              <input type='text'
+                  name='message'
+                  placeholder='Write a message...'
+                  onChange={(e) => setNewMessage(e.target.value)} />
+              <button
+                  className="material-symbols-outlined"
+                  id='send-button'
+                  type='submit'
+              >
+                  send
+              </button>
         <input
           className="message-input"
           type="text"
@@ -54,9 +64,6 @@ const Messages: React.FC<{ channelName: string }> = ({ channelName }) => {
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Write a message..."
         />
-        <button className="send-button" type="submit" disabled={!newMessage.trim()}>
-          Send
-        </button>
       </form>
     </div>
   );

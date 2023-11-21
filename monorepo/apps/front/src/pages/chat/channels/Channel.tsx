@@ -3,22 +3,27 @@ import { useParams } from 'react-router-dom';
 import ChannelMembers from './ChannelMembers'
 import Cookies from "js-cookie";
 import axios from 'axios';
+import Messages from './Messages';
 
 import Settings from './Settings';
 import { channel } from '../../../layouts/ChannelsLayout';
 
-export interface user {
+export interface User {
     name: string;
     owner: boolean;
     admin: boolean;
     avatar: string;
 }
 
+export interface Channel {
+    name: string;
+    access: string; // add other necessary fields from your channel model
+}
+
 const Channel: React.FC = () => {
-    const [message, setMessage] = useState<string>("");
-    const [members, setMembers] = useState<user[]>([]);
-    const [currentChannel, setCurrentChannel] = useState<channel>();
-    const [me, setMe] = useState<user>();
+    const [members, setMembers] = useState<User[]>([]);
+    const [currentChannel, setCurrentChannel] = useState<Channel>();
+    const [me, setMe] = useState<User>();
     const [settingsModal, setSettingsModal] = useState<boolean>(false);
     const jwtToken = Cookies.get('jwt-token');
     const { channelName } = useParams<{ channelName: string }>();
@@ -90,23 +95,24 @@ const Channel: React.FC = () => {
             </div>
             <div id='chat' >
                 <p>
-                    <input type='text'
+                    {/* <input type='text'
                         name='message'
                         placeholder='Send a message'
-                        onChange={(e) => setMessage(e.target.value)} />
+                        onChange={(e) => setMessage(e.target.value)} /> */}
                 </p>
                 <p>
-                    <button
+                    {/* <button
                         className="material-symbols-outlined"
                         id='send-button'
                         type='submit'
-                        value={message}
-                        disabled={!message}
+                        // value={message}
+                        // disabled={!message}
                     >
                         send
-                    </button>
+                    </button> */}
                 </p>
             </div>
+            {channelName && <Messages channelName={channelName} />}
             <div id='members'>
                 {members && me && currentChannel &&
                     <ChannelMembers me={me}

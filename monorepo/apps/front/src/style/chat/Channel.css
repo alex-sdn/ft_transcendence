@@ -20,7 +20,7 @@
     color: white;
 }
 
-.channel #chat {
+/* .channel #chat {
     display: flex;
     position: absolute;
     background: white;
@@ -28,7 +28,7 @@
     height: 77%;
     left: 350px;
     bottom: 3%;
-}
+} */
 
 .channel input {
     position: absolute;
