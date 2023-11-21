@@ -7,6 +7,8 @@ import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { User } from "@prisma/client";
 import * as speakeasy from "speakeasy";
+import * as path from "path";
+import * as fs from "fs";
 
 @Injectable()
 export class AuthService {
@@ -41,24 +43,25 @@ export class AuthService {
 			const refreshToken = tokenResponse.data.refresh_token; //pour pas avoir a relog
 
 			// GET USER INFO FROM 42API
-			const login42 = await this.getFortyTwoLogin(accessToken);
-			console.log('42 login=' + login42);
+			const info42 = await this.getFortyTwoLogin(accessToken);
+			console.log('42 login=' + info42.login42);
 
 			// CHECK WITH DB IF EXISTS
 			const user = await this.prisma.user.findUnique({
 				where: {
-					login42
+					login42: info42.login42
 				},
 			});
 
 			// IF NOT -> First login page (or not???)
 			if (!user) {
 				console.log('FIRST CONNECTION')
-				let nickname = login42;
-				let newUser = await this.createUser(login42, nickname);
+				const avatar = await this.getFortyTwoAvatar(info42.login42, info42.image);
+				let nickname = info42.login42;
+				let newUser = await this.createUser(info42.login42, nickname, avatar);
 				while (!newUser) {
 					nickname += '_';
-					newUser = await this.createUser(login42, nickname);
+					newUser = await this.createUser(info42.login42, nickname, avatar);
 				}
 				return {
 					access_token: await this.signToken(newUser.id, newUser.nickname, false),
@@ -108,7 +111,7 @@ export class AuthService {
 		throw new ForbiddenException('2FA_CODE_INCORRECT',);
 	}
 
-	async createUser(login42: string, nickname: string): Promise<User> {
+	async createUser(login42: string, nickname: string, avatar: string): Promise<User> {
 		const checkTaken = await this.prisma.user.findUnique({
 			where: {
 				nickname: nickname,
@@ -120,14 +123,15 @@ export class AuthService {
 		const user = await this.prisma.user.create({
 			data: {
 				login42,
-				nickname
+				nickname,
+				avatar
 			},
 		});
 		return user;
 	}
 
-	//Fetch user info from 42 api with access token
-	async getFortyTwoLogin(accessToken: string): Promise<string> {
+	// Fetch user info from 42 api with access token
+	async getFortyTwoLogin(accessToken: string) {
 		const userEndpoint = "https://api.intra.42.fr/v2/me";
 
 		const fullInfo = await lastValueFrom(this.httpService.get(
@@ -144,7 +148,25 @@ export class AuthService {
 				throw new ForbiddenException('Error fetching user info');
 			})
 		));
-		return fullInfo.login;
+		return {
+			login42: fullInfo.login,
+			image: fullInfo.image.versions.small
+		}
+	}
+
+	// Download 42 avatar
+	async getFortyTwoAvatar(login42: string, image: string) {
+		try {
+			const response = await axios.get(image, {responseType: 'stream'});
+			const imgPath = path.join(__dirname, '../../uploads/custom/', login42);
+			//pipe the img stream to the file
+			response.data.pipe(fs.createWriteStream(imgPath));
+			//return image name
+			return login42;
+		} catch (error) {
+			console.log("42 avatar error:", error);
+			return "default-avatar";
+		}
 	}
 
 	// create JWT
@@ -193,6 +215,7 @@ export class AuthService {
 	}
 
 
+	/*****************************/
 	// FOR TESTING ! returns jwt for given nickname
 	async genToken(nickname: string) {
 		const user = await this.prisma.user.findUnique({
@@ -209,13 +232,13 @@ export class AuthService {
 		newUser: boolean,
 		has2fa: boolean
 	}> {
-		let login42 = 'fakeuser';
+		let info42 = 'fakeuser';
 		let nickname = 'testuser';
-		let newUser = await this.createUser(login42, nickname);
+		let newUser = await this.createUser(info42, nickname, "default-avatar");
 		while (!newUser) {
 			nickname += '_';
-			login42 += '_'
-			newUser = await this.createUser(login42, nickname);
+			info42 += '_'
+			newUser = await this.createUser(info42, nickname, "default-avatar");
 		}
 		return {
 			access_token: await this.signToken(newUser.id, newUser.nickname, false),
