@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
 import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
+
 import { user } from './Channel.tsx';
+import { channel } from "../../../layouts/ChannelsLayout.tsx";
 
 import Mute from './Mute.tsx';
 import Kick from './Kick.tsx';
@@ -9,12 +10,12 @@ import Ban from './Ban.tsx';
 import Admin from "./Admin.tsx";
 
 interface channelUsersProps {
-    members: user[];
     me: user;
+    members: user[];
+    currentChannel: channel;
 }
 
-const ChannelUsers: React.FC<channelUsersProps> = ({ members, me }) => {
-    const { channelName } = useParams<{ channelName: string }>();
+const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel }) => {
     const [selectedMember, setSelectedMember] = useState<user | null>(null);
     // Modals:
     const [profileModal, setProfileModal] = useState<boolean>(false);
@@ -59,7 +60,7 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ members, me }) => {
                 {selectedMember &&
                     <ModalHeader className="justify-content-center">
                         <ModalTitle className="text-center">
-                            {selectedMember.name}
+                            {selectedMember.name} {/* remplacer le nom du user par un lien vers son profile */}
                             {selectedMember.owner &&
                                 <span className="material-symbols-outlined">
                                     family_star
@@ -114,28 +115,28 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ members, me }) => {
             </Modal>
             {selectedMember &&
                 <Mute selectedMember={selectedMember}
-                    selectedChannel={channelName}
+                    selectedChannel={currentChannel.name}
                     muteModal={muteModal}
                     onClose={() => setMuteModal(false)}
                 />
             }
             {selectedMember &&
                 <Kick selectedMember={selectedMember}
-                    selectedChannel={channelName}
+                    selectedChannel={currentChannel.name}
                     kickModal={kickModal}
                     onClose={() => setKickModal(false)}
                 />
             }
             {selectedMember &&
                 <Ban selectedMember={selectedMember}
-                    selectedChannel={channelName}
+                    selectedChannel={currentChannel.name}
                     banModal={banModal}
                     onClose={() => setBanModal(false)}
                 />
             }
             {selectedMember &&
                 <Admin selectedMember={selectedMember}
-                    selectedChannel={channelName}
+                    selectedChannel={currentChannel.name}
                     adminModal={adminModal}
                     onClose={() => setAdminModal(false)}
                 />
