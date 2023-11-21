@@ -71,6 +71,7 @@ const Channel: React.FC = () => {
             </div>
         </div>
     );
+
 }
 
 export default Channel;

@@ -32,13 +32,12 @@
     border-radius: 4px;
 }
   
-.send-button {
-    padding: 10px 20px;
-    background-color: #007bff; /* Bootstrap primary color */
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+#send-button {
+    position: absolute;
+    display: flex;
+    left: 10%;
+    bottom: 3%;
+    transform: translate(-85%, 0);
 }
   
 .send-button:disabled {
