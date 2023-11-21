@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors, ValidationPipe } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { Request, Response } from "express";
 import { UserService } from "./user.service";
 import { EditNicknameDto } from "./dto";
 import { TwoFactorDto } from "../auth/dto";
 import { FileInterceptor } from "@nestjs/platform-express";
+import * as path from 'path';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('user')
@@ -37,7 +38,23 @@ export class UserController {
 		return this.userService.getAvatar(filename, res);
 	}
 
-	@UseInterceptors(FileInterceptor('avatar', {dest: 'uploads/custom/'}))
+	@UseInterceptors(FileInterceptor('avatar', {
+		dest: 'uploads/custom/',
+		limits: {fileSize: 100000},       // UPDATE LATER
+		fileFilter(req, file, callback) {  // MOVE ?
+			const allowedFileTypes = ['.png', '.jpg', '.jpeg'];
+			const extension = path.extname(file.originalname).toLowerCase();
+
+			if (allowedFileTypes.includes(extension)) {
+				// Accept the file
+				callback(null, true);
+			} else {
+				// Reject the file
+				callback(new HttpException('Only PNG and JPEG files are allowed',
+					HttpStatus.UNSUPPORTED_MEDIA_TYPE), false);
+			}
+		},
+	}))
 	@Patch('me/editAvatar')
 	editAvatar(@Req() req: Request, @UploadedFile() file) {
 		return this.userService.editAvatar(req.user, file.filename);
