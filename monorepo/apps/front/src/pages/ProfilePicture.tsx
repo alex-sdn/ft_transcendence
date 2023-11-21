@@ -64,6 +64,9 @@ const ProfilePicture: React.FC = () => {
                 //     navigate('/');
                     if (response.status === 200)
                        window.location.assign('/profile');
+                    // if (response.status === 413)
+                        //AFFICHER MSG ERREUR
+
             } catch (error) {
                 console.log(error);
             }
