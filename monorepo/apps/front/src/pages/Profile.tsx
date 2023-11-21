@@ -5,8 +5,6 @@ import ProfilePicture from './ProfilePicture';
 import Modal from 'react-modal';
 import Nickname from './Nickname';
 import Twofa from './2fa';
-// import { useNavigate } from 'react-router-dom';
-// import Login from './Login';
 
 const Profile: React.FC = () => {
 
@@ -157,12 +155,6 @@ const Profile: React.FC = () => {
     },
   };
 
-  // const disconnect = () => {
-  //   Cookies.remove('jwt-token');
-  //   // setIsConnected(false)
-  //   window.location.reload();
-  // }
-
   return (
     <div className="_profile">
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
@@ -226,7 +218,6 @@ const Profile: React.FC = () => {
           </div>
         }
         </div>
-      {/* <button className='button-29' onClick={disconnect}>Disconnection</button> */}
     </div>
 </div>
       )
