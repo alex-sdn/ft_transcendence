@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import SocketContext from '../../Socket';
 
+
 interface Message {
   sender: string;
   content: string;
