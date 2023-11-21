@@ -1,16 +1,16 @@
 import React, { useContext, useState } from "react";
 import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
 import { user } from './Channel.tsx';
-import SocketContext from "../../Socket";
+import SocketContext from "../../../Socket.js";
 
-interface muteModalProps {
+interface muteProps {
     selectedMember: user;
     selectedChannel: string | undefined;
     muteModal: boolean;
     onClose: () => void;
 }
 
-const Mute: React.FC<muteModalProps> = ({
+const Mute: React.FC<muteProps> = ({
     selectedMember,
     selectedChannel,
     muteModal,
@@ -23,7 +23,7 @@ const Mute: React.FC<muteModalProps> = ({
     const handleMute = async () => {
         const createPromise = new Promise<{
             sender: string;
-            target: string
+            target: string;
         }>((resolve, reject) => {
             if (socket) {
                 socket.emit("mute", { target: selectedMember.name, channel: selectedChannel, time: duration });
@@ -39,7 +39,7 @@ const Mute: React.FC<muteModalProps> = ({
         createPromise
             .then((data) => {
                 const message = data.sender + " muted " + data.target + " for " + duration + " minutes";
-                socket?.emit("message", { target: selectedChannel, message: message });
+                socket?.emit("message", { target: data.target, message: message });
                 setError("");
                 setDuration("");
                 onClose();
@@ -68,7 +68,7 @@ const Mute: React.FC<muteModalProps> = ({
                         value={duration}
                         onChange={(e) => setDuration(e.target.value)}
                         placeholder="Duration in minutes"
-                        required />
+                    />
                     {error && <div className="text-danger">{error}</div>}
                 </ModalBody>
                 <ModalFooter>
@@ -79,7 +79,7 @@ const Mute: React.FC<muteModalProps> = ({
                             setError("");
                             setDuration("")
                         }}>
-                        Close
+                        Cancel
                     </button>
                 </ModalFooter>
             </Modal>

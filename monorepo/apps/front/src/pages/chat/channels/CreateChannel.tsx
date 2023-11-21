@@ -1,7 +1,6 @@
 import React, { useContext, useState } from "react";
-import SocketContext from "../../Socket";
+import SocketContext from "../../../Socket";
 import {
-    Alert,
     Modal,
     ModalBody,
     ModalFooter,
@@ -16,15 +15,18 @@ import {
 const createChannel: React.FC = () => {
     const socket = useContext(SocketContext);
     const [channelName, setChannelName] = useState<string>("");
-    const [access, setAccess] = useState<string>('public');
+    const [access, setAccess] = useState<string>("public");
     const [password, setPassword] = useState<string>("");
+    const [error, setError] = useState<string>("");
     const [showModal, setShowModal] = useState<boolean>(false);
-    const [showAlert, setShowAlert] = useState<boolean>(false);
 
     const handleChannelSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
-        const createPromise = new Promise<{ target: string }>((resolve, reject) => {
+        const createPromise = new Promise<{
+            sender: string;
+            target: string;
+        }>((resolve, reject) => {
             if (socket) {
                 socket.emit("create", { target: channelName, access: access, password: password });
                 socket.on("create", (data) => {
@@ -32,25 +34,26 @@ const createChannel: React.FC = () => {
                 });
                 socket.on("error", (data) => {
                     reject(data);
-                })
+                });
             }
         });
 
         createPromise
             .then((data) => {
+                const message = data.sender + " created this channel";
+                socket?.emit("message", { target: data.target, message: message });
                 setShowModal(false);
-                window.location.assign(`/chat/channel/${data.target}`);
+                window.location.assign(`/chat/channels/${data.target}`);
 
             })
             .catch((error) => {
-                setShowAlert(true);
-                console.log("error msg: " + error.message);
+                setError(error.message);
             });
     }
 
     return (
         <div className="create-channel">
-            <button className="button-59"
+            <button className="button-59 new-channel-button"
                 onClick={() => setShowModal(true)}>
                 New channel
             </button>
@@ -95,28 +98,28 @@ const createChannel: React.FC = () => {
                                 />
                             </FormGroup>
                         )}
+                        {error && <div className="text-danger">{error}</div>}
                         <ModalFooter>
-                            <button className="button-59 btn-new-channel"
+                            <button className="button-59"
                                 type="submit"
                             >
                                 Create channel
+                            </button>
+                            <button className="button-59"
+                                type="button"
+                                onClick={() => {
+                                    setChannelName("");
+                                    setAccess("public");
+                                    setPassword("");
+                                    setError("");
+                                    setShowModal(false);
+                                }}>
+                                Cancel
                             </button>
                         </ModalFooter>
                     </Form>
                 </ModalBody >
             </Modal >
-            <Alert variant="danger"
-                show={showAlert}
-                onClose={() => setShowAlert(false)}
-                dismissible
-                style={{ position: "absolute" }}
-                className="fixed-top"
-            >
-                <p>
-                    This channel name is already taken.
-                    Please chose an other name.
-                </p>
-            </Alert>
         </div >
     );
 }
