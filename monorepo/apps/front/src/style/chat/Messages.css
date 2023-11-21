@@ -1,7 +1,11 @@
 .messages-container {
     display: flex;
-    flex-direction: column;
-    height: 100%;
+    position: absolute;
+    background: white;
+    width: 50%;
+    height: 77%;
+    left: 350px;
+    bottom: 3%;
 }
   
 .messages-list {
@@ -24,18 +28,22 @@
     padding: 10px;
     gap: 10px; /* Space between input and button */
 }
-  
+
+
 .message-input {
-    flex-grow: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    position: absolute;
+    display: flex;
+    width: 85%;
+    left: 50%;
+    bottom: 3%;
+    transform: translate(-50%, 0);
 }
-  
+
+
 #send-button {
     position: absolute;
     display: flex;
-    left: 10%;
+    left: 95%;
     bottom: 3%;
     transform: translate(-85%, 0);
 }
