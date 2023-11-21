@@ -21,7 +21,7 @@ export class AuthController {
 
 	// 2FA
 	@UseGuards(AuthGuard('jwt-2fa'))
-	@Get('signin/2fa')
+	@Post('signin/2fa')
 	signin(@Req() req: Request, @Body() dto: TwoFactorDto) {
 		return this.authService.signin(req.user, dto.code);
 	}
