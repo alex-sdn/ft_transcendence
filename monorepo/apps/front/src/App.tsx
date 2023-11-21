@@ -22,6 +22,7 @@ import Login from './pages/Login'
 import Nickname from './pages/Nickname'
 import Login2fa from './pages/Login2fa'
 import ProfilePicture from './pages/ProfilePicture'
+import ProfileUser from './pages/ProfileUser'
 import Channel from './pages/chat/channels/Channel'
 import Friend from './pages/chat/friend/Friend'
 
@@ -44,6 +45,7 @@ const router = createBrowserRouter(
       <Route path="nickname" element={<Nickname />} />
       {/* <Route path="disconnect" element={<Disconnect />} /> */}
       <Route path="profile_picture" element={<ProfilePicture />} />
+      <Route path="profileUser/:Nick" element={<ProfileUser />} />
       <Route path='*' element={<NotFound />} />
     </Route>
   )

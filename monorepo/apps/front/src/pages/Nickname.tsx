@@ -21,7 +21,7 @@ const Nickname: React.FC = () => {
             console.log(response);
             if (response.status === 200) {
                 //if 2fa === true => redirect 2fa
-                return navigate('/profile_picture')
+                return navigate('/profile_picture');
             } else {
                 return { error: 'Nickname already taken' };
             }
