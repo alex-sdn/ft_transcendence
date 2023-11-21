@@ -44,6 +44,20 @@ export class UserService {
 		return user;
 	}
 
+	async getAllUsers() {
+		var users = await this.prisma.user.findMany();
+
+		for (var i in users) {
+			delete users[i].createdAt;
+			delete users[i].has2fa;
+			delete users[i].secret2fa;
+			delete users[i].LP;
+			delete users[i].win;
+			delete users[i].loss;
+		}
+		return users;
+	}
+
 	async editNickname(user, nickname: string) {
 		// not necessary if validationPipe
 		if (!nickname)
