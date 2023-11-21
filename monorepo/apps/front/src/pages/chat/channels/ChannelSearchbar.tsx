@@ -70,7 +70,6 @@ const ChannelSearchbar: React.FC<channelSearchBarProps> = ({ myChannels }) => {
 
     const joinChannel = async (event: React.FormEvent) => {
         event.preventDefault();
-
         const createPromise = new Promise<{ target: string }>((resolve, reject) => {
             if (socket) {
                 socket.emit("join", { target: value, password: password });

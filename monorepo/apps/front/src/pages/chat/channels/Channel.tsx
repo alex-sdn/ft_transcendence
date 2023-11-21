@@ -107,7 +107,7 @@ const Channel: React.FC = () => {
                     </button>
                 </p> */}
             </div>
-            <div id='members'>
+            <div>
                 {members && me && currentChannel &&
                     <ChannelMembers me={me}
                         members={members}
