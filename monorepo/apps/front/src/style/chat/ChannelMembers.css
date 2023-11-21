@@ -1,3 +1,28 @@
 .members-list {
-    
+    height: 76vh;
+    width: 250px;
+    position: absolute;
+    background: white;
+    color: black;
+    left: 1375px;
+    bottom: 3.5%;
+}
+
+.members-list ul {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+
+.members-list li {
+    list-style-type: none;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-around;
 }

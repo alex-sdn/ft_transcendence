@@ -60,9 +60,7 @@ const Invite: React.FC<inviteProps> = ({
         });
 
         createPromise
-            .then((data) => {
-                const message = data.sender + " invited you to " + data.channel;
-                socket.emit("privmsg", { target: userSelected, message: message });
+            .then(() => {
                 setError("");
                 setUserSelected("");
                 onClose();
