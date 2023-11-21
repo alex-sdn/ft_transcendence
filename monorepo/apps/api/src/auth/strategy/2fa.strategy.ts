@@ -9,7 +9,7 @@ export class TwoFactorStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
 	constructor(config: ConfigService, private prisma: PrismaService) {
 		super({
 			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-			secretOrKey: config.get('JWT_SECRET'),
+			secretOrKey: config.get('JWT_2FA_SECRET'),
 		});
 	}
 

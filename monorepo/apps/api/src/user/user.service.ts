@@ -23,7 +23,7 @@ export class UserService {
 			}
 		});
 
-		delete user.secret2fa;
+		delete fullUser.secret2fa;
 		return fullUser;
 	}
 
@@ -44,6 +44,20 @@ export class UserService {
 		return user;
 	}
 
+	async getAllUsers() {
+		var users = await this.prisma.user.findMany();
+
+		for (var i in users) {
+			delete users[i].createdAt;
+			delete users[i].has2fa;
+			delete users[i].secret2fa;
+			delete users[i].LP;
+			delete users[i].win;
+			delete users[i].loss;
+		}
+		return users;
+	}
+
 	async editNickname(user, nickname: string) {
 		// not necessary if validationPipe
 		if (!nickname)
@@ -59,7 +73,7 @@ export class UserService {
 				}
 			});
 			// returns new JWT (necessaire?)
-			return this.authService.signToken(updatedUser.id, updatedUser.nickname, false);
+			return this.authService.signToken(updatedUser.id, updatedUser.nickname);
 		} catch(error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {
 				if (error.code === 'P2002') {

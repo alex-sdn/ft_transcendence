@@ -64,7 +64,7 @@ export class AuthService {
 					newUser = await this.createUser(info42.login42, nickname, avatar);
 				}
 				return {
-					access_token: await this.signToken(newUser.id, newUser.nickname, false),
+					access_token: await this.signToken(newUser.id, newUser.nickname),
 					newUser: true,
 					has2fa: false
 				};
@@ -73,7 +73,7 @@ export class AuthService {
 			else if (user.has2fa === true) {
 				console.log('USER FOUND WITH 2FA');
 				return {
-					access_token: await this.signToken(user.id, user.nickname, true),
+					access_token: await this.sign2faToken(user.id, user.nickname),
 					newUser: false,
 					has2fa: true
 				};
@@ -82,7 +82,7 @@ export class AuthService {
 			else {
 				console.log('USER FOUND, OK')
 				return {
-					access_token: await this.signToken(user.id, user.nickname, false),
+					access_token: await this.signToken(user.id, user.nickname),
 					newUser: false,
 					has2fa: false
 				};
@@ -105,7 +105,7 @@ export class AuthService {
 
 		if (isValid) {
 			// return full access token
-			return await this.signToken(user.id, user.nickname, false);
+			return await this.signToken(user.id, user.nickname);
 		}
 		// return value if wrong ??
 		throw new ForbiddenException('2FA_CODE_INCORRECT',);
@@ -170,17 +170,34 @@ export class AuthService {
 	}
 
 	// create JWT
-	async signToken(userId: number, nickname: string, need2fa: boolean) {
+	async signToken(userId: number, nickname: string) {
 		const payload = {
 			userId,
 			nickname,
-			need2fa
+			need2fa: false
 		};
 		const secret = this.config.get('JWT_SECRET');
 
 		const token = await this.jwt.signAsync(
 			payload, {
 			expiresIn: '6h',
+			secret: secret
+			}
+		);
+		return token;
+	}
+
+	async sign2faToken(userId: number, nickname: string) {
+		const payload = {
+			userId,
+			nickname,
+			need2fa: true
+		};
+		const secret = this.config.get('JWT_2FA_SECRET');
+
+		const token = await this.jwt.signAsync(
+			payload, {
+			expiresIn: '15m',
 			secret: secret
 			}
 		);
@@ -224,7 +241,7 @@ export class AuthService {
 		if (!user)
 			return null;
 
-		return await this.signToken(user.id, user.nickname, false);
+		return await this.signToken(user.id, user.nickname);
 	}
 
 	async fakelogin(): Promise<{
@@ -241,7 +258,7 @@ export class AuthService {
 			newUser = await this.createUser(info42, nickname, "default-avatar");
 		}
 		return {
-			access_token: await this.signToken(newUser.id, newUser.nickname, false),
+			access_token: await this.signToken(newUser.id, newUser.nickname),
 			newUser: true,
 			has2fa: false
 		};
