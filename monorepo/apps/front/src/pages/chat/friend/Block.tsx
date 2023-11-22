@@ -20,14 +20,18 @@ const Block: React.FC<blockProps> = ({
     const blockUser = async () => {
         const response = await axios.post(`/api/user/block/${nickname}`, { nickname: nickname }, {
             headers: {
-                'Authorization': 'Bearer ' + jwtToken,
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + jwtToken,
             },
         });
-        console.log(response.data);
-        // if (response.status === 200) {
-        //     console.log(response.data);
-        // }
+        if (response.status === 201) {
+            setError("");
+            onClose();
+        }
+        else {
+            console.log("user already blocked")
+            setError("User already blocked");
+        }
     }
 
     return (
@@ -52,8 +56,8 @@ const Block: React.FC<blockProps> = ({
                         </button>
                         <button className="button-59"
                             onClick={() => {
-                                onClose();
                                 setError("");
+                                onClose();
                             }}>
                             No
                         </button>
@@ -63,8 +67,8 @@ const Block: React.FC<blockProps> = ({
                 <ModalFooter>
                     <button className="button-59"
                         onClick={() => {
-                            onClose();
                             setError("");
+                            onClose();
                         }}>
                         Cancel
                     </button>
