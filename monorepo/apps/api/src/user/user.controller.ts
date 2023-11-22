@@ -95,6 +95,11 @@ export class UserController {
 	}
 
 	/**  BLOCK  **/
+	@Get('block/:nickname')
+	checkBlock(@Param('nickname') nickname: string, @Req() req: Request) {
+		return this.userService.checkBlock(nickname, req.user);
+	}
+
 	@Post('block/:nickname')
 	addBlock(@Param('nickname') nickname: string, @Req() req: Request) {
 		return this.userService.addBlock(nickname, req.user);
