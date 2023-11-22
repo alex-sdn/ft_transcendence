@@ -18,18 +18,24 @@ const Block: React.FC<blockProps> = ({
     const jwtToken = Cookies.get('jwt-token');
 
     const blockUser = async () => {
-        const response = await axios.post(`/api/user/block/${nickname}`, { nickname: nickname }, {
+        const isBlocked = await axios.get(`/api/user/block/${nickname}`, {
             headers: {
-                'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + jwtToken,
             },
-        });
-        if (response.status === 201) {
-            setError("");
-            onClose();
+        })
+        if (!isBlocked.data) {
+            const response = await axios.post(`/api/user/block/${nickname}`, { nickname: nickname }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + jwtToken,
+                },
+            });
+            if (response.status === 201) {
+                setError("");
+                onClose();
+            }
         }
         else {
-            console.log("user already blocked")
             setError("User already blocked");
         }
     }
