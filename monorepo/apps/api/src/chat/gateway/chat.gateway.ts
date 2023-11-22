@@ -375,17 +375,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		try {
 			await this.chatService.inviteUser(user, target, channel);
 
+			// Notify target if connected AND sender
 			// Get target socket
 			const targetSocket = this.userToSocket.get(target.id);
-			if (!targetSocket) {
-				throw new Error('target not connected to ws');
+			if (targetSocket) {
+				targetSocket.emit('invite', {
+					sender: user.nickname,
+					target: target.nickname,
+					channel: channel.name
+				});
 			}
-			// Notify target AND sender (?)
-			targetSocket.emit('invite', {
-				sender: user.nickname,
-				target: target.nickname,
-				channel: channel.name
-			});
 			client.emit('invite', {
 				sender: user.nickname,
 				target: target.nickname,
