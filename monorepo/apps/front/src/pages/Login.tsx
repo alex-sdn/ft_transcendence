@@ -18,7 +18,7 @@ const Login: React.FC = () => {
                 if (data.newUser)
                     return navigate('/nickname');
                 else if (data.has2fa)
-                    return navigate('/game');
+                    return navigate('/login2fa');
                 return navigate('/');
                 // You can then set it in your component's state or use it as needed.
             })

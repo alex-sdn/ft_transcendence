@@ -31,7 +31,7 @@ h1 {
     padding: 60px;
     color: rgb(226, 224, 224);
     /* text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff; */
-    text-align: justify;
+    text-align: left;
     border-radius: 15px;
     /* background: rgba(253, 254, 255, 0.726); */
     box-shadow: rgba(0, 0, 0, 0.3) 0px 30px 38px, rgba(0, 0, 0, 0.22) 0px 20px 12px;
@@ -67,3 +67,17 @@ h1 {
   padding-right: 1px;
   will-change: box-shadow,transform;
 }
+
+.button-29:focus {
+    box-shadow: #ffffff86 0 0 0 1.5px inset, rgba(45, 35, 66, .4) 0 2px 4px, rgba(45, 35, 66, .3) 0 7px 13px -3px, #ffffff6c 0 -3px 0 inset;
+  }
+  
+  .button-29:hover {
+    box-shadow: rgba(255, 255, 255, 0.4) 0 4px 8px, rgba(45, 35, 66, .3) 0 7px 13px -3px, #ffffff3b 0 -3px 0 inset;
+    transform: translateY(-2px);
+  }
+  
+  .button-29:active {
+    box-shadow: #ffffff73 0 3px 7px inset;
+    transform: translateY(2px);
+  }
