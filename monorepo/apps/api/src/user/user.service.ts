@@ -289,12 +289,30 @@ export class UserService {
 	}
 
 	/**  BLOCK  **/
+	async checkBlock(nickname: string, user): Promise<boolean> {
+		const target = await this.prisma.user.findUnique({
+			where: {nickname: nickname},
+			include: {blockedBy: true}
+		});
+
+		if (!target) {
+			throw new HttpException('USER DOES NOT EXIST', HttpStatus.BAD_REQUEST);
+		}
+
+		// Check if blocked by you
+		if (target.blockedBy.some(blocked => blocked.blockerId === user.id)) {
+			return true;
+		}
+		return false;
+	}
+
 	async addBlock(nickname: string, user) {
 		const target = await this.prisma.user.findUnique({
 			where: {nickname: nickname},
 			include: {
 				friends1: true,
-				blockedBy: true}
+				blockedBy: true
+			}
 		});
 
 		if (!target) {
