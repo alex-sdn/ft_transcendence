@@ -84,6 +84,11 @@ export class UserController {
 		return this.userService.myFriends(req.user);
 	}
 
+	@Get('friend/:nickname')
+	checkFriend(@Param('nickname') nickname: string, @Req() req: Request) {
+		return this.userService.checkFriend(nickname, req.user);
+	}
+
 	@Post('friend/:nickname')
 	addFriend(@Param('nickname') nickname: string, @Req() req: Request) {
 		return this.userService.addFriend(nickname, req.user);
