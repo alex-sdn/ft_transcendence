@@ -28,6 +28,7 @@ import Channel from './pages/chat/channels/Channel'
 import Friend from './pages/chat/friend/Friend'
 
 const jwtToken = Cookies.get('jwt-token');
+const jwt2faToken = Cookies.get('jwt-2fa-token');
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -43,7 +44,7 @@ const router = createBrowserRouter(
         </Route>
       </Route>
       <Route path="profile" element={jwtToken ? <Profile /> : <Navigate to='/login' />} />
-      <Route path="login2fa" element={jwtToken ? <Login2fa /> : <Navigate to='/login' />} />
+      <Route path="login2fa" element={jwt2faToken ? <Login2fa /> : <Navigate to='/login' />} />
       <Route path="login" element={<Login />} />
       <Route path="nickname" element={jwtToken ? <Nickname /> : <Navigate to='/login' />} />
       {/* <Route path="disconnect" element={<Disconnect />} /> */}

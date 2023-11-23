@@ -9,19 +9,23 @@ const Login: React.FC = () => {
     const navigate2 = useNavigate(); // FOR FAKELOGIN ONLY
 
     const authURL = "/api/auth?code=" + code;
-    const navigate = useNavigate();
     if (code) {
         fetch(authURL)
             .then(response => response.json()) // Ensure the response is treated as text
             .then(data => {
                 // 'data' will be the string returned by the backend
                 // rajouter token dans cookie
+                if (data.has2fa) {
+                    Cookies.set("jwt-2fa-token", data.access_token, { expires: 1 });
+                    window.location.assign('/login2fa');
+                    return;
+                }
                 Cookies.set("jwt-token", data.access_token, { expires: 1 });
-                if (data.newUser)
-                    return navigate('/nickname');
-                else if (data.has2fa)
-                    return navigate('/login2fa');
-                return navigate('/');
+                if (data.newUser) {
+                    window.location.assign('/nickname');
+                    return;
+                }
+                window.location.assign('/');
                 // You can then set it in your component's state or use it as needed.
             })
             .catch(error => {
