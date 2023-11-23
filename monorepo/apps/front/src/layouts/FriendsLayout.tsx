@@ -31,7 +31,11 @@ const FriendsLayout: React.FC = () => {
                     <ul>
                         {myFriends.map((userName, index) => (
                             <li key={index}>
-                                <NavLink to={`/chat/@me/${userName}`}>{userName}</NavLink>
+                                {jwtToken ?
+                                    <NavLink to={`/chat/@me/${userName}`}>{userName}</NavLink>
+                                    :
+                                    <NavLink to="/login">{userName}</NavLink>
+                                }
                             </li>
                         ))}
                     </ul>
