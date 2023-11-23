@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors, ValidationPipe } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { Request, Response } from "express";
 import { UserService } from "./user.service";
@@ -25,6 +25,11 @@ export class UserController {
 	@Get(':nickname')
 	getUser(@Param('nickname') nickname: string) {
 		return this.userService.getUser(nickname);
+	}
+
+	@Get('id/:id')
+	getUserById(@Param('id', ParseIntPipe) userId: number) {
+		return this.userService.getUserById(userId);
 	}
 
 	@Patch('me/editNickname')
