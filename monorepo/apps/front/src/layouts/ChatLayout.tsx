@@ -1,11 +1,7 @@
 import React from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import Cookies from "js-cookie";
 
 const ChatLayout: React.FC = () => {
-    const jwtToken = Cookies.get('jwt-token');
-
-
     return (
         <div className="sidebar">
             <div>
