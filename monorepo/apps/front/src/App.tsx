@@ -4,7 +4,7 @@ import {
   createRoutesFromElements,
   RouterProvider
 } from 'react-router-dom'
-
+import Cookies from "js-cookie";
 import SocketContext, { initializeSocket } from './Socket'
 
 // layouts
@@ -26,11 +26,12 @@ import ProfileUser from './pages/ProfileUser'
 import Channel from './pages/chat/channels/Channel'
 import Friend from './pages/chat/friend/Friend'
 
+const jwtToken = Cookies.get('jwt-token');
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path='/' element={<RootLayout />}>
-      <Route index element={<Home />} />
-      <Route path="game" element={<Game />} />
+    <Route path='/' element={ <RootLayout />}>
+      <Route index element={ <Home /> } />
+      <Route path="game" element={<Game /> } />
       <Route path="chat" element={<ChatLayout />}>
         <Route path='channels' element={<ChannelsLayout />}>
           <Route path=":channelName" element={<Channel />} />
