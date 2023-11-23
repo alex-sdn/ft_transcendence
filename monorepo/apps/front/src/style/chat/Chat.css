@@ -3,40 +3,8 @@
 /* setting button */
 @import url(https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0);
 
-.sidebar {
-    height: calc(100vh - 116px);
-    background-color: white;
-    position: relative;
-    width: 300px;
-    margin: 0;
-    padding: 0;
-}
-
-.sidebar a {
-    display: block;
-    color: black;
-    padding: 10px;
-    text-decoration: none;
-    margin-left: 0;
-}
-
-.sidebar a.active {
-    color: white;
-    background-color: black;
-}
-
-.sidebar a:hover:not(.active) {
-    color: white;
-    background-color: black;
-}
-
-.sidebar ul li:hover {
-    color: white;
-    background-color: black;
-}
-
 .change-view {
-    min-width: 140px;
+    min-width: 133px;
     position: absolute;
     bottom: 10px;
 }
@@ -44,6 +12,7 @@
 .channels-button {
     left: 10%;
     transform: translateX(-10%);
+    border-right: none;
 }
 
 .friends-button {
