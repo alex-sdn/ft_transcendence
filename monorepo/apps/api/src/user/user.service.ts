@@ -29,12 +29,20 @@ export class UserService {
 
 	async getUser(nickname: string) {
 		const user = await this.prisma.user.findUnique({
-			where: {
-				nickname
-			},
-			include: {
-				matchesP1 : true,
-			}
+			where: {nickname},
+			include: {matchesP1 : true,}
+		});
+		if (!user)
+			throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
+
+		delete user.has2fa;
+		delete user.secret2fa;
+		return user;
+	}
+
+	async getUserById(userId: number) {
+		const user = await this.prisma.user.findUnique({
+			where: {id: userId}
 		});
 		if (!user)
 			throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
