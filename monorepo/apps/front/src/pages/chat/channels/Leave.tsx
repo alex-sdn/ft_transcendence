@@ -1,32 +1,31 @@
-import React, { useContext, useState } from "react";
-import { user } from './Channel.tsx';
-import SocketContext from "../../../Socket.js";
+import React, { useState } from "react";
+import { channel } from "../../../layouts/ChannelsLayout";
+import { Socket } from "socket.io-client";
 import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
 
-interface adminProps {
-    selectedMember: user;
-    selectedChannel: string | undefined;
-    adminModal: boolean;
+interface leaveProps {
+    currentChannel: channel;
+    leaveModal: boolean;
+    socket: Socket;
     onClose: () => void;
 }
 
-const Admin: React.FC<adminProps> = ({
-    selectedMember,
-    selectedChannel,
-    adminModal,
+const Leave: React.FC<leaveProps> = ({
+    currentChannel,
+    leaveModal,
+    socket,
     onClose
 }) => {
-    const socket = useContext(SocketContext);
     const [error, setError] = useState<string>("");
 
-    const handleAdmin = async () => {
+    const handleLeave = async () => {
         const createPromise = new Promise<{
             sender: string;
             target: string
         }>((resolve, reject) => {
             if (socket) {
-                socket.emit("admin", { target: selectedMember.name, channel: selectedChannel });
-                socket.on("admin", (data) => {
+                socket.emit("leave", { target: currentChannel.name });
+                socket.on("leave", (data) => {
                     resolve(data);
                 });
                 socket.on("error", data => {
@@ -39,6 +38,7 @@ const Admin: React.FC<adminProps> = ({
             .then(() => {
                 setError("");
                 onClose();
+                window.location.assign('/chat/channels');
             })
             .catch((error) => {
                 setError(error.message);
@@ -47,19 +47,17 @@ const Admin: React.FC<adminProps> = ({
 
     return (
         <div>
-            <Modal show={adminModal}
-                onHide={() => onClose}
-                style={{ color: "black" }}
-                className="text-center"
-            >
+            <Modal show={leaveModal}
+                onHide={onClose}
+                style={{ color: "black" }}>
                 <ModalHeader>
                     <ModalTitle>
-                        Do you really want to make <strong>{selectedMember.name}</strong> an admin?
+                        Do you really want to leave <strong>{currentChannel.name}</strong>?
                     </ModalTitle>
                 </ModalHeader>
                 <ModalBody className="action-buttons">
                     <button className="button-59"
-                        onClick={handleAdmin}
+                        onClick={handleLeave}
                     >
                         Yes
                     </button>
@@ -67,7 +65,8 @@ const Admin: React.FC<adminProps> = ({
                         onClick={() => {
                             onClose();
                             setError("");
-                        }}>
+                        }}
+                    >
                         No
                     </button>
                     {error && <div className="text-danger">{error}</div>}
@@ -77,13 +76,14 @@ const Admin: React.FC<adminProps> = ({
                         onClick={() => {
                             onClose();
                             setError("");
-                        }}>
+                        }}
+                    >
                         Cancel
                     </button>
                 </ModalFooter>
             </Modal>
         </div>
-    )
+    );
 }
 
-export default Admin;
+export default Leave;

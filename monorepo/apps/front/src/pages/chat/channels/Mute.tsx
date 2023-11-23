@@ -37,9 +37,7 @@ const Mute: React.FC<muteProps> = ({
         });
 
         createPromise
-            .then((data) => {
-                const message = data.sender + " muted " + data.target + " for " + duration + " minutes";
-                socket?.emit("message", { target: data.target, message: message });
+            .then(() => {
                 setError("");
                 setDuration("");
                 onClose();

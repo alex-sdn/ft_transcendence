@@ -113,12 +113,20 @@ export class AuthService {
 
 	async createUser(login42: string, nickname: string, avatar: string): Promise<User> {
 		const checkTaken = await this.prisma.user.findUnique({
-			where: {
-				nickname: nickname,
-			},
-		});
-		if (checkTaken)
-			return null;
+            where: {
+                nickname: nickname,
+            },
+        });
+        if (checkTaken)
+            return null;
+
+        const checkTaken2 = await this.prisma.user.findUnique({
+            where: {
+                login42: login42,
+            },
+        });
+        if (checkTaken2)
+            return null;	
 
 		const user = await this.prisma.user.create({
 			data: {
