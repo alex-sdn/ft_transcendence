@@ -112,8 +112,7 @@ const Channel: React.FC = () => {
                     </button> */}
                 </p>
             </div>
-            <Messages sender={me?.name} target={channelName} />
-            {/* {channelName && <Messages channelName={channelName} />} */}
+            <Messages target={channelName} />
             <div id='members'>
                 {members && me && currentChannel &&
                     <ChannelMembers me={me}

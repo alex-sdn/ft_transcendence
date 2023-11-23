@@ -16,7 +16,14 @@
     border: 1px solid #ccc; /* Light grey border */
 }
   
-.message {
+.regular-message {
+    padding: 5px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee; /* Light grey line under each message */
+    color: black;
+}
+
+.command-message {
     padding: 5px;
     margin-bottom: 10px;
     border-bottom: 1px solid #eee; /* Light grey line under each message */
