@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { user } from './Channel.tsx';
 import SocketContext from "../../../Socket.js";
-import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
+import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
 
 interface banProps {
     selectedMember: user;
@@ -36,9 +36,7 @@ const Ban: React.FC<banProps> = ({
         });
 
         createPromise
-            .then((data) => {
-                const message = data.sender + " banned " + data.target;
-                socket?.emit("message", { target: selectedChannel, message: message });
+            .then(() => {
                 setError("");
                 onClose();
                 window.location.reload();
@@ -60,8 +58,12 @@ const Ban: React.FC<banProps> = ({
                         Do you really want to ban <strong>{selectedMember.name}</strong>?
                     </ModalTitle>
                 </ModalHeader>
-                <ModalBody>
-                    <button className="button-59" onClick={handleBan}>Yes</button>
+                <ModalBody className="action-buttons">
+                    <button className="button-59"
+                        onClick={handleBan}
+                    >
+                        Yes
+                    </button>
                     <button className="button-59"
                         onClick={() => {
                             onClose();
@@ -71,6 +73,15 @@ const Ban: React.FC<banProps> = ({
                     </button>
                     {error && <div className="text-danger">{error}</div>}
                 </ModalBody>
+                <ModalFooter>
+                    <button className="button-59"
+                        onClick={() => {
+                            onClose();
+                            setError("");
+                        }}>
+                        Cancel
+                    </button>
+                </ModalFooter>
             </Modal>
         </div>
     )

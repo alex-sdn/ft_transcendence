@@ -25,7 +25,7 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
     const [adminModal, setAdminModal] = useState<boolean>(false);
 
     return (
-        <div className="members">
+        <div>
             <div className="members-list">
                 <ul>
                     {members.map((member, index) => (
@@ -81,7 +81,7 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
                         </p>
                         {me.admin && (
                             <div>
-                                <p>
+                                <p className="action-buttons">
                                     <button onClick={() => setMuteModal(true)}
                                         className="button-59">
                                         Mute
@@ -95,12 +95,14 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
                                         Ban
                                     </button>
                                 </p>
-                                <p>
-                                    <button onClick={() => setAdminModal(true)}
-                                        className="button-59">
-                                        Give admin rights
-                                    </button>
-                                </p>
+                                {me.owner && selectedMember &&
+                                    <p>
+                                        <button onClick={() => setAdminModal(true)}
+                                            className="button-59">
+                                            Give admin rights
+                                        </button>
+                                    </p>
+                                }
                             </div>
                         )}
                     </ModalBody>
@@ -134,7 +136,7 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
                     onClose={() => setBanModal(false)}
                 />
             }
-            {selectedMember &&
+            {me.owner && selectedMember &&
                 <Admin selectedMember={selectedMember}
                     selectedChannel={currentChannel.name}
                     adminModal={adminModal}

@@ -40,8 +40,6 @@ const createChannel: React.FC = () => {
 
         createPromise
             .then((data) => {
-                const message = data.sender + " created this channel";
-                socket?.emit("message", { target: data.target, message: message });
                 setShowModal(false);
                 window.location.assign(`/chat/channels/${data.target}`);
 
