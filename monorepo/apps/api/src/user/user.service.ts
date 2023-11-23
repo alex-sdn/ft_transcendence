@@ -198,13 +198,31 @@ export class UserService {
 		return friends;
 	}
 
+	async checkFriend(nickname: string, user): Promise<boolean> {
+		const target = await this.prisma.user.findUnique({
+			where: {nickname: nickname},
+			include: {friends1: true}
+		});
+
+		if (!target) {
+			throw new HttpException('USER DOES NOT EXIST', HttpStatus.BAD_REQUEST);
+		}
+
+		// Check if friends
+		if (target.friends1.some(friendship => friendship.user2Id === user.id)) {
+			return true;
+		}
+		return false;
+	}
+
 	async addFriend(nickname: string, user) {
 		const target = await this.prisma.user.findUnique({
 			where: {nickname: nickname},
 			include: {
 				friends1: true,
 				blocked: true,
-				blockedBy: true}
+				blockedBy: true
+			}
 		});
 
 		if (!target) {
