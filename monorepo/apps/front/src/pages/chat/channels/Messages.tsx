@@ -1,10 +1,12 @@
 import React, { useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 import SocketContext from '../../../Socket';
 
 export interface Message {
     sender: string;
     target: string;
     message: string;
+    isCommand: boolean;
 }
 
 const Messages: React.FC<Message> = ({ sender, target }) => {
@@ -16,7 +18,6 @@ const Messages: React.FC<Message> = ({ sender, target }) => {
     useEffect(() => {
         const handleMessageReceive = (message: Message) => {
             setMessages(prevMessages => [...prevMessages, message]);
-            console.log(message.sender, message.target, message.message);
         };
 
         if (socket) {
@@ -34,6 +35,36 @@ const Messages: React.FC<Message> = ({ sender, target }) => {
         };
     }, [socket]);
 
+    useEffect(() => {
+        const fetchMessages = async () => {
+            try {
+                const response = await axios.get(`/api/chat/${target}/privmsg`);
+                if (response.status === 200) {
+                    setMessages(response.data);
+                }
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+            }
+        };
+
+        fetchMessages();
+
+        if (socket) {
+            socket.on("privmsg", fetchMessages);
+            socket.on("error", (error) => {
+                setError(error.message);
+            });
+        }
+
+        return () => {
+            if (socket) {
+                socket.off("privmsg", fetchMessages);
+                socket.off("error");
+            }
+        };
+
+    }, [socket, target]);
+
     const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (newMessage.trim() && socket) {
@@ -47,7 +78,7 @@ const Messages: React.FC<Message> = ({ sender, target }) => {
         <div className="messages-container">
             <div className="messages-list">
                 {messages.map((msg, index) => (
-                    <div key={index} className="message">
+                    <div key={index} className={msg.isCommand ? "command-message" : "regular-message"}>
                         <strong>{msg.sender}:</strong> <span>{msg.message}</span>
                     </div>
                 ))}
