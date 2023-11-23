@@ -39,9 +39,6 @@ const Profile: React.FC = () => {
         console.log(resp_profile);
       }
     }
-
-
-
     getProfileData();
   },);
 
@@ -54,14 +51,14 @@ const Profile: React.FC = () => {
         },
       },);
       const fileName = response.data.avatar;
-      console.log("response.data = " + response.data);
-
-      response = await axios.get('api/user/avatar/' + fileName, {
+      console.log("response.data PROFILE = " + response.data);
+      response = await axios.get('/api/user/avatar/' + fileName, {
         headers: {
           'Authorization': 'Bearer ' + jwtToken,
         },
         responseType: 'arraybuffer',
       });
+      console.log('RESP PROFILE  ==> '+ response.data);
       if (response.status === 200) {
         const blob = new Blob([response.data]);
         const file = new File([blob], fileName);

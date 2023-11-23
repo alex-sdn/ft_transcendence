@@ -13,6 +13,7 @@ const Profile: React.FC = () => {
   const [win, setWin] = useState<number>();
   const [lp, setLp] = useState<number>();
   const [gameNb, setGameNb] = useState<number>();
+  const [id, setId] = useState<number>();
 
 
   const jwtToken = Cookies.get('jwt-token');
@@ -32,6 +33,7 @@ const Profile: React.FC = () => {
         setWin(resp_profile.win);
         setLp(resp_profile.LP);
         setGameNb(resp_profile.loss + resp_profile.win);
+        setId(resp_profile.id);
         console.log(resp_profile);
       }
     }
@@ -39,7 +41,7 @@ const Profile: React.FC = () => {
 
 
     getProfileData();
-  },);
+  }, [id]);
 
 //REQUETE AVATAR
   useEffect(() => {
@@ -50,22 +52,23 @@ const Profile: React.FC = () => {
         },
       },);
       const fileName = response.data.avatar;
-      console.log("response.data = " + response.data);
-
-      response = await axios.get('api/user/avatar/' + fileName, {
+      console.log('FILENAME PROFILEUSER===> ' + fileName)
+      response = await axios.get('/api/user/avatar/' + fileName, {
         headers: {
           'Authorization': 'Bearer ' + jwtToken,
         },
         responseType: 'arraybuffer',
       }, );
+              console.log('RESP PROFILEUSER==> '+ response.data);
       if (response.status === 200) {
         const blob = new Blob([response.data]);
+
         const file = new File([blob], fileName);
         setImage(file);
       }
     };
     fetchDefaultAvatar();
-  }, []);
+  }, [id]);
 
       console.log('token = ', jwtToken);
 //   const customStyles = {
