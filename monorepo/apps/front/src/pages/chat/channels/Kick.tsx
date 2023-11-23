@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { user } from './Channel.tsx';
 import SocketContext from "../../../Socket.js";
-import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
+import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
 
 interface kickProps {
     selectedMember: user;
@@ -36,9 +36,7 @@ const Kick: React.FC<kickProps> = ({
         });
 
         createPromise
-            .then((data) => {
-                const message = data.sender + " kicked " + data.target;
-                socket?.emit("message", { target: selectedChannel, message: message });
+            .then(() => {
                 setError("");
                 onClose();
                 window.location.reload();
@@ -60,8 +58,12 @@ const Kick: React.FC<kickProps> = ({
                         Do you really want to kick <strong>{selectedMember.name}</strong>?
                     </ModalTitle>
                 </ModalHeader>
-                <ModalBody>
-                    <button className="button-59" onClick={handleKick}>Yes</button>
+                <ModalBody className="action-buttons">
+                    <button className="button-59"
+                        onClick={handleKick}
+                    >
+                        Yes
+                    </button>
                     <button className="button-59"
                         onClick={() => {
                             onClose();
@@ -71,6 +73,15 @@ const Kick: React.FC<kickProps> = ({
                     </button>
                     {error && <div className="text-danger">{error}</div>}
                 </ModalBody>
+                <ModalFooter>
+                    <button className="button-59"
+                        onClick={() => {
+                            onClose();
+                            setError("");
+                        }}>
+                        Cancel
+                    </button>
+                </ModalFooter>
             </Modal>
         </div>
     )

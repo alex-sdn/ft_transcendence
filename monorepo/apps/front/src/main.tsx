@@ -14,6 +14,8 @@ import './style/chat/Chat.css';
 import './style/chat/Channel.css'
 import './style/chat/CreateChannel.css';
 import './style/chat/ChannelSearchbar.css'
+import './style/chat/ChannelsLayout.css'
+import './style/chat/ChannelMembers.css'
 
 
 import 'bootstrap/dist/css/bootstrap.min.css'

@@ -9,9 +9,8 @@ const RootLayout: React.FC = () => {
 
   const disconnect = () => {
     Cookies.remove('jwt-token');
-    return navigate('/');
+    return navigate('/login');
   }
-
 
   return (
     <div className='root-layout'>
@@ -22,11 +21,7 @@ const RootLayout: React.FC = () => {
           {jwtToken ? <NavLink to="game">Game</NavLink> : <NavLink to="/login">Game</NavLink>}
           {jwtToken ? <NavLink to="chat">Chat</NavLink> : <NavLink to="/login">Chat</NavLink>}
           {jwtToken ? <NavLink to="profile">Profile</NavLink> : <NavLink to="/login">Profile</NavLink>}
-          {/* <NavLink to="/">Home</NavLink>
-          <NavLink to="game">Game</NavLink>
-          <NavLink to="chat">Chat</NavLink>
-          <NavLink to="profile">Profile</NavLink> */}
-          <button className='button-29' onClick={disconnect}>Disconnection</button> 
+          <button className='button-59' onClick={disconnect}>Logout</button> 
         </nav>
       </header>
       <main>
