@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 // import Cookies from "js-cookie";
-import { useNavigate, NavLink} from "react-router-dom";
+import { NavLink} from "react-router-dom";
 
 const SearchNick: React.FC = () => {
 
     // const jwtToken = Cookies.get('jwt-token');
     const [inputNick, setInputCode] = useState<string>('');
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputCode(e.target.value);
@@ -22,7 +22,7 @@ const SearchNick: React.FC = () => {
         <div>
         <input type='text' name='code' id='code' value={inputNick} onChange={handleChange} placeholder='Research'/>
         {/* <button className='button-29' onClick={handleValidation}>ok</button> */}
-        <NavLink to={/ProfileUser/${inputNick}}>aller vers</NavLink>
+        <NavLink to={`/ProfileUser/${inputNick}`}>aller vers</NavLink>
         </div>
     )
 }
