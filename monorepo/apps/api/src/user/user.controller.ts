@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors, ValidationPipe } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { Request, Response } from "express";
 import { UserService } from "./user.service";
 import { EditNicknameDto } from "./dto";
 import { TwoFactorDto } from "../auth/dto";
 import { FileInterceptor } from "@nestjs/platform-express";
+import * as path from 'path';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('user')
@@ -26,6 +27,11 @@ export class UserController {
 		return this.userService.getUser(nickname);
 	}
 
+	@Get('id/:id')
+	getUserById(@Param('id', ParseIntPipe) userId: number) {
+		return this.userService.getUserById(userId);
+	}
+
 	@Patch('me/editNickname')
 	editNickname(@Req() req: Request, @Body(new ValidationPipe()) dto: EditNicknameDto) {
 		return this.userService.editNickname(req.user, dto.nickname);
@@ -37,7 +43,23 @@ export class UserController {
 		return this.userService.getAvatar(filename, res);
 	}
 
-	@UseInterceptors(FileInterceptor('avatar', {dest: 'uploads/custom/'}))
+	@UseInterceptors(FileInterceptor('avatar', {
+		dest: 'uploads/custom/',
+		limits: {fileSize: 100000},       // UPDATE LATER
+		fileFilter(req, file, callback) {  // MOVE ?
+			const allowedFileTypes = ['.png', '.jpg', '.jpeg'];
+			const extension = path.extname(file.originalname).toLowerCase();
+
+			if (allowedFileTypes.includes(extension)) {
+				// Accept the file
+				callback(null, true);
+			} else {
+				// Reject the file
+				callback(new HttpException('Only PNG and JPEG files are allowed',
+					HttpStatus.UNSUPPORTED_MEDIA_TYPE), false);
+			}
+		},
+	}))
 	@Patch('me/editAvatar')
 	editAvatar(@Req() req: Request, @UploadedFile() file) {
 		return this.userService.editAvatar(req.user, file.filename);
@@ -67,6 +89,11 @@ export class UserController {
 		return this.userService.myFriends(req.user);
 	}
 
+	@Get('friend/:nickname')
+	checkFriend(@Param('nickname') nickname: string, @Req() req: Request) {
+		return this.userService.checkFriend(nickname, req.user);
+	}
+
 	@Post('friend/:nickname')
 	addFriend(@Param('nickname') nickname: string, @Req() req: Request) {
 		return this.userService.addFriend(nickname, req.user);
@@ -78,6 +105,11 @@ export class UserController {
 	}
 
 	/**  BLOCK  **/
+	@Get('block/:nickname')
+	checkBlock(@Param('nickname') nickname: string, @Req() req: Request) {
+		return this.userService.checkBlock(nickname, req.user);
+	}
+
 	@Post('block/:nickname')
 	addBlock(@Param('nickname') nickname: string, @Req() req: Request) {
 		return this.userService.addBlock(nickname, req.user);
