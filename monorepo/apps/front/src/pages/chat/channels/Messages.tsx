@@ -1,13 +1,13 @@
 import React, { useContext, useState, useEffect } from 'react';
 import SocketContext from '../../../Socket';
 
-interface Message {
-    user: string;
-    content: string;
-    channelName: string;
+export interface Message {
+    sender: string;
+    target: string;
+    message: string;
 }
 
-const Messages: React.FC<Message> = ({ user, channelName }) => {
+const Messages: React.FC<Message> = ({ sender, target }) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState("");
     const socket = useContext(SocketContext);
@@ -16,7 +16,7 @@ const Messages: React.FC<Message> = ({ user, channelName }) => {
     useEffect(() => {
         const handleMessageReceive = (message: Message) => {
             setMessages(prevMessages => [...prevMessages, message]);
-            console.log(messages);
+            console.log(message.sender, message.target, message.message);
         };
 
         if (socket) {
@@ -37,7 +37,7 @@ const Messages: React.FC<Message> = ({ user, channelName }) => {
     const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (newMessage.trim() && socket) {
-            socket.emit("message", { sender: user, target: channelName , message: newMessage});
+            socket.emit("message", { sender: sender, target: target , message: newMessage});
             setNewMessage('');
         }
     };
@@ -48,7 +48,7 @@ const Messages: React.FC<Message> = ({ user, channelName }) => {
             <div className="messages-list">
                 {messages.map((msg, index) => (
                     <div key={index} className="message">
-                        <strong>{msg.user}:</strong> <span>{msg.content}</span>
+                        <strong>{msg.sender}:</strong> <span>{msg.message}</span>
                     </div>
                 ))}
             </div>
