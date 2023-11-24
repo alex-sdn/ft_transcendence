@@ -5,7 +5,7 @@ import { AuthService } from "src/auth/auth.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { GameService } from "../game.service";
 import { instrument } from "@socket.io/admin-ui";
-import { width, height, Puck, Paddle } from '../game.math';
+import { width, height, Puck, Paddle, leftscore, rightscore } from '../game.math';
 
 let intervalId;
 let isPlaying: boolean = false;
@@ -26,7 +26,7 @@ export interface PuckDir {
     },
 })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
-	
+
 	@WebSocketServer()
 	server: Server;
 
@@ -43,18 +43,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.right = new Paddle(false);
 	}
 
+    /******************************************************************************
+    *                         CONNECTION & DISCONNECTION                          *
+    ******************************************************************************/
+
 	// < user.id, Socket >
 	private userToSocket = new Map<number, Socket>();
 	// < client.id, User >  (replace user with userId for updates?)
 	private idToUser = new Map<string, User>();
-
-	//for socket.io admin UI
-    afterInit() {
-        instrument(this.server, {
-            auth: false,
-            mode: "development",
-        });
-    }
 
 	// Add user to maps if jwt OK, disconnect if not
 	async handleConnection(client: any, ...args: any[]) {
@@ -82,7 +78,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
-	/**  EVENTS  **/
+	//for socket.io admin UI
+    afterInit() {
+        instrument(this.server, {
+            auth: false,
+            mode: "development",
+        });
+    }
+
+    /******************************************************************************
+    *                                   EVENTS                                    *
+    ******************************************************************************/
 
 	async sleep(ms: number) {
         return new Promise((resolve) => setTimeout(resolve, ms));
@@ -93,18 +99,26 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const { action } = body;
         if (action === 'upPressed') {
             console.log('up pressed');
-            this.left.update(-10);
+            this.left.move(-10);
         } else if (action === 'downPressed') {
             console.log('down pressed');
-            this.left.update(10);
+            this.left.move(10);
+        } else if (action === 'released') {
+            console.log('released');
+            this.left.move(0);
         }
-        //} else if (action === 'released') {
-        //    console.log('released');
-        //    this.left.move(0);
-        //}
-        //this.left.update();
+        this.left.update();
         console.log(this.left.getY());  
     }
+
+    /******************************************************************************
+    *                                   MATCHMAKING                               *
+    ******************************************************************************/
+
+
+    /******************************************************************************
+    *                                  GAME LOOP                                  *
+    ******************************************************************************/
 
     @SubscribeMessage('gameStart')
     async onGameStart(@MessageBody() body: any) {
@@ -121,7 +135,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 //if (this.puck.checkPaddleRight(this.right) || this.puck.checkPaddleLeft(this.left) || this.puck.checkEdges()) {
                     this.puck.checkPaddleRight(this.right);
                     this.puck.checkPaddleLeft(this.left); 
-                    this.puck.checkEdges();
+                    if (this.puck.checkEdges())
+                        this.server.emit('Score', { left: leftscore, right: rightscore });
                     const newPuckPos = { x: this.puck.getX(), y: this.puck.getY() };
                     const newPuckDir = { x: this.puck.getXSpeed(), y: this.puck.getYSpeed() };
                     this.server.emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
@@ -130,8 +145,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                     //console.log(this.puck.getY());
                 //}
             //}, 1000 / 60);
-            const newPos = { leftPos: this.left.getY(), rightPos: this.right.getY() };
-            this.server.emit('Paddle', { paddle: newPos });
+            //const newPos = { leftPos: this.left.getY(), rightPos: this.right.getY() };
+            this.server.emit('Paddle', { leftPos: this.left.getY(), rightPos: this.right.getY() });
+            //console.log(newPos.leftPos);
             await this.sleep(20);
         }
     }

@@ -6,5 +6,9 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class GameService {
 	constructor(private prisma: PrismaService) {}
 
+	/******************************************************************************
+	*                              UPDATE PROFILES                                *
+	******************************************************************************/
+
 
 }

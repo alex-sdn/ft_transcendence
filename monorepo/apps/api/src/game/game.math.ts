@@ -1,8 +1,8 @@
 export const width: number = 600;
 export const height: number = 400;
 
-let leftscore: number = 0;
-let rightscore: number = 0;
+export let leftscore: number = 0;
+export let rightscore: number = 0;
 
 /******************************************************************************
 *                                  PADDLE                                     *
@@ -23,9 +23,9 @@ export class Paddle {
         this.ychange = 0;
 
         if (isLeft) {
-            this.x = 0;
+            this.x = 10;
         } else {
-            this.x = width;
+            this.x = width - 10;
         }
     }
 
@@ -34,8 +34,8 @@ export class Paddle {
         this.ychange = steps;
     }
 
-    update(steps: number): void {
-        this.y += steps;
+    update(): void {
+        this.y += this.ychange;
         this.y = this.constrain(this.y, this.h / 2, height - this.h / 2);
         //console.log(this.y);
     }
@@ -82,11 +82,12 @@ export class Puck {
         this.y = height / 2;
         this.xspeed = 0;
         this.yspeed = 0;
-        this.r = 6;
+        this.r = 5;
 
         this.reset();
     }
 
+    //add -5 + 5 ?
     checkPaddleLeft(p: Paddle): boolean {
         if (
             this.y - this.r < p.getY() + p.getH() / 2 &&
@@ -106,6 +107,7 @@ export class Puck {
         return (false);
     }
 
+    //add -5 + 5 ?
     checkPaddleRight(p: Paddle): boolean {
         if (
             this.y - this.r < p.getY() + p.getH() / 2 &&
@@ -142,18 +144,18 @@ export class Puck {
     }
 
     checkEdges(): boolean {
-        if (this.y < 0 || this.y > height) {
+        if (this.y < 5 || this.y > height - 5) {
             this.yspeed *= -1;
-            return (true);
+            return (false);
         }
 
-        if (this.x - this.r > width) {
+        if (this.x - this.r - 5 > width) {
             leftscore++;
             this.reset();
             return (true);
         }
 
-        if (this.x + this.r < 0) {
+        if (this.x + this.r + 5 < 0) {
             rightscore++;
             this.reset();
             return (true);
