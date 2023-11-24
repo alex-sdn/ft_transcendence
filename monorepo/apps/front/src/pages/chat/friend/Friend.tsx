@@ -1,11 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Block from "./Block";
+import axios from "axios";
+import Cookies from "js-cookie";
 
 const Friend: React.FC = () => {
     const [message, setMessage] = useState<string>("");
+    const [isBlocked, setIsBlocked] = useState<boolean>(false);
     const [blockModal, setBlockModal] = useState<boolean>(false);
     const { userName } = useParams<{ userName: string }>();
+    const jwtToken = Cookies.get('jwt-token');
+
+    useEffect(() => {
+        const getBlocked = async () => {
+            const response = await axios.get(`/api/user/block/${userName}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + jwtToken,
+                },
+            })
+            if (response.status === 200) {
+                setIsBlocked(response.data);
+            }
+        }
+        getBlocked()
+    }, [userName, jwtToken])
 
     return (
         <div className="channel">
@@ -38,6 +56,8 @@ const Friend: React.FC = () => {
             </div> */}
             {userName &&
                 <Block nickname={userName}
+                    isBlocked={isBlocked}
+                    isChannel={false}
                     blockModal={blockModal}
                     onClose={() => setBlockModal(false)}
                 />
