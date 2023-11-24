@@ -18,7 +18,7 @@ const ProfilePicture: React.FC = () => {
             },);
             const fileName = response.data.avatar;
 
-            response = await axios.get('api/user/avatar/' + fileName, {
+            response = await axios.get('/api/user/avatar/' + fileName, {
                 headers: {
                     'Authorization': 'Bearer ' + jwtToken,
                 },
@@ -41,11 +41,11 @@ const ProfilePicture: React.FC = () => {
     };
 
 
-        createRoutesFromElements(
-          <Route path='/' element={<RootLayout />}>
-          <Route path="profile_picture" element={<ProfilePicture/>} />
-          </Route>
-        )
+    createRoutesFromElements(
+        <Route path='/' element={<RootLayout />}>
+            <Route path="profile_picture" element={<ProfilePicture />} />
+        </Route>
+    )
 
     const changeImageHandler = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -64,6 +64,8 @@ const ProfilePicture: React.FC = () => {
                 //     navigate('/');
                     if (response.status === 200)
                        window.location.assign('/profile');
+                    // if (response.status === 413)
+                        //AFFICHER MSG ERREUR
             } catch (error) {
                 console.log(error);
             }
@@ -79,6 +81,7 @@ const ProfilePicture: React.FC = () => {
                 <p><button type='submit'>Save changes</button></p>
             </Form>
         </div>
+        
     );
 }
 
