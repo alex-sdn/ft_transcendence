@@ -4,8 +4,11 @@ import axios from 'axios'
 import { useParams } from 'react-router-dom';
 
 const Profile: React.FC = () => {
-    const {Nick} = useParams<{ Nick: string}>();
-    console.log('INPUTNICK =' + Nick);
+    // const {Userid} = useParams<{ Userid: string}>();
+    // const Useridnb = Userid.toString();
+    const { ID } = useParams<{ ID?: string }>();
+// const UseridNb = Userid ? Userid.toString() : '';
+    console.log('USERIDNB =' + ID);
 
   const [nickname, setNickname] = useState<string>('');
   const [image, setImage] = useState<File>();
@@ -21,7 +24,7 @@ const Profile: React.FC = () => {
   useEffect(() => {
     const getProfileData = async () => {
       console.log('token = ', jwtToken);
-      const response = await axios.get(`/api/user/${Nick}`, {
+      const response = await axios.get(`/api/user/id/${ID}`, {
         headers: {
           'Authorization': 'Bearer ' + jwtToken,
         },
@@ -37,16 +40,13 @@ const Profile: React.FC = () => {
         console.log(resp_profile);
       }
     }
-
-
-
     getProfileData();
   }, [id]);
 
 //REQUETE AVATAR
   useEffect(() => {
     const fetchDefaultAvatar = async () => {
-      let response = await axios.get(`/api/user/${Nick}`, {
+      let response = await axios.get(`/api/user/id/${ID}`, {
         headers: {
           'Authorization': 'Bearer ' + jwtToken,
         },

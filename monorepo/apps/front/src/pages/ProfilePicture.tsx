@@ -82,6 +82,7 @@ const ProfilePicture: React.FC = () => {
                 <p><button type='submit'>Save changes</button></p>
             </Form>
         </div>
+        
     );
 }
 
