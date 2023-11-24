@@ -5,6 +5,7 @@ import ProfilePicture from './ProfilePicture';
 import Modal from 'react-modal';
 import Nickname from './Nickname';
 import Twofa from './2fa';
+import SearchNick from './SearchNick';
 
 const Profile: React.FC = () => {
 
@@ -38,9 +39,6 @@ const Profile: React.FC = () => {
         console.log(resp_profile);
       }
     }
-
-
-
     getProfileData();
   },);
 
@@ -53,14 +51,14 @@ const Profile: React.FC = () => {
         },
       },);
       const fileName = response.data.avatar;
-      console.log("response.data = " + response.data);
-
-      response = await axios.get('api/user/avatar/' + fileName, {
+      console.log("response.data PROFILE = " + response.data);
+      response = await axios.get('/api/user/avatar/' + fileName, {
         headers: {
           'Authorization': 'Bearer ' + jwtToken,
         },
         responseType: 'arraybuffer',
       });
+      console.log('RESP PROFILE  ==> '+ response.data);
       if (response.status === 200) {
         const blob = new Blob([response.data]);
         const file = new File([blob], fileName);
@@ -158,9 +156,12 @@ const Profile: React.FC = () => {
 
   return (
     <div className="_profile">
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+      
+      <div>{/* <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}> */}
+        <p><SearchNick/></p>
+        <p>
         {image && <img className="_avatar-img" src={URL.createObjectURL(image)} alt='profile picture' />}
-
+        </p>
         {<div>
           <button className="button-29" onClick={openModalpic}>⚙️</button>
           <Modal

@@ -62,8 +62,10 @@ const ProfilePicture: React.FC = () => {
                 });
                 // if (response.status === 200)
                 //     navigate('/');
-                if (response.status === 200)
-                    window.location.assign('/profile');
+                    if (response.status === 200)
+                       window.location.assign('/profile');
+                    // if (response.status === 413)
+                        //AFFICHER MSG ERREUR
             } catch (error) {
                 console.log(error);
             }
@@ -79,6 +81,7 @@ const ProfilePicture: React.FC = () => {
                 <p><button type='submit'>Save changes</button></p>
             </Form>
         </div>
+        
     );
 }
 
