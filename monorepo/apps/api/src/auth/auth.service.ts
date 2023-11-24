@@ -26,8 +26,8 @@ export class AuthService {
 		console.log('Query=' + code);
 		const tokenEndpoint = 'https://api.intra.42.fr/oauth/token';
 
-		const clientId = 'u-s4t2ud-1b7f717c58b58406ad4b2abe9145475069d66ace504146041932a899c47ff960';
-		const clientSecret = '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';
+		const clientId = this.config.get('FORTYTWO_ID');
+		const clientSecret = this.config.get('FORTYTWO_SECRET');
 
 		try {
 			// GET TOKENS FROM 42 API
