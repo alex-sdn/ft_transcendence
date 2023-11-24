@@ -15,12 +15,12 @@ export interface user {
 }
 
 const Channel: React.FC = () => {
-    const [message, setMessage] = useState<string>("");
+    const jwtToken = Cookies.get('jwt-token');
     const [members, setMembers] = useState<user[]>([]);
     const [currentChannel, setCurrentChannel] = useState<channel>();
+    const [message, setMessage] = useState<string>("");
     const [me, setMe] = useState<user>();
     const [settingsModal, setSettingsModal] = useState<boolean>(false);
-    const jwtToken = Cookies.get('jwt-token');
     const { channelName } = useParams<{ channelName: string }>();
 
     useEffect(() => {
@@ -73,7 +73,7 @@ const Channel: React.FC = () => {
     }, [channelName, me, jwtToken]); // fonction appelee chaque fois que les elements entre [] changent
 
     return (
-        <div className="channel">
+        <div>
             <div className='name-settings'>
                 <h2>{channelName}</h2>
                 <button className="material-symbols-outlined"
@@ -88,8 +88,8 @@ const Channel: React.FC = () => {
                         onClose={() => setSettingsModal(false)}
                     />}
             </div>
-            <div id='chat' >
-                <p>
+            <div className='chat-messages' >
+                {/* <p>
                     <input type='text'
                         name='message'
                         placeholder='Send a message'
@@ -105,9 +105,9 @@ const Channel: React.FC = () => {
                     >
                         send
                     </button>
-                </p>
+                </p> */}
             </div>
-            <div id='members'>
+            <div>
                 {members && me && currentChannel &&
                     <ChannelMembers me={me}
                         members={members}

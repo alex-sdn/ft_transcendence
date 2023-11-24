@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import Cookies from "js-cookie";
-import { useNavigate } from "react-router-dom";
 import axios from 'axios'
 
 const Login2fa: React.FC = () => {
 
-    const jwtToken = Cookies.get('jwt-token');
+    const jwtToken = Cookies.get('jwt-2fa-token');
     console.log('TOKEN == ' + jwtToken);
-    const navigate = useNavigate();
     const [inputCode, setInputCode] = useState<string>('');
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,9 +28,11 @@ const Login2fa: React.FC = () => {
           });
           
              if (responsesecret.status === 201) {
-              console.log('2FA successful'); 
+              console.log('2FA successful');
+              Cookies.remove('jwt-2fa-token');
               Cookies.set("jwt-token", responsesecret.data, { expires: 1 });
-              return navigate('/');
+              window.location.assign('/');
+              return ;
              }
             else {
               console.log('2fa FAILED')}}

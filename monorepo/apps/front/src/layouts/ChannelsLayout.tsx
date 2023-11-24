@@ -34,14 +34,18 @@ const ChannelsLayout: React.FC = () => {
 
     return (
         <div>
-            <div className="sidebar">
+            <div>
                 <div>
                     <ChannelSearchbar myChannels={myChannels} />
                     <nav>
-                        <ul>
+                        <ul className="my-channels">
                             {myChannels.map((channelName, index) => (
                                 <li key={index}>
-                                    <NavLink to={`/chat/channels/${channelName}`}>{channelName}</NavLink>
+                                    {jwtToken ?
+                                        <NavLink to={`/chat/channels/${channelName}`}>{channelName}</NavLink>
+                                        :
+                                        <NavLink to="/login">{channelName}</NavLink>
+                                    }
                                 </li>
                             ))}
                         </ul>
