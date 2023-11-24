@@ -46,7 +46,7 @@ const router = createBrowserRouter(
       <Route path="nickname" element={<Nickname />} />
       {/* <Route path="disconnect" element={<Disconnect />} /> */}
       <Route path="profile_picture" element={<ProfilePicture />} />
-      <Route path="profileUser/:Nick" element={<ProfileUser />} />
+      <Route path="profileUser/:ID" element={<ProfileUser />} />
       <Route path='*' element={<NotFound />} />
     </Route>
   )
