@@ -5,7 +5,7 @@ import { AuthService } from "src/auth/auth.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { ChatService } from "../chat.service";
 
-@WebSocketGateway({namespace: 'chat1'})
+@WebSocketGateway()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
 		private chatService: ChatService,
