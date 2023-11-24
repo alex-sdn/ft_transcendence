@@ -8,7 +8,7 @@ const SearchNick: React.FC = () => {
 
     // const jwtToken = Cookies.get('jwt-token');
     const [inputNick, setInputCode] = useState<string>('');
-    const [id, setId] = useState<number>();
+    // const [id, setId] = useState<number>();
     const navigate = useNavigate();
     const jwtToken = Cookies.get('jwt-token');
     var ID : string;
@@ -26,21 +26,14 @@ const SearchNick: React.FC = () => {
             },
           },);
           if (response.status === 200) {
-            console.log("************304************");
-            console.log(response.data.id);
-            // setId(response.data.id);
             ID = response.data.id.toString();
-            console.log('ID ========= ' + ID);
           }
           else 
-          {console.log("**********else*************")}
+          {console.log("Error")}
         }
       const handleValidation = async () => {
 
-        // <NavLink to={/ProfileUser/${inputNick}}>aller vers</NavLink>
         await getProfileData();
-                console.log('test ========= ' + `/profileUser/${ID}`);
-        
         return navigate(`/profileUser/${ID}`);
       }
 
@@ -48,7 +41,6 @@ const SearchNick: React.FC = () => {
         <div>
         <input type='text' name='code' id='code' value={inputNick} onChange={handleChange} placeholder='Research'/>
         <button className='button-29' onClick={handleValidation}>ok</button>
-        {/* <NavLink to={`/ProfileUser/${inputNick}`}>aller vers</NavLink> */}
         </div>
     )
 }

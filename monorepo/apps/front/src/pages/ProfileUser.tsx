@@ -4,11 +4,7 @@ import axios from 'axios'
 import { useParams } from 'react-router-dom';
 
 const Profile: React.FC = () => {
-    // const {Userid} = useParams<{ Userid: string}>();
-    // const Useridnb = Userid.toString();
     const { ID } = useParams<{ ID?: string }>();
-// const UseridNb = Userid ? Userid.toString() : '';
-    console.log('USERIDNB =' + ID);
 
   const [nickname, setNickname] = useState<string>('');
   const [image, setImage] = useState<File>();
@@ -23,7 +19,6 @@ const Profile: React.FC = () => {
 
   useEffect(() => {
     const getProfileData = async () => {
-      console.log('token = ', jwtToken);
       const response = await axios.get(`/api/user/id/${ID}`, {
         headers: {
           'Authorization': 'Bearer ' + jwtToken,
@@ -37,7 +32,6 @@ const Profile: React.FC = () => {
         setLp(resp_profile.LP);
         setGameNb(resp_profile.loss + resp_profile.win);
         setId(resp_profile.id);
-        console.log(resp_profile);
       }
     }
     getProfileData();
@@ -52,14 +46,12 @@ const Profile: React.FC = () => {
         },
       },);
       const fileName = response.data.avatar;
-      console.log('FILENAME PROFILEUSER===> ' + fileName)
       response = await axios.get('/api/user/avatar/' + fileName, {
         headers: {
           'Authorization': 'Bearer ' + jwtToken,
         },
         responseType: 'arraybuffer',
       }, );
-              console.log('RESP PROFILEUSER==> '+ response.data);
       if (response.status === 200) {
         const blob = new Blob([response.data]);
 
@@ -70,7 +62,6 @@ const Profile: React.FC = () => {
     fetchDefaultAvatar();
   }, [id]);
 
-      console.log('token = ', jwtToken);
 //   const customStyles = {
 //     content: {
 //       top: '50%',
