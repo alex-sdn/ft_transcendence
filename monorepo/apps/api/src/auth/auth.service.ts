@@ -48,12 +48,10 @@ export class AuthService {
 
 			// CHECK WITH DB IF EXISTS
 			const user = await this.prisma.user.findUnique({
-				where: {
-					login42: info42.login42
-				},
+				where: { login42: info42.login42 },
 			});
 
-			// IF NOT -> First login page (or not???)
+			// IF NOT -> First login page
 			if (!user) {
 				console.log('FIRST CONNECTION')
 				const avatar = await this.getFortyTwoAvatar(info42.login42, info42.image);
@@ -107,23 +105,19 @@ export class AuthService {
 			// return full access token
 			return await this.signToken(user.id, user.nickname);
 		}
-		// return value if wrong ??
 		throw new ForbiddenException('2FA_CODE_INCORRECT',);
 	}
 
+	// Create User in db with given data
 	async createUser(login42: string, nickname: string, avatar: string): Promise<User> {
 		const checkTaken = await this.prisma.user.findUnique({
-            where: {
-                nickname: nickname,
-            },
+            where: {nickname: nickname}
         });
         if (checkTaken)
             return null;
 
         const checkTaken2 = await this.prisma.user.findUnique({
-            where: {
-                login42: login42,
-            },
+            where: {login42: login42}  // TMP FOR FAKELOGIN ONLY
         });
         if (checkTaken2)
             return null;	
@@ -212,7 +206,7 @@ export class AuthService {
 		return token;
 	}
 
-	// verify JWT (for chat websocket only)
+	// verify JWT (for sockets only)
 	async validateToken(bearerToken: string) {
 		try {
 			if (!bearerToken)
@@ -220,15 +214,13 @@ export class AuthService {
 
 			const token = bearerToken.split(' ')[1];
 			const secret = this.config.get('JWT_SECRET')
-			const decoded = this.jwt.verify(token, {secret: secret} );
+			const decoded = this.jwt.verify(token, {secret: secret});
 			
 			if (decoded.need2fa === true)
 				return null;
 
 			const user = await this.prisma.user.findUnique({
-				where: {
-					id: decoded.userId,
-				},
+				where: {id: decoded.userId}
 			});
 
 			// delete unnecessary info
