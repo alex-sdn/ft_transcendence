@@ -3,7 +3,7 @@ TO DO:
 URGENT:
 - [X] : math of game
 - [X] : handle lags (info sent 1/60 frames) --> setInterval -> do it the other way around from front to back [BALL OK / PADDLE OK] --> was a socket transforming into http long polling issue OK
-- [ ] : print scores on screen
+- [X] : print scores on screen
 - [ ] : socket room / waiting room
 - [ ] : handle deconnection / timeout
 - [ ] : send & receive invitation from chat
