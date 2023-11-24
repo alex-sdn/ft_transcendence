@@ -78,3 +78,10 @@ h2 {
     'GRAD' 0,
     'opsz' 24
 }
+
+.welcome {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%);
+}
