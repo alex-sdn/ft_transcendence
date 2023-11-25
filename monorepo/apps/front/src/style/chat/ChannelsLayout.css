@@ -1,0 +1,45 @@
+.sidebar {
+    background-color: white;
+    position: relative;
+    height: calc(100vh - 116px);
+    width: 300px;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar nav {
+    position: absolute;
+    top: 40px;
+    width: 111%;
+}
+
+.sidebar a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: black;
+}
+
+.sidebar ul {
+    padding: 0;
+}
+
+.sidebar a.active {
+    color: white;
+    background-color: black;
+}
+
+.sidebar a:hover:not(.active) {
+    color: white;
+    background-color: black;
+}
+
+.sidebar ul li:hover {
+    color: white;
+    background-color: black;
+}
+
+.my-channels {
+    color: black;
+    list-style-type: none;
+}

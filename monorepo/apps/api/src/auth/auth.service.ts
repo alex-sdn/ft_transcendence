@@ -26,8 +26,8 @@ export class AuthService {
 		console.log('Query=' + code);
 		const tokenEndpoint = 'https://api.intra.42.fr/oauth/token';
 
-		const clientId = 'u-s4t2ud-1b7f717c58b58406ad4b2abe9145475069d66ace504146041932a899c47ff960';
-		const clientSecret = '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';
+		const clientId = this.config.get('FORTYTWO_ID');
+		const clientSecret = this.config.get('FORTYTWO_SECRET');
 
 		try {
 			// GET TOKENS FROM 42 API
@@ -48,12 +48,10 @@ export class AuthService {
 
 			// CHECK WITH DB IF EXISTS
 			const user = await this.prisma.user.findUnique({
-				where: {
-					login42: info42.login42
-				},
+				where: { login42: info42.login42 },
 			});
 
-			// IF NOT -> First login page (or not???)
+			// IF NOT -> First login page
 			if (!user) {
 				console.log('FIRST CONNECTION')
 				const avatar = await this.getFortyTwoAvatar(info42.login42, info42.image);
@@ -64,7 +62,7 @@ export class AuthService {
 					newUser = await this.createUser(info42.login42, nickname, avatar);
 				}
 				return {
-					access_token: await this.signToken(newUser.id, newUser.nickname, false),
+					access_token: await this.signToken(newUser.id, newUser.nickname),
 					newUser: true,
 					has2fa: false
 				};
@@ -73,7 +71,7 @@ export class AuthService {
 			else if (user.has2fa === true) {
 				console.log('USER FOUND WITH 2FA');
 				return {
-					access_token: await this.signToken(user.id, user.nickname, true),
+					access_token: await this.sign2faToken(user.id, user.nickname),
 					newUser: false,
 					has2fa: true
 				};
@@ -82,7 +80,7 @@ export class AuthService {
 			else {
 				console.log('USER FOUND, OK')
 				return {
-					access_token: await this.signToken(user.id, user.nickname, false),
+					access_token: await this.signToken(user.id, user.nickname),
 					newUser: false,
 					has2fa: false
 				};
@@ -105,20 +103,24 @@ export class AuthService {
 
 		if (isValid) {
 			// return full access token
-			return await this.signToken(user.id, user.nickname, false);
+			return await this.signToken(user.id, user.nickname);
 		}
-		// return value if wrong ??
 		throw new ForbiddenException('2FA_CODE_INCORRECT',);
 	}
 
+	// Create User in db with given data
 	async createUser(login42: string, nickname: string, avatar: string): Promise<User> {
 		const checkTaken = await this.prisma.user.findUnique({
-			where: {
-				nickname: nickname,
-			},
-		});
-		if (checkTaken)
-			return null;
+            where: {nickname: nickname}
+        });
+        if (checkTaken)
+            return null;
+
+        const checkTaken2 = await this.prisma.user.findUnique({
+            where: {login42: login42}  // TMP FOR FAKELOGIN ONLY
+        });
+        if (checkTaken2)
+            return null;	
 
 		const user = await this.prisma.user.create({
 			data: {
@@ -170,11 +172,11 @@ export class AuthService {
 	}
 
 	// create JWT
-	async signToken(userId: number, nickname: string, need2fa: boolean) {
+	async signToken(userId: number, nickname: string) {
 		const payload = {
 			userId,
 			nickname,
-			need2fa
+			need2fa: false
 		};
 		const secret = this.config.get('JWT_SECRET');
 
@@ -187,7 +189,24 @@ export class AuthService {
 		return token;
 	}
 
-	// verify JWT (for chat websocket only)
+	async sign2faToken(userId: number, nickname: string) {
+		const payload = {
+			userId,
+			nickname,
+			need2fa: true
+		};
+		const secret = this.config.get('JWT_2FA_SECRET');
+
+		const token = await this.jwt.signAsync(
+			payload, {
+			expiresIn: '15m',
+			secret: secret
+			}
+		);
+		return token;
+	}
+
+	// verify JWT (for sockets only)
 	async validateToken(bearerToken: string) {
 		try {
 			if (!bearerToken)
@@ -195,15 +214,13 @@ export class AuthService {
 
 			const token = bearerToken.split(' ')[1];
 			const secret = this.config.get('JWT_SECRET')
-			const decoded = this.jwt.verify(token, {secret: secret} );
+			const decoded = this.jwt.verify(token, {secret: secret});
 			
 			if (decoded.need2fa === true)
 				return null;
 
 			const user = await this.prisma.user.findUnique({
-				where: {
-					id: decoded.userId,
-				},
+				where: {id: decoded.userId}
 			});
 
 			// delete unnecessary info
@@ -224,7 +241,7 @@ export class AuthService {
 		if (!user)
 			return null;
 
-		return await this.signToken(user.id, user.nickname, false);
+		return await this.signToken(user.id, user.nickname);
 	}
 
 	async fakelogin(): Promise<{
@@ -241,7 +258,7 @@ export class AuthService {
 			newUser = await this.createUser(info42, nickname, "default-avatar");
 		}
 		return {
-			access_token: await this.signToken(newUser.id, newUser.nickname, false),
+			access_token: await this.signToken(newUser.id, newUser.nickname),
 			newUser: true,
 			has2fa: false
 		};

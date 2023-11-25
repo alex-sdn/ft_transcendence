@@ -21,11 +21,12 @@ export interface Channel {
 }
 
 const Channel: React.FC = () => {
-    const [members, setMembers] = useState<User[]>([]);
-    const [currentChannel, setCurrentChannel] = useState<Channel>();
-    const [me, setMe] = useState<User>();
-    const [settingsModal, setSettingsModal] = useState<boolean>(false);
     const jwtToken = Cookies.get('jwt-token');
+    const [members, setMembers] = useState<user[]>([]);
+    const [currentChannel, setCurrentChannel] = useState<channel>();
+    const [message, setMessage] = useState<string>("");
+    const [me, setMe] = useState<user>();
+    const [settingsModal, setSettingsModal] = useState<boolean>(false);
     const { channelName } = useParams<{ channelName: string }>();
 
     useEffect(() => {
@@ -75,10 +76,10 @@ const Channel: React.FC = () => {
             }
         }
         getChannelInfos();
-    }, [channelName, me, jwtToken]); // fonction appelee chaque fois que les elements entre [] changent
+    }, [channelName, jwtToken]);
 
     return (
-        <div className="channel">
+        <div>
             <div className='name-settings'>
                 <h2>{channelName}</h2>
                 <button className="material-symbols-outlined"
@@ -93,27 +94,27 @@ const Channel: React.FC = () => {
                         onClose={() => setSettingsModal(false)}
                     />}
             </div>
-            <div id='chat' >
-                <p>
-                    {/* <input type='text'
+            <div className='chat-messages' >
+                {/* <p>
+                    <input type='text'
                         name='message'
                         placeholder='Send a message'
-                        onChange={(e) => setMessage(e.target.value)} /> */}
+                        onChange={(e) => setMessage(e.target.value)} />
                 </p>
                 <p>
-                    {/* <button
+                    <button
                         className="material-symbols-outlined"
                         id='send-button'
                         type='submit'
-                        // value={message}
-                        // disabled={!message}
+                        value={message}
+                        disabled={!message}
                     >
                         send
-                    </button> */}
-                </p>
+                    </button>
+                </p> */}
             </div>
             <Messages target={channelName} />
-            <div id='members'>
+            <div>
                 {members && me && currentChannel &&
                     <ChannelMembers me={me}
                         members={members}

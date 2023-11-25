@@ -23,18 +23,14 @@ export class UserService {
 			}
 		});
 
-		delete user.secret2fa;
+		delete fullUser.secret2fa;
 		return fullUser;
 	}
 
 	async getUser(nickname: string) {
 		const user = await this.prisma.user.findUnique({
-			where: {
-				nickname
-			},
-			include: {
-				matchesP1 : true,
-			}
+			where: {nickname},
+			include: {matchesP1 : true,}
 		});
 		if (!user)
 			throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
@@ -42,6 +38,32 @@ export class UserService {
 		delete user.has2fa;
 		delete user.secret2fa;
 		return user;
+	}
+
+	async getUserById(userId: number) {
+		const user = await this.prisma.user.findUnique({
+			where: {id: userId}
+		});
+		if (!user)
+			throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
+
+		delete user.has2fa;
+		delete user.secret2fa;
+		return user;
+	}
+
+	async getAllUsers() {
+		var users = await this.prisma.user.findMany();
+
+		for (var i in users) {
+			delete users[i].createdAt;
+			delete users[i].has2fa;
+			delete users[i].secret2fa;
+			delete users[i].LP;
+			delete users[i].win;
+			delete users[i].loss;
+		}
+		return users;
 	}
 
 	async editNickname(user, nickname: string) {
@@ -59,7 +81,7 @@ export class UserService {
 				}
 			});
 			// returns new JWT (necessaire?)
-			return this.authService.signToken(updatedUser.id, updatedUser.nickname, false);
+			return this.authService.signToken(updatedUser.id, updatedUser.nickname);
 		} catch(error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {
 				if (error.code === 'P2002') {
@@ -184,13 +206,31 @@ export class UserService {
 		return friends;
 	}
 
+	async checkFriend(nickname: string, user): Promise<boolean> {
+		const target = await this.prisma.user.findUnique({
+			where: {nickname: nickname},
+			include: {friends1: true}
+		});
+
+		if (!target) {
+			throw new HttpException('USER DOES NOT EXIST', HttpStatus.BAD_REQUEST);
+		}
+
+		// Check if friends
+		if (target.friends1.some(friendship => friendship.user2Id === user.id)) {
+			return true;
+		}
+		return false;
+	}
+
 	async addFriend(nickname: string, user) {
 		const target = await this.prisma.user.findUnique({
 			where: {nickname: nickname},
 			include: {
 				friends1: true,
 				blocked: true,
-				blockedBy: true}
+				blockedBy: true
+			}
 		});
 
 		if (!target) {
@@ -275,12 +315,30 @@ export class UserService {
 	}
 
 	/**  BLOCK  **/
+	async checkBlock(nickname: string, user): Promise<boolean> {
+		const target = await this.prisma.user.findUnique({
+			where: {nickname: nickname},
+			include: {blockedBy: true}
+		});
+
+		if (!target) {
+			throw new HttpException('USER DOES NOT EXIST', HttpStatus.BAD_REQUEST);
+		}
+
+		// Check if blocked by you
+		if (target.blockedBy.some(blocked => blocked.blockerId === user.id)) {
+			return true;
+		}
+		return false;
+	}
+
 	async addBlock(nickname: string, user) {
 		const target = await this.prisma.user.findUnique({
 			where: {nickname: nickname},
 			include: {
 				friends1: true,
-				blockedBy: true}
+				blockedBy: true
+			}
 		});
 
 		if (!target) {

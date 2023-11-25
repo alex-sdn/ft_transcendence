@@ -1,12 +1,29 @@
-import React, { useState } from "react";
-import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import Block from "./Block";
+import axios from "axios";
+import Cookies from "js-cookie";
 
 const Friend: React.FC = () => {
     const [message, setMessage] = useState<string>("");
-    const [error, setError] = useState<string>("");
+    const [isBlocked, setIsBlocked] = useState<boolean>(false);
     const [blockModal, setBlockModal] = useState<boolean>(false);
     const { userName } = useParams<{ userName: string }>();
+    const jwtToken = Cookies.get('jwt-token');
+
+    useEffect(() => {
+        const getBlocked = async () => {
+            const response = await axios.get(`/api/user/block/${userName}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + jwtToken,
+                },
+            })
+            if (response.status === 200) {
+                setIsBlocked(response.data);
+            }
+        }
+        getBlocked()
+    }, [userName, jwtToken])
 
     return (
         <div className="channel">
@@ -18,7 +35,7 @@ const Friend: React.FC = () => {
                     block
                 </button>
             </div>
-            <div id='chat' >
+            {/* <div id='chat' >
                 <p>
                     <input type='text'
                         name='message'
@@ -36,34 +53,15 @@ const Friend: React.FC = () => {
                         send
                     </button>
                 </p>
-            </div>
-            <Modal show={blockModal}
-                onHide={() => setBlockModal(false)}
-                style={{ color: "black" }}
-                className="text-center"
-            >
-                <ModalHeader>
-                    <ModalTitle>
-                        Do you want to block <strong>{userName}</strong>?
-                    </ModalTitle>
-                </ModalHeader>
-                <ModalBody>
-                    <p>You wont be abble to see this user's messages anymore</p>
-                    <button className="button-59"
-                        onClick={() => {
-                            setBlockModal(false);
-                            setError("");
-                        }}>
-                        No
-                    </button>
-                    <button className="button-59"
-                    // onClick={blockUser}
-                    >
-                        Yes
-                    </button>
-                    {error && <div className="text-danger">{error}</div>}
-                </ModalBody>
-            </Modal>
+            </div> */}
+            {userName &&
+                <Block nickname={userName}
+                    isBlocked={isBlocked}
+                    isChannel={false}
+                    blockModal={blockModal}
+                    onClose={() => setBlockModal(false)}
+                />
+            }
         </div>
     );
 }

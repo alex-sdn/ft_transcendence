@@ -11,13 +11,10 @@ export function initializeSocket(): Socket | undefined {
     if (!jwtToken)
         return;
     const socket = io("http://localhost:3000/chat1", {
+    // const socket = io("http://made-f0br7s13:3000/chat1", {
         extraHeaders: {
             'Authorization': 'Bearer ' + jwtToken,
         }
     });
     return socket;
 }
-// const socket.on('create', (data: JSON)
-//     //maj affichage channels
-//     //ouvrir page nouveau channel
-// );

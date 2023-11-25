@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
-import { Form, FormControl, FormGroup, FormLabel, Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
+import { Form, FormControl, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
 import Cookies from "js-cookie";
 import axios from "axios";
 
@@ -60,10 +60,9 @@ const Invite: React.FC<inviteProps> = ({
         });
 
         createPromise
-            .then((data) => {
-                const message = data.sender + " invited you to " + data.channel;
-                socket.emit("privmsg", { target: userSelected, message: message });
+            .then(() => {
                 setError("");
+                setUserSelected("");
                 onClose();
             })
             .catch((error) => {
@@ -80,7 +79,7 @@ const Invite: React.FC<inviteProps> = ({
             >
                 <ModalHeader>
                     <ModalTitle>
-                    Invite a friend to <strong>{currentChannel.name}</strong>
+                        Invite a friend to <strong>{currentChannel.name}</strong>
                     </ModalTitle>
                 </ModalHeader>
                 <ModalBody>
@@ -112,7 +111,8 @@ const Invite: React.FC<inviteProps> = ({
                                 type="button"
                                 onClick={() => {
                                     onClose();
-                                    setError("")
+                                    setError("");
+                                    setUserSelected("");
                                 }}
                             >
                                 Cancel

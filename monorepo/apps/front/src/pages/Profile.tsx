@@ -4,6 +4,8 @@ import axios from 'axios'
 import ProfilePicture from './ProfilePicture';
 import Modal from 'react-modal';
 import Nickname from './Nickname';
+import Twofa from './2fa';
+import SearchNick from './SearchNick';
 
 const Profile: React.FC = () => {
 
@@ -17,6 +19,7 @@ const Profile: React.FC = () => {
 
 
   const jwtToken = Cookies.get('jwt-token');
+
   useEffect(() => {
     const getProfileData = async () => {
       console.log('token = ', jwtToken);
@@ -32,16 +35,14 @@ const Profile: React.FC = () => {
         setWin(resp_profile.win);
         setLp(resp_profile.LP);
         setGameNb(resp_profile.loss + resp_profile.win);
-        setTwofa(resp_profile.twofa);
+        setTwofa(resp_profile.has2fa);
         console.log(resp_profile);
       }
     }
-
-
-
     getProfileData();
   },);
 
+  //REQUETE AVATAR
   useEffect(() => {
     const fetchDefaultAvatar = async () => {
       let response = await axios.get('/api/user/me', {
@@ -50,14 +51,14 @@ const Profile: React.FC = () => {
         },
       },);
       const fileName = response.data.avatar;
-      console.log("response.data = " + response.data);
-
-      response = await axios.get('api/user/avatar/' + fileName, {
+      console.log("response.data PROFILE = " + response.data);
+      response = await axios.get('/api/user/avatar/' + fileName, {
         headers: {
           'Authorization': 'Bearer ' + jwtToken,
         },
         responseType: 'arraybuffer',
       });
+      console.log('RESP PROFILE  ==> '+ response.data);
       if (response.status === 200) {
         const blob = new Blob([response.data]);
         const file = new File([blob], fileName);
@@ -68,7 +69,7 @@ const Profile: React.FC = () => {
   }, []);
 
 
-  //MODALE start {
+  //MODALE PP {
   const [isOpenpic, setIsOpenpic] = useState(false);
 
   const openModalpic = () => {
@@ -79,7 +80,8 @@ const Profile: React.FC = () => {
     window.location.reload();
     setIsOpenpic(false);
   };
-  // } MODALE end
+
+  //  MODALE NICKNAME
 
   const [isOpennic, setIsOpennic] = useState(false);
 
@@ -92,6 +94,52 @@ const Profile: React.FC = () => {
     setIsOpennic(false);
   };
 
+  //2FA activation Modale
+
+  const [isOpenfa, setIsOpenfa] = useState(false);
+
+  const openModalfa = () => {
+    setIsOpenfa(true);
+  };
+
+  const closeModalfa = () => {
+    window.location.reload();
+    setIsOpenfa(false);
+  };
+
+  //2FA deactivation Modale
+
+  const [isOpenNofa, setIsOpenNofa] = useState(false);
+
+  const openModalNofa = () => {
+    setIsOpenNofa(true);
+  };
+
+  const closeModalNofa = () => {
+    window.location.reload();
+    setIsOpenNofa(false);
+  };
+
+  const handleClic = () => {
+    deac2fabutton();
+  }
+
+  const deac2fabutton = async () => {
+    try {
+      console.log('token = ', jwtToken);
+      const response = await axios.delete('/api/user/me/edit2fa', {
+        headers: {
+          'Authorization': 'Bearer ' + jwtToken,
+        },
+      },);
+      if (response.status === 200) {
+        console.log('2FA successfully deactivated');
+        window.location.reload();
+      }
+    }
+    catch (error) { console.log('Error encountered when deactivating 2FA'); }
+  }
+  console.log('token = ', jwtToken);
   const customStyles = {
     content: {
       top: '50%',
@@ -108,10 +156,12 @@ const Profile: React.FC = () => {
 
   return (
     <div className="_profile">
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+      
+      <div>{/* <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}> */}
+        <p><SearchNick/></p>
+        <p>
         {image && <img className="_avatar-img" src={URL.createObjectURL(image)} alt='profile picture' />}
-
-        {/* MODALE start */}
+        </p>
         {<div>
           <button className="button-29" onClick={openModalpic}>⚙️</button>
           <Modal
@@ -123,10 +173,9 @@ const Profile: React.FC = () => {
             <ProfilePicture />
           </Modal>
         </div>} </div>
-      {/* MODALE end*/}
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <h1>{nickname}</h1>&emsp;
+        <h1>{nickname}</h1> &emsp;
         {<div>
           <button className="button-29" onClick={openModalnic}>⚙️</button>
           <Modal
@@ -141,15 +190,39 @@ const Profile: React.FC = () => {
 
       <div className="_info"> <p>Game played : <span className='_score'>{gameNb}</span></p>
         <p>Victory : <span className='_score'>{win} </span></p>
-        <p>Loss : <span className='_score'>{loss}</span> </p>
+        <p>Loss : <span className='_score'>{loss}</span></p>
+
         <p>Ladder Points : <span className='_score'>{lp}</span> </p>
-        <p>Two factor authentification : {twofa ? <span className='_score'>activated</span> : <span className='_score'> deactivated</span>} </p>
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <p>Two factor authentification : {twofa ? <span className='_score'>activated</span> : <span className='_score'> deactivated</span>}</p> &emsp;
+          {twofa ?
+            <div>
+              <button className="button-29" onClick={openModalNofa}> ⚙️ </button>
+
+              <Modal
+                isOpen={isOpenNofa}
+                onRequestClose={closeModalNofa}
+                style={customStyles}>
+                <div>Are you sure you want to deactivate 2fa ?</div>
+                <button className='button-29' onClick={handleClic}>YES</button>
+                <button onClick={closeModalNofa} className='button-29'>NO</button>
+              </Modal>
+            </div>
+            : <div>
+              <button className="button-29" onClick={openModalfa}> ⚙️ </button>
+              <Modal
+                isOpen={isOpenfa}
+                onRequestClose={closeModalfa}
+                style={customStyles}>
+                <button onClick={closeModalfa}>x</button>
+                <Twofa />
+              </Modal>
+            </div>
+          }
+        </div>
       </div>
     </div>
-
   )
-
-
 }
 
 export default Profile;
