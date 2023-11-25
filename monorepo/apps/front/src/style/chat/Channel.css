@@ -22,7 +22,7 @@
     margin: 4px;
 }
 
-.chat-messages {
+/* .chat-messages {
     display: flex;
     position: absolute;
     background: white;
@@ -30,7 +30,7 @@
     height: 76vh;
     left: 14lh;
     bottom: 3vh;
-}
+} */
 
 .channel input {
     position: absolute;
