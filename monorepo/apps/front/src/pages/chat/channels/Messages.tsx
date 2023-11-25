@@ -1,6 +1,7 @@
-import React, { useContext, useState, useEffect } from 'react';
-import axios from 'axios';
-import SocketContext from '../../../Socket';
+import React, { useContext, useState, useEffect } from "react";
+import axios from "axios";
+import SocketContext from "../../../Socket";
+import Cookies from "js-cookie";
 
 export interface Message {
     sender: string;
@@ -9,7 +10,13 @@ export interface Message {
     isCommand: boolean;
 }
 
-const Messages: React.FC<Message> = ({ sender, target }) => {
+export interface MessageProps {
+    sender: string;
+    target: string;
+}
+
+const Messages: React.FC<MessageProps> = ({ sender, target }) => {
+    const jwtToken = Cookies.get('jwt-token');
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState("");
     const socket = useContext(SocketContext);
@@ -37,38 +44,22 @@ const Messages: React.FC<Message> = ({ sender, target }) => {
 
     useEffect(() => {
         const fetchMessages = async () => {
-            try {
-                const response = await axios.get(`/api/chat/${target}/privmsg`);
-                if (response.status === 200) {
-                    setMessages(response.data);
-                }
-            } catch (error) {
-                console.error('Error fetching messages:', error);
+            const response = await axios.get(`/api/chat/:${target}/messages`, {
+                headers: {
+                    'Authorization': 'Bearer ' + jwtToken,
+                },
+            },);
+            if (response.status === 200) {
+                setMessages(response.data);
             }
-        };
-
-        fetchMessages();
-
-        if (socket) {
-            socket.on("privmsg", fetchMessages);
-            socket.on("error", (error) => {
-                setError(error.message);
-            });
         }
-
-        return () => {
-            if (socket) {
-                socket.off("privmsg", fetchMessages);
-                socket.off("error");
-            }
-        };
-
-    }, [socket, target]);
+        fetchMessages();
+    }, [target, jwtToken]);
 
     const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (newMessage.trim() && socket) {
-            socket.emit("message", { sender: sender, target: target , message: newMessage});
+            socket.emit("message", { sender: sender, target: target, message: newMessage });
             setNewMessage('');
         }
     };
