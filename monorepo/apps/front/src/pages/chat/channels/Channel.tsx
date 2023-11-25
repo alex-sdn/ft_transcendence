@@ -94,7 +94,7 @@ const Channel: React.FC = () => {
                         onClose={() => setSettingsModal(false)}
                     />}
             </div>
-            <Messages target={channelName} />
+            <Messages sender={me} target={channelName} />
             <div>
                 {members && me && currentChannel &&
                     <ChannelMembers me={me}
