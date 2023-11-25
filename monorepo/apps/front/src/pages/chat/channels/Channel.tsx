@@ -94,27 +94,7 @@ const Channel: React.FC = () => {
                         onClose={() => setSettingsModal(false)}
                     />}
             </div>
-            <div className='chat-messages' >
-                <Messages target={channelName} />
-                {/* <p>
-                    <input type='text'
-                        name='message'
-                        placeholder='Send a message'
-                        onChange={(e) => setMessage(e.target.value)} />
-                </p>
-                <p>
-                    <button
-                        className="material-symbols-outlined"
-                        id='send-button'
-                        type='submit'
-                        value={message}
-                        disabled={!message}
-                    >
-                        send
-                    </button>
-                </p> */}
-            </div>
-            
+            <Messages target={channelName} />
             <div>
                 {members && me && currentChannel &&
                     <ChannelMembers me={me}
