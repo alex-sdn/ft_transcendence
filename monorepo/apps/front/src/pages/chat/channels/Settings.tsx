@@ -6,6 +6,7 @@ import SocketContext from "../../../Socket.js";
 import Access from "./Access.tsx";
 import { channel } from "../../../layouts/ChannelsLayout.tsx";
 import Invite from "./Invite.tsx";
+import Leave from "./Leave.tsx";
 
 interface settingsProps {
     me: user;
@@ -18,39 +19,7 @@ const Settings: React.FC<settingsProps> = ({ me, currentChannel, settingsModal, 
     const [leaveModal, setLeaveModal] = useState<boolean>(false);
     const [accessModal, setAccessModal] = useState<boolean>(false);
     const [inviteModal, setInviteModal] = useState<boolean>(false);
-    const [error, setError] = useState<string>("");
     const socket = useContext(SocketContext);
-
-
-    const handleLeave = async () => {
-        const createPromise = new Promise<{
-            sender: string;
-            target: string
-        }>((resolve, reject) => {
-            if (socket) {
-                socket.emit("leave", { target: currentChannel.name });
-                socket.on("leave", (data) => {
-                    resolve(data);
-                });
-                socket.on("error", data => {
-                    reject(data);
-                });
-            }
-        });
-
-        createPromise
-            .then((data) => {
-                const message = data.target + " left the channel";
-                socket?.emit("message", { target: currentChannel.name, message: message });
-                setError("");
-                setLeaveModal(false);
-                onClose();
-                window.location.assign('/chat/channels');
-            })
-            .catch((error) => {
-                setError(error.message);
-            });
-    }
 
     return (
         <div>
@@ -65,27 +34,30 @@ const Settings: React.FC<settingsProps> = ({ me, currentChannel, settingsModal, 
                     </ModalTitle>
                 </ModalHeader>
                 <ModalBody>
-                    <button className="button-59"
-                        onClick={() => setLeaveModal(true)}
-                    >
-                        Leave channel
-                    </button>
-                    {me.admin &&
+                    <p>
                         <button className="button-59"
-                            onClick={() => setInviteModal(true)}
+                            onClick={() => setLeaveModal(true)}
                         >
-                            Invite
+                            Leave channel
                         </button>
-                    }
-                    {me.owner &&
-                        <p>
+                    </p>
+                    <p className="action-buttons">
+                        {me.admin &&
+                            currentChannel.access === 'private' &&
+                            <button className="button-59"
+                                onClick={() => setInviteModal(true)}
+                            >
+                                Invite
+                            </button>
+                        }
+                        {me.owner &&
                             <button className="button-59"
                                 onClick={() => setAccessModal(true)}
                             >
                                 Change access
                             </button>
-                        </p>
-                    }
+                        }
+                    </p>
                 </ModalBody>
                 <ModalFooter>
                     <button className="button-59"
@@ -95,31 +67,13 @@ const Settings: React.FC<settingsProps> = ({ me, currentChannel, settingsModal, 
                     </button>
                 </ModalFooter>
             </Modal>
-            <Modal show={leaveModal}
-                onHide={() => setLeaveModal(false)}
-                style={{ color: "black" }}>
-                <ModalHeader>
-                    <ModalTitle>
-                        Do you really want to leave <strong>{currentChannel.name}</strong>?
-                    </ModalTitle>
-                </ModalHeader>
-                <ModalBody>
-                    <button className="button-59"
-                        onClick={handleLeave}
-                    >
-                        Yes
-                    </button>
-                    <button className="button-59"
-                        onClick={() => {
-                            setLeaveModal(false);
-                            setError("");
-                        }}
-                    >
-                        No
-                    </button>
-                    {error && <div className="text-danger">{error}</div>}
-                </ModalBody>
-            </Modal>
+            {socket &&
+                <Leave currentChannel={currentChannel}
+                    leaveModal={leaveModal}
+                    socket={socket}
+                    onClose={() => setLeaveModal(false)}
+                />
+            }
             {socket &&
                 <Invite currentChannel={currentChannel}
                     inviteModal={inviteModal}

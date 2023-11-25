@@ -1,4 +1,7 @@
 .ProfilePicture img {
     width:200px;
+    height: 200px;
     clip-path:ellipse(50% 50%);
+    border-radius: 100px;
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 5px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
 }

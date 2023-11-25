@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import Cookies from "js-cookie";
-import { Form, useNavigate } from "react-router-dom";
+import { Form } from "react-router-dom";
 import axios from "axios";
 
 const Nickname: React.FC = () => {
     const [newNickname, setnewNickname] = useState({ nickname: '' });
     const jwtToken = Cookies.get('jwt-token');
-    const navigate = useNavigate();
 
     const handleNicknameSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -20,8 +19,7 @@ const Nickname: React.FC = () => {
             });
             console.log(response);
             if (response.status === 200) {
-                //if 2fa === true => redirect 2fa
-                return navigate('/profile_picture')
+                return window.location.reload();
             } else {
                 return { error: 'Nickname already taken' };
             }

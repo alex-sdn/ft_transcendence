@@ -50,9 +50,7 @@ const Access: React.FC<accessProps> = ({
         });
 
         createPromise
-            .then((data) => {
-                const message = data.sender + "changed the access of the channel to " + data.access;
-                socket?.emit("message", { target: data.target, message: message });
+            .then(() => {
                 setError("");
                 setPassword("");
                 onClose();
