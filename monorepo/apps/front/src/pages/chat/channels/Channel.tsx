@@ -95,6 +95,7 @@ const Channel: React.FC = () => {
                     />}
             </div>
             <div className='chat-messages' >
+                <Messages target={channelName} />
                 {/* <p>
                     <input type='text'
                         name='message'
@@ -113,7 +114,7 @@ const Channel: React.FC = () => {
                     </button>
                 </p> */}
             </div>
-            <Messages target={channelName} />
+            
             <div>
                 {members && me && currentChannel &&
                     <ChannelMembers me={me}
