@@ -50,11 +50,12 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 						'Authorization': 'Bearer ' + jwtToken,
 					},
 				});
+				console.log(response);
 				if (response.status === 200) {
 					const previousmessages: Message[] = response.data.map(msg => ({
-						//sender: msg.sender,
+						sender: msg.sender.nickname,
 						//target: msg.target,
-						//message: msg.message,
+						message: msg.message,
 						//isCommand: msg.isCommand,
 					}));
 					setMessages(previousmessages);
@@ -81,7 +82,7 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 			<div className="messages-list">
 				{messages.map((msg, index) => (
 					<div key={index} className={msg.isCommand ? "command-message" : "regular-message"}>
-						<strong>{msg.sender}:</strong> <span>{msg.message}</span>
+						<strong>{msg.sender}</strong>{!msg.isCommand && ":"} <span>{msg.message}</span>
 					</div>
 				))}
 			</div>
@@ -103,6 +104,7 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 			</form>
 		</div>
 	);
+
 };
 
 export default Messages;

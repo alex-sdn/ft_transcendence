@@ -7,7 +7,7 @@
     left: 350px;
     bottom: 3%;
 }
-  
+
 .messages-list {
     flex-grow: 1;
     overflow-y: auto;
@@ -15,28 +15,27 @@
     padding: 10px;
     border: 1px solid #ccc; /* Light grey border */
 }
-  
+
 .regular-message {
     padding: 5px;
     margin-bottom: 10px;
-    border-bottom: 1px solid #eee; /* Light grey line under each message */
+    /*border-bottom: 1px solid #eee; Light grey line under each message*/
     color: black;
 }
 
 .command-message {
-    padding: 5px;
+    padding: 1px;
     margin-bottom: 10px;
-    border-bottom: 1px solid #eee; /* Light grey line under each message */
-    color: black;
+    /*border-bottom: 1px solid #eee; Light grey line under each message*/
+    color: grey;
 }
-  
+
 .message-form {
     display: flex;
     align-items: center;
     padding: 10px;
     gap: 10px; /* Space between input and button */
 }
-
 
 .message-input {
     position: absolute;
@@ -47,7 +46,6 @@
     transform: translate(-50%, 0);
 }
 
-
 #send-button {
     position: absolute;
     display: flex;
@@ -55,7 +53,7 @@
     bottom: 3%;
     transform: translate(-85%, 0);
 }
-  
+
 .send-button:disabled {
     background-color: #aaa; /* Disabled button color */
 }
