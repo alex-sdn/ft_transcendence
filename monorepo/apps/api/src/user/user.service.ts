@@ -186,9 +186,9 @@ export class UserService {
 		return friends;
 	}
 
-	async checkFriend(nickname: string, user): Promise<boolean> {
+	async checkFriend(userId: number, user): Promise<boolean> {
 		const target = await this.prisma.user.findUnique({
-			where: {nickname: nickname},
+			where: {id: userId},
 			include: {friends1: true}
 		});
 
@@ -203,9 +203,9 @@ export class UserService {
 		return false;
 	}
 
-	async addFriend(nickname: string, user) {
+	async addFriend(userId: number, user) {
 		const target = await this.prisma.user.findUnique({
-			where: {nickname: nickname},
+			where: {id: userId},
 			include: {
 				friends1: true,
 				blocked: true,
@@ -244,9 +244,9 @@ export class UserService {
 		});
 	}
 
-	async deleteFriend(nickname: string, user) {
+	async deleteFriend(userId: number, user) {
 		const target = await this.prisma.user.findUnique({
-			where: {nickname: nickname},
+			where: {id: userId},
 			include: {friends1: true}
 		});
 
@@ -292,9 +292,9 @@ export class UserService {
 	}
 
 	/**  BLOCK  **/
-	async checkBlock(nickname: string, user): Promise<boolean> {
+	async checkBlock(userId: number, user): Promise<boolean> {
 		const target = await this.prisma.user.findUnique({
-			where: {nickname: nickname},
+			where: {id: userId},
 			include: {blockedBy: true}
 		});
 
@@ -309,9 +309,9 @@ export class UserService {
 		return false;
 	}
 
-	async addBlock(nickname: string, user) {
+	async addBlock(userId: number, user) {
 		const target = await this.prisma.user.findUnique({
-			where: {nickname: nickname},
+			where: {id: userId},
 			include: {
 				friends1: true,
 				blockedBy: true
@@ -328,7 +328,7 @@ export class UserService {
 		// Check if already friends
 		if (target.friends1.some(friendship => friendship.user2Id === user.id)) {
 			// delete friend before blocking
-			this.deleteFriend(target.nickname, user);
+			this.deleteFriend(target.id, user);
 		}
 
 		// OK, add block
@@ -340,9 +340,9 @@ export class UserService {
 		});
 	}
 
-	async deleteBlock(nickname: string, user) {
+	async deleteBlock(userId: number, user) {
 		const target = await this.prisma.user.findUnique({
-			where: {nickname: nickname},
+			where: {id: userId},
 			include: {blockedBy: true}
 		});
 
