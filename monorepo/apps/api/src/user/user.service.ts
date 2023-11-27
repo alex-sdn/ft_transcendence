@@ -6,13 +6,15 @@ import * as speakeasy from "speakeasy";
 import * as qrcode from "qrcode";
 import { Response } from "express";
 import * as path from "path";
+import { ChatGateway } from "src/chat/gateway/chat.gateway";
 
 
 @Injectable()
 export class UserService {
 	constructor(
 		private prisma: PrismaService,
-		private authService: AuthService) {}
+		private authService: AuthService,
+		private chatGateway: ChatGateway) {}
 
 	async getMe(user) {
 		const fullUser = await this.prisma.user.findUnique({
@@ -75,6 +77,8 @@ export class UserService {
 				where: {id: user.id},
 				data: {nickname}
 			});
+			// emit refresh event
+			this.chatGateway.refreshNickname(user.id);
 			// returns new JWT (necessaire?)
 			return this.authService.signToken(updatedUser.id, updatedUser.nickname);
 		} catch(error) {
