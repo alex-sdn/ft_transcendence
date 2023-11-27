@@ -6,8 +6,8 @@ import {
   Navigate
 } from 'react-router-dom'
 import Cookies from "js-cookie";
-// import SocketContext, { initializeSocket } from './Socket'
-import SocketProvider from './Socket';
+import SocketContext, { initializeSocket } from './Socket'
+// import SocketProvider from './Socket';
 
 // layouts
 import RootLayout from './layouts/RootLayout'
@@ -56,12 +56,12 @@ const router = createBrowserRouter(
 )
 
 function App() {
-  // const socket = initializeSocket();
+  const socket = initializeSocket();
 
   return (
-    <SocketProvider>
+    <SocketContext.Provider value={socket}>
       <RouterProvider router={router} />
-    </SocketProvider>
+    </SocketContext.Provider>
   );
 }
 
