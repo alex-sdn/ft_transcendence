@@ -63,7 +63,6 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 				}
 			} catch (error) {
 				console.error('Error fetching messages:', error);
-				// Handle the error appropriately, maybe set an error state
 			}
 		};
 
