@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import SocketContext from "../../../Socket";
@@ -21,6 +21,7 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 	const [newMessage, setNewMessage] = useState("");
 	const socket = useContext(SocketContext);
 	const [error, setError] = useState<string>("");
+	const messagesEndRef = useRef(null);
 
 	useEffect(() => {
 		const handleMessageReceive = (message: Message) => {
@@ -56,7 +57,7 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 						sender: msg.sender.nickname,
 						//target: msg.target,
 						message: msg.message,
-						//isCommand: msg.isCommand,
+						isCommand: msg.isCommand,
 					}));
 					setMessages(previousmessages);
 				}
@@ -70,12 +71,16 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 	}, [target, jwtToken]);
 
 	const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        if (newMessage.trim() && socket) {
-            socket.emit("message", { sender: sender, target: target , message: newMessage});
-            setNewMessage('');
-        }
-    };
+		event.preventDefault();
+		if (newMessage.trim() && socket) {
+			socket.emit("message", { sender: sender, target: target , message: newMessage});
+			setNewMessage('');
+		}
+	};
+
+	useEffect(() => {
+		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+	}, [messages]);
 
 	return (
 		<div className="messages-container">
@@ -85,6 +90,7 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 						<strong>{msg.sender}</strong>{!msg.isCommand && ":"} <span>{msg.message}</span>
 					</div>
 				))}
+				<div ref={messagesEndRef} />
 			</div>
 			<form className="message-form" onSubmit={handleSendMessage}>
 				<input
