@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 const ProfilePicture: React.FC = () => {
     const jwtToken = Cookies.get('jwt-token');
     const [image, setImage] = useState<File>();
+    const [error, setError] = useState<string>("");
     // const navigate = useNavigate();
 
     useEffect(() => {
@@ -62,12 +63,13 @@ const ProfilePicture: React.FC = () => {
                 });
                 // if (response.status === 200)
                 //     navigate('/');
-                    if (response.status === 200)
-                       window.location.assign('/profile');
-                    // if (response.status === 413)
-                        //AFFICHER MSG ERREUR
+                if (response.status === 200)
+                    window.location.assign('/profile');
+                // if (response.status === 413)
+                //AFFICHER MSG ERREUR
             } catch (error) {
-                console.log(error);
+                setError((error as any).response.data.message)
+                // console.log(error);
             }
         }
     };
@@ -77,11 +79,21 @@ const ProfilePicture: React.FC = () => {
             <h2>Choose a profile picture:</h2>
             {image && <img src={URL.createObjectURL(image)} alt='profile picture' />}
             <Form encType='multipart/form-data' onSubmit={changeImageHandler}>
-                <p><input type="file" accept='image/*' onChange={selectImageHandler} /></p>
-                <p><button type='submit'>Save changes</button></p>
+                <p>
+                    <input type="file" accept='image/*' onChange={selectImageHandler} />
+                </p>
+                {error &&
+                    <p className='text-danger'>
+                        {error}
+                    </p>}
+                <p>
+                    <button type='submit'>
+                        Save changes
+                    </button>
+                </p>
             </Form>
         </div>
-        
+
     );
 }
 

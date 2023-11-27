@@ -44,7 +44,7 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
             }
         }
         getBlocked();
-    }, [blockModal, selectedMember])
+    }, [blockModal, selectedMember]);
 
     return (
         <div>
