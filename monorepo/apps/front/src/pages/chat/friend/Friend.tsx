@@ -8,6 +8,7 @@ const Friend: React.FC = () => {
     const [message, setMessage] = useState<string>("");
     const [isBlocked, setIsBlocked] = useState<boolean>(false);
     const [blockModal, setBlockModal] = useState<boolean>(false);
+    // const { id } = useParams<{ id: string }>();
     const { userName } = useParams<{ userName: string }>();
     const jwtToken = Cookies.get('jwt-token');
 
