@@ -19,7 +19,8 @@ const Nickname: React.FC = () => {
             });
             console.log(response);
             if (response.status === 200) {
-                return window.location.reload();
+                window.location.assign("/profile_picture");
+                // return window.location.reload();
             } else {
                 return { error: 'Nickname already taken' };
             }
