@@ -1,59 +1,53 @@
 .messages-container {
-    display: flex;
-    position: absolute;
-    background: white;
-    width: 100%;
-    height: 76vh;
-    left: 350px;
-    bottom: 3%;
+	display: flex;
+	flex-direction: column; /* Stack children vertically */
+	background: white;
+	width: 100%;
+	height: 76vh;
+	left: 350px;
+	position: relative;
 }
 
 .messages-list {
-    flex-grow: 1;
-    overflow-y: auto;
-    background-color: white;
-    padding: 10px;
-    border: 1px solid #ccc; /* Light grey border */
+	flex-grow: 1; /* Allow it to take up available space */
+	overflow-y: auto;
+	background-color: white;
+	padding: 10px;
+	border: 1px solid #ccc; /* Light grey border */
+	margin-bottom: 10px; /* Add space between list and form */
 }
 
 .regular-message {
-    padding: 5px;
-    margin-bottom: 10px;
-    /*border-bottom: 1px solid #eee; Light grey line under each message*/
-    color: black;
+	padding: 5px;
+	margin-bottom: 10px;
+	color: black;
 }
 
 .command-message {
-    padding: 1px;
-    margin-bottom: 10px;
-    /*border-bottom: 1px solid #eee; Light grey line under each message*/
-    color: grey;
+	padding: 5px;
+	margin-bottom: 10px;
+	color: grey;
 }
 
 .message-form {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    gap: 10px; /* Space between input and button */
+	display: flex;
+	align-items: center;
+	padding: 10px;
+	gap: 10px; /* Space between input and button */
 }
 
 .message-input {
-    position: absolute;
-    display: flex;
-    width: 85%;
-    left: 50%;
-    bottom: 3%;
-    transform: translate(-50%, 0);
+	flex-grow: 1; /* Allow input to fill available space */
 }
 
 #send-button {
-    position: absolute;
-    display: flex;
-    left: 95%;
-    bottom: 3%;
-    transform: translate(-85%, 0);
+	position: absolute;
+	display: flex;
+	left: 95%;
+	bottom: 3%;
+	transform: translate(-85%, 0);
 }
 
 .send-button:disabled {
-    background-color: #aaa; /* Disabled button color */
+	background-color: #aaa; /* Disabled button color */
 }
