@@ -137,8 +137,9 @@ export class UserController {
 		return this.userService.myMatches(req.user);
 	}
 
-	@Get('matches/:nickname')  // :id ?? CHECK LATER
-	getMatches(@Param('nickname') nickname: string, @Req() req: Request) {
-		return this.userService.getMatches(nickname);
+	// @Get('matches/:nickname')  // :id ?? CHECK LATER
+	@Get('matches/:id')
+	getMatches(@Param('id', ParseIntPipe) userId: number, @Req() req: Request) {
+		return this.userService.getMatches(userId);
 	}
 }
