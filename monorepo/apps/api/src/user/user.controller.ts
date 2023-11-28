@@ -89,6 +89,11 @@ export class UserController {
 		return this.userService.myFriends(req.user);
 	}
 
+	@Get('me/friend/requests')
+	myFriendRequests(@Req() req: Request) {
+		return this.userService.myFriendRequests(req.user);
+	}
+
 	// @Get('friend/:nickname')
 	@Get('friend/:id')
 	checkFriend(@Param('id', ParseIntPipe) userId: number, @Req() req: Request) {
