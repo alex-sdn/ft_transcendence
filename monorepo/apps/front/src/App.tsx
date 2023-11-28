@@ -60,7 +60,7 @@ function App() {
   const socket = initializeSocket();
 
   return (
-    <SocketContext.Provider value={socket}>
+    <SocketContext.Provider value={socket || null}>
       <RouterProvider router={router} />
     </SocketContext.Provider>
   );

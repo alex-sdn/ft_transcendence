@@ -13,12 +13,6 @@ export class AuthController {
 		return this.authService.handleOAuthCallback(code);
 	}
 
-	// Nickname selection for first login
-	// @Post('signup')
-	// signup(@Body() dto: AuthDto) {
-	// 	return this.authService.signup(dto);
-	// }
-
 	// 2FA
 	@UseGuards(AuthGuard('jwt-2fa'))
 	@Post('signin/2fa')
