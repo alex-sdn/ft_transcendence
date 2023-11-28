@@ -454,7 +454,7 @@ export class UserService {
 		const matches = await this.prisma.match.findMany({
 			where: { user1Id: user.id },
 			include: {
-				user1: true,
+				user1: true,  // necessaire ?
 				user2: true
 			}
 		});
@@ -469,9 +469,9 @@ export class UserService {
 		return matches;
 	}
 
-	async getMatches(nickname: string) {
+	async getMatches(userId: number) {
 		const user = await this.prisma.user.findUnique({
-			where: {nickname: nickname}
+			where: {id: userId}
 		});
 		if (!user) {
 			throw new HttpException('USER DOES NOT EXIST', HttpStatus.BAD_REQUEST);
