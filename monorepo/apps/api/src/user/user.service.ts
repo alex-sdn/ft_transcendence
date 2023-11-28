@@ -120,7 +120,7 @@ export class UserService {
 	/**  2FA  **/
 	async generate2fa(user) {
 		if (user.has2fa === true)
-			throw new HttpException('2FA_ALREADY_ACTIVATED', HttpStatus.CONFLICT);
+			throw new HttpException('2FA ALREADY ACTIVATED', HttpStatus.CONFLICT);
 		// generate 2fa secret
 		const secret = speakeasy.generateSecret({
 			name: "transcendence"
@@ -156,9 +156,9 @@ export class UserService {
 				where: {id: user.id},
 				data: {has2fa: true}
 			});
-			return;
+		} else {
+			throw new HttpException('WRONG 2FA CODE', HttpStatus.UNAUTHORIZED);
 		}
-		throw new HttpException('WRONG 2FA CODE', HttpStatus.UNAUTHORIZED);
 	}
 
 	async delete2fa(user) {
@@ -207,11 +207,26 @@ export class UserService {
 		return false;
 	}
 
+	async myFriendRequests(user) {
+		var requested = await this.prisma.friendRequest.findMany({
+			where: {requestedId: user.id},
+			include: {requester: true}
+		});
+
+		for (var i in requested) {
+			delete requested[i].requester.has2fa;
+			delete requested[i].requester.secret2fa;
+		}
+		return requested;
+	}
+
 	async addFriend(userId: number, user) {
 		const target = await this.prisma.user.findUnique({
 			where: {id: userId},
 			include: {
 				friends1: true,
+				requested: true,
+				requester: true,
 				blocked: true,
 				blockedBy: true
 			}
@@ -228,71 +243,114 @@ export class UserService {
 		if (target.blockedBy.some(blocked => blocked.blockerId === user.id)) {
 			throw new HttpException('YOU BLOCKED THIS USER', HttpStatus.BAD_REQUEST);
 		}
-		// // Check if blocked by them
+		// Check if blocked by them
 		if (target.blocked.some(blocked => blocked.blockedId === user.id)) {
 			throw new HttpException('THIS USER BLOCKED YOU', HttpStatus.BAD_REQUEST);
 		}
+		// Check if already requesting
+		if (target.requested.some(requester => requester.requesterId === user.id)) {
+			throw new HttpException('ALREADY SENT FRIEND REQUEST', HttpStatus.BAD_REQUEST);
+		}
 
-		// OK, add friend
-		await this.prisma.friendship.create({
-			data: {
-				user1Id: user.id,
-				user2Id: target.id
-			}
-		});
-		await this.prisma.friendship.create({
-			data: {
-				user1Id: target.id,
-				user2Id: user.id
-			}
-		});
+		// If requested, add friend
+		if (target.requester.some(requested => requested.requestedId === user.id)) {
+			// OK, add friend
+			await this.prisma.friendship.create({
+				data: {
+					user1Id: user.id,
+					user2Id: target.id
+				}
+			});
+			await this.prisma.friendship.create({
+				data: {
+					user1Id: target.id,
+					user2Id: user.id
+				}
+			});
+			// + Delete request
+			await this.prisma.friendRequest.delete({
+				where: {
+					requesterId_requestedId: {
+						requestedId: user.id,
+						requesterId: target.id
+					}
+				}
+			});
+		}
+		// Else create request
+		else {
+			await this.prisma.friendRequest.create({
+				data: {
+					requesterId: user.id,
+					requestedId: target.id
+				}
+			});
+		}
 	}
 
 	async deleteFriend(userId: number, user) {
 		const target = await this.prisma.user.findUnique({
 			where: {id: userId},
-			include: {friends1: true}
+			include: {
+				friends1: true,
+				requester: true
+			}
 		});
 
 		if (!target) {
 			throw new HttpException('USER DOES NOT EXIST', HttpStatus.BAD_REQUEST);
 		}
-		// Check if not friends
-		if (!target.friends1.some(friendship => friendship.user2Id === user.id)) {
+
+		// If friends
+		if (target.friends1.some(friendship => friendship.user2Id === user.id)) {
+			// OK, delete friend
+			const friendship1 = await this.prisma.friendship.findUnique({
+				where: {
+					user1Id_user2Id: {
+						user1Id: user.id,
+						user2Id: target.id
+					}
+				}
+			});
+			const friendship2 = await this.prisma.friendship.findUnique({
+				where: {
+					user1Id_user2Id: {
+						user1Id: target.id,
+						user2Id: user.id
+					}
+				}
+			});
+			// delete messages first
+			await this.prisma.privmsg.deleteMany({
+				where: { friend1Id: friendship1.id }
+			});
+			await this.prisma.privmsg.deleteMany({
+				where: { friend1Id: friendship2.id }
+			})
+			// delete friendships
+			await this.prisma.friendship.delete({
+				where: { id: friendship1.id }
+			});
+			await this.prisma.friendship.delete({
+				where: { id: friendship2.id }
+			});
+		
+		}
+		// If pending request
+		else if (target.requester.some(requested => requested.requestedId === user.id)) {
+			// delete request
+			await this.prisma.friendRequest.delete({
+				where: {
+					requesterId_requestedId: {
+						requestedId: user.id,
+						requesterId: userId
+					}
+				}
+			});
+		}
+		else {
 			throw new HttpException('YOU ARE NOT FRIENDS WITH THIS USER', HttpStatus.BAD_REQUEST);
 		}
-
-		// OK, delete friend
-		const friendship1 = await this.prisma.friendship.findUnique({
-			where: {
-				user1Id_user2Id: {
-					user1Id: user.id,
-					user2Id: target.id
-				}
-			}
-		});
-		const friendship2 = await this.prisma.friendship.findUnique({
-			where: {
-				user1Id_user2Id: {
-					user1Id: target.id,
-					user2Id: user.id
-				}
-			}
-		});
-		// delete messages first
-		await this.prisma.privmsg.deleteMany({
-			where: { friend1Id: friendship1.id }
-		});
-		await this.prisma.privmsg.deleteMany({
-			where: { friend1Id: friendship2.id }
-		})
-		// delete friendships
-		await this.prisma.friendship.delete({
-			where: { id: friendship1.id }
-		});
-		await this.prisma.friendship.delete({
-			where: { id: friendship2.id }
-		});
 	}
 
 	/**  BLOCK  **/
@@ -318,7 +376,9 @@ export class UserService {
 			where: {id: userId},
 			include: {
 				friends1: true,
-				blockedBy: true
+				blockedBy: true,
+				requested: true,
+				requester: true
 			}
 		});
 
@@ -333,6 +393,27 @@ export class UserService {
 		if (target.friends1.some(friendship => friendship.user2Id === user.id)) {
 			// delete friend before blocking
 			this.deleteFriend(target.id, user);
+		}
+		// Check if pending friend requests
+		if (target.requested.some(requester => requester.requesterId === user.id)) {
+			await this.prisma.friendRequest.delete({
+				where: {
+					requesterId_requestedId: {
+						requesterId: user.id,
+						requestedId: target.id
+					}
+				}
+			});
+		}
+		if (target.requester.some(requested => requested.requestedId === user.id)) {
+			await this.prisma.friendRequest.delete({
+				where: {
+					requesterId_requestedId: {
+						requesterId: target.id,
+						requestedId: user.id
+					}
+				}
+			});
 		}
 
 		// OK, add block
@@ -373,7 +454,7 @@ export class UserService {
 		const matches = await this.prisma.match.findMany({
 			where: { user1Id: user.id },
 			include: {
-				user1: true,
+				user1: true,  // necessaire ?
 				user2: true
 			}
 		});
@@ -388,9 +469,9 @@ export class UserService {
 		return matches;
 	}
 
-	async getMatches(nickname: string) {
+	async getMatches(userId: number) {
 		const user = await this.prisma.user.findUnique({
-			where: {nickname: nickname}
+			where: {id: userId}
 		});
 		if (!user) {
 			throw new HttpException('USER DOES NOT EXIST', HttpStatus.BAD_REQUEST);
