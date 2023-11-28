@@ -116,7 +116,10 @@ const Channel: React.FC = () => {
             }
         });
 
-        // event changement de nickname
+        // event changement de nickname -> refresh
+        socket?.on("refresh", () => {
+            setEventData("refresh");
+        })
 
         return () => {
             socket?.off("join");
@@ -125,6 +128,7 @@ const Channel: React.FC = () => {
             socket?.off("kick");
             socket?.off("ban");
             socket?.off("admin");
+            socket?.off("refresh");
         };
     }, [channelName, socket]);
 
