@@ -376,7 +376,9 @@ export class UserService {
 			where: {id: userId},
 			include: {
 				friends1: true,
-				blockedBy: true
+				blockedBy: true,
+				requested: true,
+				requester: true
 			}
 		});
 
@@ -391,6 +393,27 @@ export class UserService {
 		if (target.friends1.some(friendship => friendship.user2Id === user.id)) {
 			// delete friend before blocking
 			this.deleteFriend(target.id, user);
+		}
+		// Check if pending friend requests
+		if (target.requested.some(requester => requester.requesterId === user.id)) {
+			await this.prisma.friendRequest.delete({
+				where: {
+					requesterId_requestedId: {
+						requesterId: user.id,
+						requestedId: target.id
+					}
+				}
+			});
+		}
+		if (target.requester.some(requested => requested.requestedId === user.id)) {
+			await this.prisma.friendRequest.delete({
+				where: {
+					requesterId_requestedId: {
+						requesterId: target.id,
+						requestedId: user.id
+					}
+				}
+			});
 		}
 
 		// OK, add block
