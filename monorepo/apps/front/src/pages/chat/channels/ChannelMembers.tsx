@@ -33,7 +33,7 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
     useEffect(() => {
         const getBlocked = async () => {
             if (selectedMember) {
-                const response = await axios.get(`/api/user/block/${selectedMember.name}`, {
+                const response = await axios.get(`/api/user/block/${selectedMember.id}`, {
                     headers: {
                         'Authorization': 'Bearer ' + jwtToken,
                     },
