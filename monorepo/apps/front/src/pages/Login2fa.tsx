@@ -39,7 +39,9 @@ const Login2fa: React.FC = () => {
 
               
     return (
-        <div>
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div>OTP Needed from your authentifier</div><br />
         <input type='text' name='code' id='code' value={inputCode} onChange={handleChange} placeholder='Enter OTP'/>
         <button className='button-29' onClick={handleValidation}>ok</button>    
         </div>
