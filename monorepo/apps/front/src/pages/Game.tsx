@@ -242,7 +242,7 @@ const Game: React.FC = () => {
         console.log(room.name);
         console.log("-ROOM ROLE-")
         console.log(room.role);
-        socket?.emit('ready', { action: 'ready' });
+        socket?.emit('ready', { roomName: room.name });
     };
 
     /******************************************************************************

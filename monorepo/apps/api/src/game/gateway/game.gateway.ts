@@ -42,9 +42,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private gameService: GameService,
 		private authService: AuthService,
 		private prisma: PrismaService) {
-		this.puck = new Puck();
-        this.left = new Paddle(true);
-        this.right = new Paddle(false);
 	}
 
     /******************************************************************************
@@ -57,7 +54,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	// < client.id, User >  (replace user with userId for updates?)
 	private idToUser = new Map<string, User>();
 
-    //private roomsList = new Map<number, string>();
+    private roomsList = new Map<string, Room>();
 
     private defaultWaitingList = new Map<string, User>();
 
@@ -143,12 +140,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         
     }
 
-    @SubscribeMessage('ready')
-    async onReady(@ConnectedSocket() client: Socket, @MessageBody('roomName') roomName: string) {
-        //start countdown + start game
-    }
-
-	@SubscribeMessage('keys')
+	@SubscribeMessage('keys') //change for socket room
     async onKeys(@ConnectedSocket() client: Socket, @MessageBody() body: any) {
         const { action } = body;
         if (action === 'upPressed') {
@@ -169,7 +161,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     *                                   MATCHMAKING                               *
     ******************************************************************************/
 
-    async matchmaking(option:OPTION)
+    async matchmaking(option:OPTION) // add upgraded option
     {
         if (option == OPTION.Default)
         {
@@ -184,19 +176,19 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 const secondId = iteratorId.next();
                 const secondPlayer = iteratorPlayer.next();
 
-                console.log("****FIRST PLAYER****");                
-                console.log(firstId);
+                // console.log("****FIRST PLAYER****");                
+                // console.log(firstId);
 
-                console.log("****SECOND PLAYER****");                
-                console.log(secondId);
+                // console.log("****SECOND PLAYER****");                
+                // console.log(secondId);
 
                 const roomName = `default-${firstId.value}-${secondId.value}`;
 
-                console.log("****ROOM NAME****");
-                console.log(roomName);
+                // console.log("****ROOM NAME****");
+                // console.log(roomName);
 
-                console.log("DEBUG");
-                console.log(firstPlayer.value.id);
+                // console.log("DEBUG");
+                // console.log(firstPlayer.value.id);
 
                 const firstClient = await this.userToSocket.get(firstPlayer.value.id);
                 const secondClient = await this.userToSocket.get(secondPlayer.value.id);
@@ -209,20 +201,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
                 const room = await new Room(roomName, firstPlayer.value, secondPlayer.value);
 
+                this.roomsList.set(roomName, room);
+
                 await this.server.to(roomName).emit('AreYouReady');
 
                 this.defaultWaitingList.delete(firstId.value);
                 this.defaultWaitingList.delete(secondId.value);
 
-                console.log("****EMPTY WAITING LIST****");
-                this.defaultWaitingList.forEach((user, key) => {
-                    console.log(`Key: ${key}, User:`, user);
-                });
+                // console.log("****EMPTY WAITING LIST****");
+                // this.defaultWaitingList.forEach((user, key) => {
+                //     console.log(`Key: ${key}, User:`, user);
+                // });
             }
-        }
-        if (option == OPTION.Upgraded)
-        {
-            // launch upgraded
         }
     }
 
@@ -234,35 +224,43 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }	
 
-    @SubscribeMessage('gameStart')
-    async onGameStart(@MessageBody() body: any) {
-        //console.log("PLAY");
-        isPlaying = true;
+    @SubscribeMessage('ready')
+    async onReady(@ConnectedSocket() client: Socket, @MessageBody('roomName') roomName: string) {
 
-        const newPuckPos = { x: this.puck.getX(), y: this.puck.getY() };
-        const newPuckDir = { x: this.puck.getXSpeed(), y: this.puck.getYSpeed() };
-        this.server.emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
+        const room = await this.roomsList.get(roomName);
+        
+        room.isReady();
 
-        while (isPlaying === true) {
-            //const updatePuckInterval = setInterval(() => {
-                this.puck.update();
-                //if (this.puck.checkPaddleRight(this.right) || this.puck.checkPaddleLeft(this.left) || this.puck.checkEdges()) {
-                    this.puck.checkPaddleRight(this.right);
-                    this.puck.checkPaddleLeft(this.left); 
-                    if (this.puck.checkEdges())
-                        this.server.emit('Score', { left: leftscore, right: rightscore });
-                    const newPuckPos = { x: this.puck.getX(), y: this.puck.getY() };
-                    const newPuckDir = { x: this.puck.getXSpeed(), y: this.puck.getYSpeed() };
-                    this.server.emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
-                    //console.log("PUCK COORDINATES");
-                    //console.log(this.puck.getX());
-                    //console.log(this.puck.getY());
-                //}
-            //}, 1000 / 60);
-            //const newPos = { leftPos: this.left.getY(), rightPos: this.right.getY() };
-            this.server.emit('Paddle', { leftPos: this.left.getY(), rightPos: this.right.getY() });
-            //console.log(newPos.leftPos);
-            await this.sleep(20);
+        //two players are ready --> start game loop
+        if (room.getReady() >= 2)
+        {
+            isPlaying = true;
+
+            const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
+            const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
+            this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
+    
+            while (isPlaying === true) {
+                //const updatePuckInterval = setInterval(() => {
+                    room.getPuck().update();
+                    //if (this.puck.checkPaddleRight(this.right) || this.puck.checkPaddleLeft(this.left) || this.puck.checkEdges()) {
+                        room.getPuck().checkPaddleRight(room.getPaddleRight());
+                        room.getPuck().checkPaddleLeft(room.getPaddleLeft); 
+                        if (room.getPuck().checkEdges())
+                            this.server.to(roomName).emit('Score', { left: room.getLeftScore(), right: getRightScore() });
+                        const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
+                        const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
+                        this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
+                        //console.log("PUCK COORDINATES");
+                        //console.log(this.puck.getX());
+                        //console.log(this.puck.getY());
+                    //}
+                //}, 1000 / 60);
+                //const newPos = { leftPos: this.left.getY(), rightPos: this.right.getY() };
+                this.server.to(roomName).emit('Paddle', { leftPos: room.getPaddleLeft(), rightPos: room.getPaddleRight() });
+                //console.log(newPos.leftPos);
+                await this.sleep(20);
+            }
         }
     }
-}
+}  
