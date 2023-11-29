@@ -12,7 +12,7 @@ export const gameConst = {
     PADDLE_HEIGHT: 100,
     PADDLE_WIDTH: 10,
     PADDLE_OFFSET: 10,
-    BALL_RADIUS: 6,
+    //BALL_RADIUS: 6,
 };
 
 export interface PuckPos {
@@ -40,6 +40,17 @@ export interface Score {
     right: number;
 }
 
+export enum ROLE {
+    Left,
+    Right,
+    Undefined,
+}
+
+export interface Room {
+    name: string;
+    role: ROLE;
+}
+
 /******************************************************************************
 *                                   GAME                                      *
 ******************************************************************************/
@@ -49,6 +60,7 @@ const Game: React.FC = () => {
     const [score, setScore] = useState<Score>({ left: 0, right: 0});
     const [puckPos, setPuckPos] = useState<PuckPos>({ x: gameConst.PLAYGROUND_WIDTH / 2, y: gameConst.PLAYGROUND_HEIGHT / 2 });
     const [puckDir, setPuckDir] = useState<PuckDir>({ x: 0, y: 0 });
+    const [room, setRoom] = useState<Room>({ name: "", role: ROLE.Undefined });
 
     const canvasRef = useRef<any>(null);
 
@@ -65,7 +77,7 @@ const Game: React.FC = () => {
                 }: Puck) => {
                     setPuckPos(puckPos);
                     setPuckDir(puckDir);
-                    console.log("PUCK");
+                    //console.log("PUCK");
                     //render animation from here for optimization
                 }
             );
@@ -116,6 +128,46 @@ const Game: React.FC = () => {
         };
     }, []);
 
+    useEffect(() => {
+        if (socket)
+        {
+            socket.on(
+                "Paddle",
+                ({
+                    leftPos,
+                    rightPos
+                }: Paddle) => {
+                    setPaddle({ leftPos: leftPos, rightPos: rightPos});
+                    console.log("PADDLE");
+                    console.log(paddle.leftPos);
+                }
+            );
+        }
+        return () => {
+            if (socket)
+                socket.off("Paddle");
+        };
+    }, []);
+
+    useEffect(() => {
+        if (socket)
+        {
+            socket.on(
+                "Room",
+                ({
+                    name,
+                    role
+                }: Room) => {
+                    setRoom({ name: name, role: role});
+                }
+            );
+        }
+        return () => {
+            if (socket)
+                socket.off("Room");
+        };
+    }, []);
+
     /******************************************************************************
     *                              KEYS HANDLING                                  *
     ******************************************************************************/
@@ -153,14 +205,22 @@ const Game: React.FC = () => {
 
     const playWithRobot = () => {
         console.log('****ROBOT****');
+        socket?.emit('robot', { action: 'robot' });
     };
     
     const playDefaultGame = () => {
         console.log('****DEFAULT****');
+        socket?.emit('default', { action: 'default' });
     };
     
     const playUpgradedGame = () => {
         console.log('****UPGRADED****');
+        socket?.emit('upgraded', { action: 'upgraded' });
+    };
+
+    const IAmReady = () => {
+        console.log('****READY****');
+        socket?.emit('ready', { action: 'ready' });
     };
 
     /******************************************************************************
@@ -241,6 +301,7 @@ const Game: React.FC = () => {
                 <button onClick={playWithRobot}>Robot</button>
                 <button onClick={playDefaultGame}>Default</button>
                 <button onClick={playUpgradedGame}>Upgraded</button>
+                <button onClick={IAmReady}>IAmReady</button>
             </div>
 
         </div>
