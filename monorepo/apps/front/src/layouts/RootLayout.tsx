@@ -1,14 +1,18 @@
-import React from "react";
+import React, { useContext } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+
+// import SocketContext, {initializeSocket} from "../Socket";
 
 const RootLayout: React.FC = () => {
 
   const navigate = useNavigate();
   const jwtToken = Cookies.get('jwt-token');
+  // const socket = useContext(SocketContext);
 
   const disconnect = () => {
     Cookies.remove('jwt-token');
+    // socket = null;
     return navigate('/login');
   }
 
