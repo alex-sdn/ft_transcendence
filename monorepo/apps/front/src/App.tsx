@@ -6,7 +6,6 @@ import {
   Navigate
 } from 'react-router-dom'
 import Cookies from "js-cookie";
-
 import SocketContext, { initializeSocket } from './Socket'
 
 // layouts
@@ -24,6 +23,7 @@ import Login from './pages/Login'
 import Nickname from './pages/Nickname'
 import Login2fa from './pages/Login2fa'
 import ProfilePicture from './pages/ProfilePicture'
+import ProfileUser from './pages/ProfileUser'
 import Channel from './pages/chat/channels/Channel'
 import Friend from './pages/chat/friend/Friend'
 
@@ -58,7 +58,7 @@ function App() {
   const socket = initializeSocket();
 
   return (
-    <SocketContext.Provider value={socket}>
+    <SocketContext.Provider value={socket || null}>
       <RouterProvider router={router} />
     </SocketContext.Provider>
   );

@@ -9,6 +9,6 @@ import { JwtStrategy, TwoFactorStrategy } from './strategy';
 	imports: [HttpModule, JwtModule.register({})],
 	controllers: [AuthController],
 	providers: [AuthService, JwtStrategy, TwoFactorStrategy],
-	exports: [AuthService, JwtStrategy] //rm jwtstrategy
+	exports: [AuthService, JwtStrategy]
 })
 export class AuthModule {}

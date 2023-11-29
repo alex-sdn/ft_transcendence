@@ -438,4 +438,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 	}
 
+	refreshNickname(userId: number) {
+		const sockets = Array.from(this.userToSocket.values());
+		
+		// send to all sockets ?
+		for (var i in sockets) {
+			// need json ?
+			sockets[i].emit('refresh');
+		}
+	}
+
 }
