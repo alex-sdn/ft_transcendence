@@ -168,6 +168,22 @@ const Game: React.FC = () => {
         };
     }, []);
 
+    useEffect(() => {
+        if (socket)
+        {
+            socket.on(
+                "Ready",
+                () => {
+                    //ask if ready?
+                }
+            );
+        }
+        return () => {
+            if (socket)
+                socket.off("Ready");
+        };
+    }, []);
+
     /******************************************************************************
     *                              KEYS HANDLING                                  *
     ******************************************************************************/
@@ -301,7 +317,7 @@ const Game: React.FC = () => {
                 <button onClick={playWithRobot}>Robot</button>
                 <button onClick={playDefaultGame}>Default</button>
                 <button onClick={playUpgradedGame}>Upgraded</button>
-                <button onClick={IAmReady}>IAmReady</button>
+                <button onClick={IAmReady}>Ready</button>
             </div>
 
         </div>

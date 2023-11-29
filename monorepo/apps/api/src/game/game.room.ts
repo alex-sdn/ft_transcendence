@@ -1,3 +1,4 @@
+import { User } from "@prisma/client";
 import { width, height, Puck, Paddle } from './game.math';
 
 let isPlaying: boolean = false;
@@ -23,27 +24,30 @@ export interface Score {
 }
 
 export class Room {
-    private left: string;
-    private right: string;
+
     private name: string;
+    
+    private left: User;
+    private right: User;
+
     private ready: Ready;
 
     private leftPaddle: Paddle;
     private rightPaddle: Paddle;
+
     private puck: Puck;
 
     private score: Score;
 
-    //private winner: User | null;
-    //private loser: User | null;
-
-    constructor(left: string, right: string, name: string) {
+    constructor(name: string, left: User, right: User) {
+        this.name = name;
         this.left = left;
         this.right = right;
-        this.name = name;
-        
-        this.init();
+        //this.init();
     }
+
+    //init
+
 
     //+ getters and setters
 

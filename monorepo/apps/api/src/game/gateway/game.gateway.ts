@@ -6,6 +6,15 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { GameService } from "../game.service";
 import { instrument } from "@socket.io/admin-ui";
 import { width, height, Puck, Paddle, leftscore, rightscore } from '../game.math';
+import { Room } from '../game.room';
+
+let isPlaying: boolean = false;
+
+export enum OPTION {
+    Robot,
+    Default,
+    Upgraded,
+}
 
 //let intervalId;
 
@@ -42,11 +51,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	// < client.id, User >  (replace user with userId for updates?)
 	private idToUser = new Map<string, User>();
 
-    private roomsList = new Map<number, string>();
+    //private roomsList = new Map<number, string>();
 
-    private DefaultWaitingList = new Map<number, string>();
+    private defaultWaitingList = new Map<string, User>();
 
-    private UpgradedWaitingList = new Map<number, string>();
+    private upgradedWaitingList = new Map<string, User>();
 
 	// Add user to maps if jwt OK, disconnect if not
 	async handleConnection(client: any, ...args: any[]) {
@@ -99,6 +108,40 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     *                                   EVENTS                                    *
     ******************************************************************************/
 
+	@SubscribeMessage('default')
+    async onDefault(@ConnectedSocket() client: Socket) {
+        
+        const user = this.idToUser.get(client.id);
+        this.defaultWaitingList.set(client.id, user);
+
+        this.defaultWaitingList.forEach((user, key) => {
+            console.log(`Key: ${key}, User:`, user);
+        });
+
+        this.matchmaking(OPTION.Default);
+
+    }
+
+	@SubscribeMessage('upgraded')
+    async onUpgraded(@ConnectedSocket() client: Socket) {                
+        
+        const user = this.idToUser.get(client.id);
+        this.defaultWaitingList.set(client.id, user);
+
+        this.matchmaking(OPTION.Upgraded);
+
+    }
+
+    @SubscribeMessage('robot')
+    async onRobot(@ConnectedSocket() client: Socket) {
+        
+    }
+
+    @SubscribeMessage('ready')
+    async onReady(@ConnectedSocket() client: Socket, @MessageBody('roomName') roomName: string) {
+        //start countdown + start game
+    }
+
 	@SubscribeMessage('keys')
     async onKeys(@ConnectedSocket() client: Socket, @MessageBody() body: any) {
         const { action } = body;
@@ -116,31 +159,56 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         //console.log(this.left.getY());  
     }
 
-	@SubscribeMessage('robot')
-    async onRobot(@ConnectedSocket() client: Socket) {
-        
-    }
-
-	@SubscribeMessage('default')
-    async onDefault(@ConnectedSocket() client: Socket) {
-        
-    }
-
-	@SubscribeMessage('upgraded')
-    async onUpgraded(@ConnectedSocket() client: Socket) {
-        
-    }
-
-    @SubscribeMessage('ready')
-    async onReady(@ConnectedSocket() client: Socket, @MessageBody('roomName') roomName: string) {
-        
-    }
-
-
     /******************************************************************************
     *                                   MATCHMAKING                               *
     ******************************************************************************/
 
+    async matchmaking(option:OPTION)
+    {
+        if (option == OPTION.Default)
+        {
+            if (this.defaultWaitingList.size >= 2)
+            {
+                const iteratorId = this.defaultWaitingList.keys();
+                const iteratorPlayer = this.defaultWaitingList.values();
+
+                const firstId = iteratorId.next();
+                const firstPlayer = iteratorPlayer.next();
+
+                const secondId = iteratorId.next();
+                const secondPlayer = iteratorPlayer.next();
+
+                console.log("****FIRST PLAYER****");                
+                console.log(firstId);
+
+                console.log("****SECOND PLAYER****");                
+                console.log(secondId);
+
+                const roomName = `default-${firstId.value}-${secondId.value}`;
+
+                console.log("****ROOM NAME****");
+                console.log(roomName);
+
+                //join room with socket
+
+                const room = await new Room(roomName, firstPlayer.value, secondPlayer.value);
+
+                //THEN send room name & status to each of them THEN ask if ready THEN start game loop
+
+                this.defaultWaitingList.delete(firstId.value);
+                this.defaultWaitingList.delete(secondId.value);
+
+                console.log("****EMPTY WAITING LIST****");
+                this.defaultWaitingList.forEach((user, key) => {
+                    console.log(`Key: ${key}, User:`, user);
+                });
+            }
+        }
+        if (option == OPTION.Upgraded)
+        {
+            // launch upgraded
+        }
+    }
 
     /******************************************************************************
     *                                  GAME LOOP                                  *
