@@ -19,8 +19,7 @@ const Nickname: React.FC = () => {
                 },
             });
             if (response.status === 200) {
-                window.location.assign("/profile_picture"); //check si first time logged
-                // return window.location.reload();
+                return window.location.reload();
             }
         } catch (error) {
             setError((error as any).response.data.message);

@@ -177,7 +177,8 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
                 />
             }
             {selectedMember &&
-                <Block nickname={selectedMember.name}
+                <Block id={selectedMember.id}
+                    nickname={selectedMember.name}
                     isBlocked={isBlocked}
                     isChannel={true}
                     blockModal={blockModal}

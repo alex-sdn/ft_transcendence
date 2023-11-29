@@ -13,7 +13,7 @@ export interface user {
     owner: boolean;
     admin: boolean;
     avatar: string;
-    id: number;
+    id: string;
 }
 
 const Channel: React.FC = () => {
