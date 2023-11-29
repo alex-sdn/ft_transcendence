@@ -50,7 +50,7 @@ const Game: React.FC = () => {
     const [puckPos, setPuckPos] = useState<PuckPos>({ x: gameConst.PLAYGROUND_WIDTH / 2, y: gameConst.PLAYGROUND_HEIGHT / 2 });
     const [puckDir, setPuckDir] = useState<PuckDir>({ x: 0, y: 0 });
 
-    const canvasRef = useRef(null);
+    const canvasRef = useRef<any>(null);
 
     const socket = useContext(SocketContext);
 
@@ -124,10 +124,10 @@ const Game: React.FC = () => {
         const handleKeyPress = (event: any) => {
             if (event.type === 'keydown') {
                 if (event.key === 'ArrowUp') {
-                    socket?.emit('userAction', { action: 'upPressed' });
+                    socket?.emit('keys', { action: 'upPressed' });
                 }
                 if (event.key === 'ArrowDown') {
-                    socket?.emit('userAction', { action: 'downPressed' });
+                    socket?.emit('keys', { action: 'downPressed' });
                 }
                 if (event.key === ' ') {
                     socket?.emit('gameStart', { action: 'gameStart' });
@@ -135,7 +135,7 @@ const Game: React.FC = () => {
             } 
             else if (event.type === 'keyup') {
                 if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-                    socket?.emit('userAction', { action: 'released' });
+                    socket?.emit('keys', { action: 'released' });
                 }
             }
         };
@@ -146,6 +146,22 @@ const Game: React.FC = () => {
             window.removeEventListener('keyup', handleKeyPress);
         };
     }, []);
+
+    /******************************************************************************
+    *                               GAME OPTIONS                                  *
+    ******************************************************************************/
+
+    const playWithRobot = () => {
+        console.log('****ROBOT****');
+    };
+    
+    const playDefaultGame = () => {
+        console.log('****DEFAULT****');
+    };
+    
+    const playUpgradedGame = () => {
+        console.log('****UPGRADED****');
+    };
 
     /******************************************************************************
     *                                GAME CANVA                                   *
@@ -159,24 +175,24 @@ const Game: React.FC = () => {
             canvas.width = gameConst.PLAYGROUND_WIDTH;
             canvas.height = gameConst.PLAYGROUND_HEIGHT;
     
-            // make background canvas white
+            // background canvas white
             ctxt.fillStyle = "white";
             ctxt.fillRect(0, 0, canvas.width, canvas.height);
     
-            // draw a black border
+            // black border
             ctxt.strokeStyle = "black";
             ctxt.lineWidth = 3;
             ctxt.setLineDash([]);
             ctxt.strokeRect(0, 0, canvas.width, canvas.height);
     
-            // draw the dashed divider line
+            // dashed divider line
             ctxt.setLineDash([23, 14.7]);
             ctxt.beginPath();
             ctxt.moveTo(canvas.width / 2, 0);
             ctxt.lineTo(canvas.width / 2, canvas.height);
             ctxt.stroke();
     
-            // draw both paddles
+            // both paddles
             //ctxt.fillStyle = "#262f69";
             ctxt.fillStyle = "black";
             ctxt.fillRect(10, paddle.leftPos - gameConst.PADDLE_HEIGHT / 2, gameConst.PADDLE_WIDTH, gameConst.PADDLE_HEIGHT);
@@ -188,7 +204,7 @@ const Game: React.FC = () => {
               gameConst.PADDLE_HEIGHT,
             );
     
-            // draw the puck
+            // puck
             //if (!isWaiting) {
               ctxt.fillStyle = "black";
               ctxt.fillRect(
@@ -198,7 +214,7 @@ const Game: React.FC = () => {
                 gameConst.PADDLE_WIDTH,
               );
 
-            // add score
+            // scores
             ctxt.font = "50px 'Calibri', bold";
             ctxt.fillStyle = "black";
             ctxt.textAlign = "center";
@@ -212,11 +228,21 @@ const Game: React.FC = () => {
 
     return (
         <div>
+            
             <p>Game is working!</p>
+
             <div>
 
             </div>
-            <canvas ref={canvasRef} width={600} height={400}></canvas>
+            
+                <canvas ref={canvasRef} width={600} height={400}></canvas>
+            
+            <div>
+                <button onClick={playWithRobot}>Robot</button>
+                <button onClick={playDefaultGame}>Default</button>
+                <button onClick={playUpgradedGame}>Upgraded</button>
+            </div>
+
         </div>
     );
 };
