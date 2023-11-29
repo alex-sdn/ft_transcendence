@@ -66,6 +66,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// add to maps
 			this.userToSocket.set(user.id, client);
 			this.idToUser.set(client.id, user);
+            console.log("USER ID : "+user.id+" ");
+            console.log("CLIENT ID : "+client.id+" ");
 		}
 	}
 
@@ -94,8 +96,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }	
 
-	@SubscribeMessage('userAction')
-    async onUserAction(@ConnectedSocket() client: Socket, @MessageBody() body: any) {
+	@SubscribeMessage('keys')
+    async onKeys(@ConnectedSocket() client: Socket, @MessageBody() body: any) {
         const { action } = body;
         if (action === 'upPressed') {
             console.log('up pressed');
