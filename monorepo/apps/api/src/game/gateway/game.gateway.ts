@@ -16,6 +16,12 @@ export enum OPTION {
     Upgraded,
 }
 
+export enum ROLE {
+    Left,
+    Right,
+    Undefined,
+}
+
 //let intervalId;
 
 @WebSocketGateway({
@@ -118,7 +124,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             console.log(`Key: ${key}, User:`, user);
         });
 
-        this.matchmaking(OPTION.Default);
+        await this.matchmaking(OPTION.Default);
 
     }
 
@@ -128,7 +134,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const user = this.idToUser.get(client.id);
         this.defaultWaitingList.set(client.id, user);
 
-        this.matchmaking(OPTION.Upgraded);
+        await this.matchmaking(OPTION.Upgraded);
 
     }
 
@@ -189,11 +195,21 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 console.log("****ROOM NAME****");
                 console.log(roomName);
 
-                //join room with socket
+                console.log("DEBUG");
+                console.log(firstPlayer.value.id);
+
+                const firstClient = await this.userToSocket.get(firstPlayer.value.id);
+                const secondClient = await this.userToSocket.get(secondPlayer.value.id);
+
+                await firstClient.join(roomName);
+                await secondClient.join(roomName);
+
+                await firstClient.emit('Room', { name: roomName, role: ROLE.Left });
+                await secondClient.emit('Room', { name: roomName, role: ROLE.Right });
 
                 const room = await new Room(roomName, firstPlayer.value, secondPlayer.value);
 
-                //THEN send room name & status to each of them THEN ask if ready THEN start game loop
+                await this.server.to(roomName).emit('AreYouReady');
 
                 this.defaultWaitingList.delete(firstId.value);
                 this.defaultWaitingList.delete(secondId.value);
