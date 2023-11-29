@@ -61,6 +61,7 @@ const Game: React.FC = () => {
     const [puckPos, setPuckPos] = useState<PuckPos>({ x: gameConst.PLAYGROUND_WIDTH / 2, y: gameConst.PLAYGROUND_HEIGHT / 2 });
     const [puckDir, setPuckDir] = useState<PuckDir>({ x: 0, y: 0 });
     const [room, setRoom] = useState<Room>({ name: "", role: ROLE.Undefined });
+    const [AskReady, setAskReady] = useState(false);
 
     const canvasRef = useRef<any>(null);
 
@@ -172,9 +173,10 @@ const Game: React.FC = () => {
         if (socket)
         {
             socket.on(
-                "Ready",
+                "AreYouReady",
                 () => {
-                    //ask if ready?
+                    console.log("Are you ready ?");
+                    setAskReady(true);
                 }
             );
         }
@@ -236,6 +238,10 @@ const Game: React.FC = () => {
 
     const IAmReady = () => {
         console.log('****READY****');
+        console.log("-ROOM NAME-")
+        console.log(room.name);
+        console.log("-ROOM ROLE-")
+        console.log(room.role);
         socket?.emit('ready', { action: 'ready' });
     };
 
@@ -300,7 +306,7 @@ const Game: React.FC = () => {
             //}
           }
         }
-      }, [paddle, puckPos, puckDir, score]);
+      }, [paddle, puckPos, puckDir, score, AskReady]);
 
     return (
         <div>
@@ -317,7 +323,9 @@ const Game: React.FC = () => {
                 <button onClick={playWithRobot}>Robot</button>
                 <button onClick={playDefaultGame}>Default</button>
                 <button onClick={playUpgradedGame}>Upgraded</button>
-                <button onClick={IAmReady}>Ready</button>
+                {AskReady && 
+                    (<button onClick={IAmReady}>Ready</button>)
+                }
             </div>
 
         </div>
