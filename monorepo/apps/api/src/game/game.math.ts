@@ -29,7 +29,6 @@ export class Paddle {
         }
     }
 
-    //don't use this one
     move(steps: number): void {
         this.ychange = steps;
     }
