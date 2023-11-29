@@ -7,18 +7,7 @@ import { GameService } from "../game.service";
 import { instrument } from "@socket.io/admin-ui";
 import { width, height, Puck, Paddle, leftscore, rightscore } from '../game.math';
 
-let intervalId;
-let isPlaying: boolean = false;
-
-export interface PuckPos {
-    x: number;
-    y: number;
-}
-
-export interface PuckDir {
-    x: number;
-    y: number;
-}
+//let intervalId;
 
 @WebSocketGateway({
     cors: {
@@ -49,8 +38,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	// < user.id, Socket >
 	private userToSocket = new Map<number, Socket>();
+
 	// < client.id, User >  (replace user with userId for updates?)
 	private idToUser = new Map<string, User>();
+
+    private roomsList = new Map<number, string>();
+
+    private DefaultWaitingList = new Map<number, string>();
+
+    private UpgradedWaitingList = new Map<number, string>();
 
 	// Add user to maps if jwt OK, disconnect if not
 	async handleConnection(client: any, ...args: any[]) {
@@ -63,11 +59,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 		else {
 			console.log('Connection accepted for', user.nickname);
+
 			// add to maps
 			this.userToSocket.set(user.id, client);
 			this.idToUser.set(client.id, user);
+            
             console.log("USER ID : "+user.id+" ");
             console.log("CLIENT ID : "+client.id+" ");
+
+            //console.log("****USER TO SOCKET****");
+            //this.userToSocket.forEach((socket, userId) => {
+            //    console.log(`User ID: ${userId}, Socket:`, socket);
+            //});
+            //console.log("****ID TO USER****");
+            //this.idToUser.forEach((user, userId) => {
+            //    console.log(`User ID: ${userId}, User:`, user);
+            //})
 		}
 	}
 
@@ -92,26 +99,43 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     *                                   EVENTS                                    *
     ******************************************************************************/
 
-	async sleep(ms: number) {
-        return new Promise((resolve) => setTimeout(resolve, ms));
-    }	
-
 	@SubscribeMessage('keys')
     async onKeys(@ConnectedSocket() client: Socket, @MessageBody() body: any) {
         const { action } = body;
         if (action === 'upPressed') {
-            console.log('up pressed');
+            //console.log('up pressed');
             this.left.move(-10);
         } else if (action === 'downPressed') {
-            console.log('down pressed');
+            //console.log('down pressed');
             this.left.move(10);
         } else if (action === 'released') {
-            console.log('released');
+            //console.log('released');
             this.left.move(0);
         }
         this.left.update();
-        console.log(this.left.getY());  
+        //console.log(this.left.getY());  
     }
+
+	@SubscribeMessage('robot')
+    async onRobot(@ConnectedSocket() client: Socket) {
+        
+    }
+
+	@SubscribeMessage('default')
+    async onDefault(@ConnectedSocket() client: Socket) {
+        
+    }
+
+	@SubscribeMessage('upgraded')
+    async onUpgraded(@ConnectedSocket() client: Socket) {
+        
+    }
+
+    @SubscribeMessage('ready')
+    async onReady(@ConnectedSocket() client: Socket, @MessageBody('roomName') roomName: string) {
+        
+    }
+
 
     /******************************************************************************
     *                                   MATCHMAKING                               *
@@ -122,9 +146,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     *                                  GAME LOOP                                  *
     ******************************************************************************/
 
+	async sleep(ms: number) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    }	
+
     @SubscribeMessage('gameStart')
     async onGameStart(@MessageBody() body: any) {
-        console.log("PLAY");
+        //console.log("PLAY");
         isPlaying = true;
 
         const newPuckPos = { x: this.puck.getX(), y: this.puck.getY() };
