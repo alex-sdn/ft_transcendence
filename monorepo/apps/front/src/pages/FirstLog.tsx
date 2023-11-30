@@ -25,25 +25,26 @@ const FirstLog: React.FC = () => {
         } catch (error) {
             setErrorNickname((error as any).response.data.message);
         }
-        try {
-            if (newImage) {
-                const formData = new FormData();
-                formData.append("avatar", newImage);
-                responseImage = await axios.patch('/api/user/me/editAvatar', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                        'Authorization': 'Bearer ' + jwtToken,
-                    },
-                });
+        if (newImage && newImage.size > 100000)
+            setErrorImage("File too large");
+        else {
+            try {
+                if (newImage) {
+                    const formData = new FormData();
+                    formData.append("avatar", newImage);
+                    responseImage = await axios.patch('/api/user/me/editAvatar', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            'Authorization': 'Bearer ' + jwtToken,
+                        },
+                    });
+                }
+            } catch (error) {
+                setErrorImage((error as any).response.data.message);
             }
-        } catch (error) {
-            setErrorImage((error as any).response.data.message);
         }
         if ((!newImage && responseNickname?.status === 200) || (responseNickname?.status === 200 && responseImage?.status === 200))
             window.location.assign('/');
-        // else if (responseNickname?.status === 200 && responseImage?.status === 200) {
-        //     window.location.assign('/');
-        // }
     };
 
     useEffect(() => {
@@ -114,6 +115,8 @@ const FirstLog: React.FC = () => {
                     <input type="text"
                         name="nickname"
                         value={newNickname.nickname}
+                        pattern="[a-zA-Z0-9_\-]+"
+                        title="Nickname can only contain letters, numbers, hyphens, and underscores."
                         onChange={(e) => {
                             handleNicknameChange(e);
                             setErrorNickname("");

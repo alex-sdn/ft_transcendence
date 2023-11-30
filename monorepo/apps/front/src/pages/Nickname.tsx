@@ -44,6 +44,8 @@ const Nickname: React.FC = () => {
                         <input type="text"
                             name="nickname"
                             value={newNickname.nickname}
+                            pattern="[a-zA-Z0-9_\-]+"
+                            title="Nickname can only contain letters, numbers, hyphens, and underscores."
                             onChange={(e) => {
                                 handleNicknameChange(e);
                                 setError("")
