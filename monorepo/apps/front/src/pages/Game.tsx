@@ -89,7 +89,7 @@ const Game: React.FC = () => {
             if (socket)
                 socket.off("Puck");
         }
-        }, []);
+        }, [roomName]);
 
     useEffect(() => {
         if (socket)
@@ -108,7 +108,7 @@ const Game: React.FC = () => {
             if (socket)
                 socket.off("Puck");
         }
-        }, []);
+        }, [roomName]);
     
     useEffect(() => {
         if (socket)
@@ -129,7 +129,7 @@ const Game: React.FC = () => {
             if (socket)
                 socket.off("Paddle");
         };
-    }, []);
+    }, [roomName]);
 
     useEffect(() => {
         if (socket)
