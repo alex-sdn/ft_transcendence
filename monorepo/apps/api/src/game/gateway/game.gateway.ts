@@ -147,21 +147,21 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         console.log("----ROOM NAME----");
         console.log(roomName);
 
-        const room = await this.roomsList.get(roomName);        
+        const room = await this.roomsList.get(roomName);      
 
         //if role == ROLE.Left
 
         if (action === 'upPressed') {
             //console.log('up pressed');
-            room.getLeftPaddle().move(-10);
+            await room.getLeftPaddle().move(-10);
         } else if (action === 'downPressed') {
             //console.log('down pressed');
-            room.getLeftPaddle().move(10);;
+            await room.getLeftPaddle().move(10);;
         } else if (action === 'released') {
             //console.log('released');
-            room.getLeftPaddle().move(-10);
+            await room.getLeftPaddle().move(-10);
         }
-        room.getLeftPaddle().update();
+        await room.getLeftPaddle().update();
         //console.log(this.left.getY());  
     }
 
@@ -265,7 +265,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                     //}
                 //}, 1000 / 60);
                 //const newPos = { leftPos: this.left.getY(), rightPos: this.right.getY() };
-                await this.server.to(roomName).emit('Paddle', { leftPos: room.getLeftPaddle(), rightPos: room.getRightPaddle() });
+                await this.server.to(roomName).emit('Paddle', { leftPos: room.getLeftPaddle().getY(), rightPos: room.getRightPaddle().getY() });
                 //console.log(newPos.leftPos);
                 await this.sleep(20);
             }
