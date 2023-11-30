@@ -8,7 +8,6 @@ const ProfilePicture: React.FC = () => {
     const jwtToken = Cookies.get('jwt-token');
     const [image, setImage] = useState<File>();
     const [error, setError] = useState<string>("");
-    // const navigate = useNavigate();
 
     useEffect(() => {
         const fetchAvatar = async () => {
@@ -38,7 +37,6 @@ const ProfilePicture: React.FC = () => {
         if (event.target.files && event.target.files?.[0]) {
             setImage(event.target.files?.[0]);
         }
-        //check size of the image
     };
 
 
@@ -50,8 +48,9 @@ const ProfilePicture: React.FC = () => {
 
     const changeImageHandler = async (event: React.FormEvent) => {
         event.preventDefault();
-
-        if (image) {
+        if (image && image.size > 100000)
+            setError("File too large");
+        else if (image) {
             const formData = new FormData();
             formData.append("avatar", image);
             try {
@@ -61,15 +60,10 @@ const ProfilePicture: React.FC = () => {
                         'Authorization': 'Bearer ' + jwtToken,
                     },
                 });
-                // if (response.status === 200)
-                //     navigate('/');
                 if (response.status === 200)
                     window.location.assign('/profile');
-                // if (response.status === 413)
-                //AFFICHER MSG ERREUR
             } catch (error) {
                 setError((error as any).response.data.message)
-                // console.log(error);
             }
         }
     };

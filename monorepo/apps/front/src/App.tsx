@@ -50,7 +50,6 @@ const router = createBrowserRouter(
       <Route path="first-log" element={jwtToken ? <FirstLog /> : <Navigate to='/login' />} />
       <Route path="login" element={<Login />} />
       <Route path="nickname" element={jwtToken ? <Nickname /> : <Navigate to='/login' />} />
-      {/* <Route path="disconnect" element={<Disconnect />} /> */}
       <Route path="profile_picture" element={jwtToken ? <ProfilePicture /> : <Navigate to='/login' />} />
       <Route path='*' element={jwtToken ? <NotFound /> : <Navigate to='/login' />} />
     </Route>
