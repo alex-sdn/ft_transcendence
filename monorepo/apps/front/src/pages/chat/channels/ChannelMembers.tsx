@@ -57,7 +57,9 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
                                     setSelectedMember(member);
                                     setProfileModal(true);
                                 }}>
-                                {member.name}
+                                <span className="members-list-name">
+                                    {member.name}
+                                </span>
                                 {member.owner &&
                                     <span className="material-symbols-outlined">
                                         family_star

@@ -79,9 +79,33 @@ const FirstLog: React.FC = () => {
     };
 
     return (
-        <Form method="post" action="username" onSubmit={handleSubmit}>
-            <h2>Welcome to Pong!</h2>
-            <div className='ProfilePicture'>
+        <Form className="first-log" method="post" action="username" onSubmit={handleSubmit}>
+            <h2>Welcome to our Pong Game!</h2>
+            <p>Set a nickname and choose a profile picture</p>
+            <p className="first-log-nickname">
+                {/* <p>
+                    <label htmlFor="nickname">Nickname</label>
+                </p> */}
+                <input type="text"
+                    name="nickname"
+                    id="nickname"
+                    value={newNickname.nickname}
+                    pattern="[a-zA-Z0-9_\-]+"
+                    title="Nickname can only contain letters, numbers, hyphens, and underscores."
+                    placeholder="Choose a nickname"
+                    onChange={(e) => {
+                        handleNicknameChange(e);
+                        setErrorNickname("");
+                    }}
+                    required
+                />
+            </p>
+            {errorNickname &&
+                <p className="text-danger">
+                    {errorNickname}
+                </p>
+            }
+            <div className='ProfilePicture first-log-picture'>
                 {image && !newImage &&
                     <img src={URL.createObjectURL(image)}
                         alt='profile picture'
@@ -107,29 +131,29 @@ const FirstLog: React.FC = () => {
                     </p>
                 }
             </div>
-            <label>
+            {/* <p className="first-log-nickname">
                 <p>
-                    <span>Choose a nickname:</span>
+                    <label htmlFor="nickname">Nickname</label>
                 </p>
-                <p>
-                    <input type="text"
-                        name="nickname"
-                        value={newNickname.nickname}
-                        pattern="[a-zA-Z0-9_\-]+"
-                        title="Nickname can only contain letters, numbers, hyphens, and underscores."
-                        onChange={(e) => {
-                            handleNicknameChange(e);
-                            setErrorNickname("");
-                        }}
-                        required
-                    />
-                </p>
-            </label>
+                <input type="text"
+                    name="nickname"
+                    id="nickname"
+                    value={newNickname.nickname}
+                    pattern="[a-zA-Z0-9_\-]+"
+                    title="Nickname can only contain letters, numbers, hyphens, and underscores."
+                    placeholder="Choose a nickname"
+                    onChange={(e) => {
+                        handleNicknameChange(e);
+                        setErrorNickname("");
+                    }}
+                    required
+                />
+            </p>
             {errorNickname &&
                 <p className="text-danger">
                     {errorNickname}
                 </p>
-            }
+            } */}
             <p>
                 <button type="submit">Save changes</button>
             </p>

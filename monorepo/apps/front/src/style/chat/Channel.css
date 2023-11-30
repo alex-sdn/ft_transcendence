@@ -7,6 +7,13 @@
     left: 14lh;
     position: absolute;
     top: 30px;
+    white-space: nowrap;
+}
+
+@-moz-document {
+    .name-settings {
+        left: 14lh;
+    }
 }
 
 .name-settings button {

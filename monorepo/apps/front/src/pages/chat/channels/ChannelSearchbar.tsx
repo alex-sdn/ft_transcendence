@@ -172,7 +172,7 @@ const ChannelSearchbar: React.FC<channelSearchBarProps> = ({ myChannels }) => {
                         </div>
                     </ModalTitle>
                 </ModalHeader>
-                <ModalBody>
+                <ModalBody className="action-buttons">
                     <button className="button-59"
                         onClick={() => {
                             setJoinModal(false);
