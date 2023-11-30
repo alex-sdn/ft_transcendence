@@ -23,7 +23,7 @@ const RootLayout: React.FC = () => {
           <NavLink to="game">Game</NavLink>
           <NavLink to="chat">Chat</NavLink>
           <NavLink to="profile">Profile</NavLink>
-          <button className='button-59' onClick={disconnect}>Logout</button> 
+          <button className='button-59' onClick={disconnect}>Logout</button>
         </nav>
       </header>
       <main>

@@ -54,7 +54,6 @@ const Channel: React.FC = () => {
                     setMe(currentUser);
 
                     const otherUsers = members.filter((member) => member.name !== currentUserName);
-                    console.log(otherUsers)
                     setMembers(otherUsers);
                     setEventData("");
                 }
