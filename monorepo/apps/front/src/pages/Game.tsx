@@ -46,10 +46,10 @@ export enum ROLE {
     Undefined,
 }
 
-export interface Room {
-    name: string;
-    role: ROLE;
-}
+// export interface Room {
+//     name: string;
+//     role: ROLE;
+// }
 
 /******************************************************************************
 *                                   GAME                                      *
@@ -60,7 +60,9 @@ const Game: React.FC = () => {
     const [score, setScore] = useState<Score>({ left: 0, right: 0});
     const [puckPos, setPuckPos] = useState<PuckPos>({ x: gameConst.PLAYGROUND_WIDTH / 2, y: gameConst.PLAYGROUND_HEIGHT / 2 });
     const [puckDir, setPuckDir] = useState<PuckDir>({ x: 0, y: 0 });
-    const [room, setRoom] = useState<Room>({ name: "", role: ROLE.Undefined });
+    const [roomName, setRoomName] = useState<string | null>(null);
+    const [role, setRole] = useState<ROLE>(ROLE.Undefined);
+
     const [AskReady, setAskReady] = useState(false);
 
     const canvasRef = useRef<any>(null);
@@ -118,29 +120,8 @@ const Game: React.FC = () => {
                     rightPos
                 }: Paddle) => {
                     setPaddle({ leftPos: leftPos, rightPos: rightPos});
-                    console.log("PADDLE");
-                    console.log(paddle.leftPos);
-                }
-            );
-        }
-        return () => {
-            if (socket)
-                socket.off("Paddle");
-        };
-    }, []);
-
-    useEffect(() => {
-        if (socket)
-        {
-            socket.on(
-                "Paddle",
-                ({
-                    leftPos,
-                    rightPos
-                }: Paddle) => {
-                    setPaddle({ leftPos: leftPos, rightPos: rightPos});
-                    console.log("PADDLE");
-                    console.log(paddle.leftPos);
+                    //console.log("PADDLE");
+                    //console.log(paddle.leftPos);
                 }
             );
         }
@@ -159,7 +140,8 @@ const Game: React.FC = () => {
                     name,
                     role
                 }: Room) => {
-                    setRoom({ name: name, role: role});
+                    setRoomName(name);
+                    setRole(role);
                 }
             );
         }
@@ -194,18 +176,21 @@ const Game: React.FC = () => {
         const handleKeyPress = (event: any) => {
             if (event.type === 'keydown') {
                 if (event.key === 'ArrowUp') {
-                    socket?.emit('keys', { action: 'upPressed' });
+                    console.log("----ROOM NAME----");
+                    console.log(roomName);
+                    console.log(role);
+                    socket?.emit('keys', { action: 'upPressed', roomName : roomName, role : role });
                 }
                 if (event.key === 'ArrowDown') {
-                    socket?.emit('keys', { action: 'downPressed' });
+                    socket?.emit('keys', { action: 'downPressed', roomName : roomName, role : role });
                 }
-                if (event.key === ' ') {
-                    socket?.emit('gameStart', { action: 'gameStart' });
-                }
+                // if (event.key === ' ') {
+                //     socket?.emit('gameStart', { action: 'gameStart', room.name, room.role });
+                // }
             } 
             else if (event.type === 'keyup') {
                 if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-                    socket?.emit('keys', { action: 'released' });
+                    socket?.emit('keys', { action: 'released', roomName : roomName, role : role });
                 }
             }
         };
@@ -215,7 +200,7 @@ const Game: React.FC = () => {
             window.removeEventListener('keydown', handleKeyPress);
             window.removeEventListener('keyup', handleKeyPress);
         };
-    }, []);
+    }, [roomName]);
 
     /******************************************************************************
     *                               GAME OPTIONS                                  *
@@ -239,10 +224,10 @@ const Game: React.FC = () => {
     const IAmReady = () => {
         console.log('****READY****');
         console.log("-ROOM NAME-")
-        console.log(room.name);
+        console.log(roomName);
         console.log("-ROOM ROLE-")
-        console.log(room.role);
-        socket?.emit('ready', { roomName: room.name });
+        console.log(role);
+        socket?.emit('ready', { roomName: roomName });
     };
 
     /******************************************************************************

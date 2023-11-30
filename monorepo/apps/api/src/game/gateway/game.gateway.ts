@@ -117,9 +117,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const user = this.idToUser.get(client.id);
         this.defaultWaitingList.set(client.id, user);
 
-        this.defaultWaitingList.forEach((user, key) => {
-            console.log(`Key: ${key}, User:`, user);
-        });
+        // this.defaultWaitingList.forEach((user, key) => {
+        //     console.log(`Key: ${key}, User:`, user);
+        // });
 
         await this.matchmaking(OPTION.Default);
 
@@ -129,7 +129,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     async onUpgraded(@ConnectedSocket() client: Socket) {                
         
         const user = this.idToUser.get(client.id);
-        this.defaultWaitingList.set(client.id, user);
+        this.upgradedWaitingList.set(client.id, user);
 
         await this.matchmaking(OPTION.Upgraded);
 
@@ -137,23 +137,31 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('robot')
     async onRobot(@ConnectedSocket() client: Socket) {
-        
+        //launch game against robot
     }
 
 	@SubscribeMessage('keys') //change for socket room
-    async onKeys(@ConnectedSocket() client: Socket, @MessageBody() body: any) {
-        const { action } = body;
+    async onKeys(@ConnectedSocket() client: Socket, @MessageBody('action') action: string,
+    @MessageBody('roomName') roomName: string, @MessageBody('role') role: ROLE) {
+
+        console.log("----ROOM NAME----");
+        console.log(roomName);
+
+        const room = await this.roomsList.get(roomName);        
+
+        //if role == ROLE.Left
+
         if (action === 'upPressed') {
             //console.log('up pressed');
-            this.left.move(-10);
+            room.getLeftPaddle().move(-10);
         } else if (action === 'downPressed') {
             //console.log('down pressed');
-            this.left.move(10);
+            room.getLeftPaddle().move(10);;
         } else if (action === 'released') {
             //console.log('released');
-            this.left.move(0);
+            room.getLeftPaddle().move(-10);
         }
-        this.left.update();
+        room.getLeftPaddle().update();
         //console.log(this.left.getY());  
     }
 
@@ -231,33 +239,33 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         
         room.isReady();
 
-        //two players are ready --> start game loop
+        //both players are ready --> start game loop
         if (room.getReady() >= 2)
         {
             isPlaying = true;
 
             const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
             const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
-            this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
+            await this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
     
             while (isPlaying === true) {
                 //const updatePuckInterval = setInterval(() => {
                     room.getPuck().update();
                     //if (this.puck.checkPaddleRight(this.right) || this.puck.checkPaddleLeft(this.left) || this.puck.checkEdges()) {
-                        room.getPuck().checkPaddleRight(room.getPaddleRight());
-                        room.getPuck().checkPaddleLeft(room.getPaddleLeft); 
+                        room.getPuck().checkPaddleRight(room.getRightPaddle());
+                        room.getPuck().checkPaddleLeft(room.getLeftPaddle()); 
                         if (room.getPuck().checkEdges())
-                            this.server.to(roomName).emit('Score', { left: room.getLeftScore(), right: getRightScore() });
+                            this.server.to(roomName).emit('Score', { left: 1, right: 0 });
                         const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
                         const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
-                        this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
+                        await this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
                         //console.log("PUCK COORDINATES");
                         //console.log(this.puck.getX());
                         //console.log(this.puck.getY());
                     //}
                 //}, 1000 / 60);
                 //const newPos = { leftPos: this.left.getY(), rightPos: this.right.getY() };
-                this.server.to(roomName).emit('Paddle', { leftPos: room.getPaddleLeft(), rightPos: room.getPaddleRight() });
+                await this.server.to(roomName).emit('Paddle', { leftPos: room.getLeftPaddle(), rightPos: room.getRightPaddle() });
                 //console.log(newPos.leftPos);
                 await this.sleep(20);
             }

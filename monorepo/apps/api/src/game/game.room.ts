@@ -47,10 +47,24 @@ export class Room {
         this.ready++;
     }
 
-    //getters & setters
+    //getters
 
     getReady(): number {
         return this.ready;
     }
+
+    getPuck(): Puck {
+        return this.puck;
+    }
+
+    getLeftPaddle(): Paddle {
+        return this.leftPaddle;
+    }
+
+    getRightPaddle(): Paddle {
+        return this.rightPaddle;
+    }
+
+
 
 }
