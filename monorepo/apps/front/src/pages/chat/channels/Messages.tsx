@@ -31,21 +31,8 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 			}
 		};
 
-		const handleKickEvent = (kickData) => { // is not working now
-			console.log("kickdata=");
-			console.log(kickData);
-			const kickMessage = {
-				sender: kickData.sender,
-				target: kickData.channel,
-				message: `${kickData.sender} has kicked ${kickData.target} from the channel ${kickData.channel}.`,
-				isCommand: true
-			};
-			setMessages(prevMessages => [...prevMessages, kickMessage]);
-		};
-
 		if (socket) {
 			socket.on("message", handleMessageReceive);
-			socket.on("kick", handleKickEvent);
 			socket.on("error", (error) => {
 				setError(error.message);
 			});
@@ -54,11 +41,84 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 		return () => {
 			if (socket) {
 				socket.off("message", handleMessageReceive);
-				socket.off("kick", handleKickEvent);
 				socket.off("error");
 			}
 		};
-	}, [socket, jwtToken]);
+	}, [socket, jwtToken, target]);
+
+	useEffect(() => {
+		socket?.on("join", data => {
+			if (data.target === target){
+				console.log(data);
+				const joinMessage = {
+					sender: data.sender,
+					target: data.target, 
+					message: ` has joined the channel (new)`, 
+					isCommand: true
+				};
+				setMessages(prevMessages => [...prevMessages, joinMessage]);
+			}
+		})
+		socket?.on("leave", data => {
+			if (data.target === target){
+				console.log(data);
+				const leaveMessage = {
+					sender: data.sender,
+					target: data.target, 
+					message: ` has left the channel (new)`, 
+					isCommand: true
+				};
+				setMessages(prevMessages => [...prevMessages, leaveMessage]);
+			}
+		})
+		socket?.on("mute", data => {
+			if (data.target === target){
+				console.log(data);
+				const muteMessage = {
+					sender: data.sender,
+					target: data.target, 
+					message: ` muted ${data.target} (new)`, 
+					isCommand: true
+				};
+				setMessages(prevMessages => [...prevMessages, muteMessage]);
+			}
+		})
+		socket?.on("kick", data => {
+			if (data.target === target){
+				console.log("Enter mute:")
+				console.log(data);
+				const kickMessage = {
+					sender: data.sender,
+					target: data.target, 
+					message: ` kicked ${data.target} from the channel (new)`, 
+					isCommand: true
+				};
+				setMessages(prevMessages => [...prevMessages, kickMessage]);
+			}
+		})
+		socket?.on("ban", data => {
+			if (data.target === target){
+				console.log(data);
+				const banMessage = {
+					sender: data.sender,
+					target: data.target, 
+					message: ` banned ${data.target} from the channel (new)`, 
+					isCommand: true
+				};
+				setMessages(prevMessages => [...prevMessages, banMessage]);
+			}
+		})
+
+
+		return () => {
+			socket?.off("join");
+			socket?.off("leave");
+            socket?.off("mute");
+            socket?.off("kick");
+            socket?.off("ban");
+		};
+
+	}, [target, socket]);
 
 	useEffect(() => {
 		const fetchMessages = async () => {
@@ -72,7 +132,7 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 				if (response.status === 200) {
 					const previousmessages: Message[] = response.data.map(msg => ({
 						sender: msg.sender.nickname,
-						//target: msg.target,
+						target: msg.target,
 						message: msg.message,
 						isCommand: msg.isCommand,
 					}));
