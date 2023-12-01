@@ -120,7 +120,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('robot')
     async onRobot(@ConnectedSocket() client: Socket) {
-        //launch game against robot
+        await this.matchmaking(OPTION.Robot);
     }
 
 	@SubscribeMessage('keys')
@@ -157,7 +157,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     *                                   MATCHMAKING                               *
     ******************************************************************************/
 
-    async matchmaking(option:OPTION) // add upgraded option
+    async matchmaking(option:OPTION) // add upgraded features
     {
         if (option == OPTION.Default)
         {
@@ -194,6 +194,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
            }
         }
+
+        // //ROBOT ROOM CREATION
+        // else if (option == OPTION.Robot)
+        // {
+        //     const roomName = `default-${client.id}-robot`;
+
+        //     const room = new Room(roomName, firstPlayer.value, robot);
+
+        //     await client.join(roomName);
+
+        //     firstClient.emit('Room', { name: roomName, role: ROLE.Left, leftNickname: room.getLeftNickname(), rightNickname: "robot" });
+
+        //     this.roomsList.set(roomName, room);
+
+        //     this.server.to(roomName).emit('AreYouReady');
+
+        //     this.defaultWaitingList.delete(firstId.value);
+        // }
     }
 
     /******************************************************************************
@@ -243,8 +261,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                     //}
                 //}, 1000 / 60);
                 this.server.to(roomName).emit('Paddle', { leftPos: room.getLeftPaddle().getY(), rightPos: room.getRightPaddle().getY() });
-                await this.sleep(20);
+                await this.sleep(10);
             }
+            //update database
+            this.gameService.createMatch(room.getLeftUser().id, room.getRightUser().id, room.getLeftScore(), room.getRightScore(), "ranked");
         }
     }
 
@@ -252,6 +272,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     async onLeave(@ConnectedSocket() client: Socket, @MessageBody('roomName') roomName: string) {
         client.leave(roomName);
         //delete room from map
+        // socket.emit (init all)
     }
 
 }  

@@ -110,4 +110,14 @@ export class Room {
     getRightNickname(): string {
         return this.rightNickname;
     }
+
+    getLeftUser(): User {
+        return this.leftPlayer;
+    }
+
+
+    getRightUser(): User {
+        return this.rightPlayer;
+    }
+
 }
