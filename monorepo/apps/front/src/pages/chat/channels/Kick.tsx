@@ -3,7 +3,7 @@ import { user } from './Channel.tsx';
 import SocketContext from "../../../Socket.js";
 import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
 
-interface kickProps {
+export interface kickProps {
     selectedMember: user;
     selectedChannel: string | undefined;
     kickModal: boolean;
