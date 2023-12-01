@@ -98,7 +98,7 @@ const PrivMessages: React.FC<PrivMessageProps> = ({ sender }) => {
 					type="text"
 					value={newMessage}
 					onChange={(e) => setNewMessage(e.target.value)}
-					placeholder="(Private) Write a message..."
+					placeholder="Write a message..."
 				/>
 				<button
 					className="material-symbols-outlined"
