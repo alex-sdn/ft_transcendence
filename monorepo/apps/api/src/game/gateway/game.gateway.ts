@@ -147,7 +147,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         console.log("----ROOM NAME----");
         console.log(roomName);
 
-        const room = await this.roomsList.get(roomName);      
+        const room = this.roomsList.get(roomName);      
 
         if (role == ROLE.Left)
         {
@@ -214,20 +214,20 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 // console.log("DEBUG");
                 // console.log(firstPlayer.value.id);
 
-                const firstClient = await this.userToSocket.get(firstPlayer.value.id);
-                const secondClient = await this.userToSocket.get(secondPlayer.value.id);
+                const firstClient = this.userToSocket.get(firstPlayer.value.id);
+                const secondClient = this.userToSocket.get(secondPlayer.value.id);
 
                 await firstClient.join(roomName);
                 await secondClient.join(roomName);
 
-                await firstClient.emit('Room', { name: roomName, role: ROLE.Left });
-                await secondClient.emit('Room', { name: roomName, role: ROLE.Right });
+                firstClient.emit('Room', { name: roomName, role: ROLE.Left });
+                secondClient.emit('Room', { name: roomName, role: ROLE.Right });
 
-                const room = await new Room(roomName, firstPlayer.value, secondPlayer.value);
+                const room = new Room(roomName, firstPlayer.value, secondPlayer.value);
 
                 this.roomsList.set(roomName, room);
 
-                await this.server.to(roomName).emit('AreYouReady');
+                this.server.to(roomName).emit('AreYouReady');
 
                 this.defaultWaitingList.delete(firstId.value);
                 this.defaultWaitingList.delete(secondId.value);
@@ -251,7 +251,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage('ready')
     async onReady(@ConnectedSocket() client: Socket, @MessageBody('roomName') roomName: string) {
 
-        const room = await this.roomsList.get(roomName);
+        const room = this.roomsList.get(roomName);
         
         room.isReady();
 
@@ -262,7 +262,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
             const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
             const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
-            await this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
+            this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
     
             while (isPlaying === true) {
                 //const updatePuckInterval = setInterval(() => {
@@ -283,14 +283,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                         }
                         const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
                         const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
-                        await this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
+                        this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
                         //console.log("PUCK COORDINATES");
                         //console.log(this.puck.getX());
                         //console.log(this.puck.getY());
                     //}
                 //}, 1000 / 60);
                 //const newPos = { leftPos: this.left.getY(), rightPos: this.right.getY() };
-                await this.server.to(roomName).emit('Paddle', { leftPos: room.getLeftPaddle().getY(), rightPos: room.getRightPaddle().getY() });
+                this.server.to(roomName).emit('Paddle', { leftPos: room.getLeftPaddle().getY(), rightPos: room.getRightPaddle().getY() });
                 //console.log(newPos.leftPos);
                 await this.sleep(20);
             }
