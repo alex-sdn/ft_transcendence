@@ -1,13 +1,13 @@
-/* @import 'normalize.css/normalize.css'; */
+@import 'normalize.css/normalize.css';
 
 .privmessages-container {
 	display: flex;
-	flex-direction: row; /* Stack children vertically */
+	flex-direction: column; /* Stack children vertically */
 	background: white;
-	width: 700px;
-	height: 700px;
+	width: 1500px;
+	height: 76vh;
 	left: 0px;
-	top: 60px;
+	top: 58px;
 	position: absolute;
 }
 

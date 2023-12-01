@@ -79,7 +79,9 @@ const PrivMessages: React.FC<PrivMessageProps> = ({ sender }) => {
 	}, [privmessages, jwtToken]);
 
 	useEffect(() => {
-		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+		if (messagesEndRef.current) {
+			messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+		}
 	}, [privmessages]);
 
 	return (
