@@ -228,6 +228,7 @@ const Game: React.FC = () => {
         console.log("-ROOM ROLE-")
         console.log(role);
         socket?.emit('ready', { roomName: roomName });
+        setAskReady(false);
     };
 
     /******************************************************************************
