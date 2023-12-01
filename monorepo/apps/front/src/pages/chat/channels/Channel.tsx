@@ -81,28 +81,30 @@ const Channel: React.FC = () => {
     return (
         <div>
             <div className='name-settings'>
-                <h2>{channelName}</h2>
-                <button className="material-symbols-outlined"
-                    onClick={() => setSettingsModal(true)}
-                >
-                    settings
-                </button>
-                {me && channelName && currentChannel &&
-                    <Settings me={me}
-                        currentChannel={currentChannel}
-                        settingsModal={settingsModal}
-                        onClose={() => setSettingsModal(false)}
-                    />}
-            </div>
-            <Messages sender={me} target={channelName} />
-            <div>
-                {members && me && currentChannel &&
-                    <ChannelMembers me={me}
-                        members={members}
-                        currentChannel={currentChannel}
-                    />}
-            </div>
-        </div>
+				<h2>{channelName}</h2>
+				<button className="material-symbols-outlined"
+					onClick={() => setSettingsModal(true)}
+				>
+					settings
+				</button>
+				{me && channelName && currentChannel &&
+					<Settings me={me}
+						currentChannel={currentChannel}
+						settingsModal={settingsModal}
+						onClose={() => setSettingsModal(false)}
+					/>}
+				{me && channelName && currentChannel &&
+					<Messages sender={me} target={channelName} />
+				}
+			</div>
+			<div>
+				{members && me && currentChannel &&
+					<ChannelMembers me={me}
+						members={members}
+						currentChannel={currentChannel}
+					/>}
+			</div>
+		</div>
     );
 }
 
