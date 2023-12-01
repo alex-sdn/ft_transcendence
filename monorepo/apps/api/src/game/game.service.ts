@@ -97,5 +97,31 @@ export class GameService {
 		}
 	}
 
+	async	statusIngame(userId: number) {
+		try {
+			await this.prisma.user.update({
+				where: {id: userId},
+				data: {status: 'ingame'}
+			});
+		} catch(error) {
+			console.log('ingame status error');
+		}
+	}
+
+	async	statusOnline(userId: number) {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: {id: userId},
+			});
+			if (user.status === 'ingame') {
+				await this.prisma.user.update({
+					where: {id: user.id},
+					data: {status: 'online'}
+				});
+			}
+		} catch(error) {
+			console.log('ingame status error');
+		}
+	}
 
 }

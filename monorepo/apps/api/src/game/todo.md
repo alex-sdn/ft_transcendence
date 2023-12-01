@@ -8,7 +8,7 @@ URGENT:
 - [ ] : set countdown
 - [ ] : handle deconnection / timeout
 - [ ] : send & receive invitation from chat
-- [ ] : send results of game to db for profiles (+ achievements + status in game)
+- [X] : send results of game to db for profiles (+ achievements + status in game)
 - [ ] : responsive screen
 - [ ] : bonus features (robot + upgraded)
 
