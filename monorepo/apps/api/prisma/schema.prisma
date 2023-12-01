@@ -53,6 +53,9 @@ model User {
 	friends1	Friendship[] @relation("UserFriends1")
 	friends2	Friendship[] @relation("UserFriends2")
 
+	requester	FriendRequest[] @relation("Requester")
+	requested	FriendRequest[] @relation("Requested")
+
 	blocked		Blocked[] @relation("Blocker")
 	blockedBy	Blocked[] @relation("Blocked")
 
@@ -115,6 +118,18 @@ model Friendship {
 	messages2	Privmsg[] @relation("Privmsg2")
 
 	@@unique([user1Id, user2Id])
+}
+
+model FriendRequest {
+	id			Int @id @default(autoincrement())
+
+	requester	User @relation("Requester", fields: [requesterId], references: [id])
+	requesterId	Int
+
+	requested	User @relation("Requested", fields: [requestedId], references: [id])
+	requestedId	Int
+
+	@@unique([requesterId, requestedId])
 }
 
 model Blocked {
