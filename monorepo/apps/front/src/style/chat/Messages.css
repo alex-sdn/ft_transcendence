@@ -1,13 +1,13 @@
-/* @import 'normalize.css/normalize.css'; */
+@import 'normalize.css/normalize.css';
 
 .messages-container {
 	display: flex;
 	flex-direction: column; /* Stack children vertically */
 	background: white;
-	width: 700px;
+	width: 1000px;
 	height: 76vh;
 	left: 0px;
-	top: 60px;
+	top: 58px;
 	position: absolute;
 }
 
