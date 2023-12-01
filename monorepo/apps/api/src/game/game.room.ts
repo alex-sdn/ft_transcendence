@@ -115,9 +115,13 @@ export class Room {
         return this.leftPlayer;
     }
 
-
     getRightUser(): User {
         return this.rightPlayer;
     }
 
+    //setters
+
+    setGameEnd(): void {
+        this.gameEnd = true;
+    }
 }

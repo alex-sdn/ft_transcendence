@@ -49,13 +49,19 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	// < user.id, Socket >
 	private userToSocket = new Map<number, Socket>();
 
-	// < client.id, User >  (replace user with userId for updates?)
+	// < client.id, User >
 	private idToUser = new Map<string, User>();
 
+    // <roomName, Room>
     private roomsList = new Map<string, Room>();
 
+    // <client.id, Room>
+    private roomsParticipants = new Map<string, Room>();
+
+    // <client.id, User>
     private defaultWaitingList = new Map<string, User>();
 
+    // <client.id, User>
     private upgradedWaitingList = new Map<string, User>();
 
 	// Add user to maps if jwt OK, disconnect if not
@@ -79,6 +85,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	handleDisconnect(client: any) {
 		console.log(client.id, "disconnected");
+
+        //check if client was in a room if so send Game.End
+        if (this.roomsParticipants.has(client.id))
+        {
+            console.log("****HAS****");
+            this.roomsParticipants.get(client.id).setGameEnd();
+        }
+        //check if client was in a waiting room if so remove from it
+
 		// rm from maps (if in)
 		if (this.idToUser.has(client.id)) {
 			this.userToSocket.delete(this.idToUser.get(client.id).id);
@@ -187,6 +202,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
                 this.roomsList.set(roomName, room);
 
+                console.log("PARTICIPANTS");
+                console.log(firstId.value);
+                console.log(secondId.value);
+                
+                this.roomsParticipants.set(firstId.value, room);
+                this.roomsParticipants.set(secondId.value, room);
+
                 this.server.to(roomName).emit('AreYouReady');
 
                 this.defaultWaitingList.delete(firstId.value);
@@ -266,13 +288,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 this.server.to(roomName).emit('Paddle', { leftPos: room.getLeftPaddle().getY(), rightPos: room.getRightPaddle().getY() });
                 await this.sleep(10);
             }
-            //update database
+
+            //if end of game due to deconnection --> set the one who deconnected as loser
+
+
+
             this.gameService.createMatch(room.getLeftUser().id, room.getRightUser().id, room.getLeftScore(), room.getRightScore(), "ranked");
             this.gameService.statusOnline(room.getLeftUser().id);
             this.gameService.statusOnline(room.getRightUser().id);
         }
     }
 
+    // clean leave
     @SubscribeMessage('leave')
     async onLeave(@ConnectedSocket() client: Socket, @MessageBody('roomName') roomName: string) {
         client.leave(roomName);

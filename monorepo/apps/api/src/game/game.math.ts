@@ -155,13 +155,11 @@ export class Puck {
         }
 
         if (this.x - this.r - 5 > width) {
-            //leftscore++;
             this.reset();
             return (POINT.Left);
         }
 
         if (this.x + this.r + 5 < 0) {
-            //rightscore++;
             this.reset();
             return (POINT.Right);
         }

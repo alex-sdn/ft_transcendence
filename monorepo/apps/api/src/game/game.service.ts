@@ -123,5 +123,4 @@ export class GameService {
 			console.log('ingame status error');
 		}
 	}
-
 }

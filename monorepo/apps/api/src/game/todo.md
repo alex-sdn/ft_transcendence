@@ -7,11 +7,9 @@ URGENT:
 - [X] : socket room / waiting room
 - [ ] : set countdown
 - [ ] : handle deconnection / timeout
-- [ ] : send & receive invitation from chat
 - [X] : send results of game to db for profiles (+ achievements + status in game)
 - [ ] : responsive screen
 - [ ] : bonus features (robot + upgraded)
-
 
 NOT URGENT:
 - [ ] : maths optimization (render animation + canva by entities + better keys handling)
@@ -22,3 +20,13 @@ NOT URGENT:
 - [ ] : improve front with bootstrap, modals, props, etc
 - [ ] : upgrade design of game
 - [ ] : compare features with original pong
+
+WITH ALEX :
+- [ ] : add achievements
+- [ ] : create robot user
+
+WITH SOLENE & ALEX :
+- [ ] : send & receive invitation from chat
+
+WITH SOLENE :
+- [ ] : .css
