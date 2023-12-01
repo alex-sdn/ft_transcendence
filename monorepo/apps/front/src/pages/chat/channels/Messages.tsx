@@ -46,6 +46,14 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 		};
 	}, [socket, jwtToken, target]);
 
+	const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		if (newMessage.trim() && socket) {
+			socket.emit("message", { sender: sender, target: target, message: newMessage });
+			setNewMessage('');
+		}
+	};
+
 	useEffect(() => {
 		socket?.on("join", data => {
 			if (data.target === target){
@@ -118,7 +126,7 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
             socket?.off("ban");
 		};
 
-	}, [target, socket]);
+	}, [socket, target]);
 
 	useEffect(() => {
 		const fetchMessages = async () => {
@@ -145,14 +153,6 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 
 		fetchMessages();
 	}, [target, jwtToken]);
-
-	const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		if (newMessage.trim() && socket) {
-			socket.emit("message", { sender: sender, target: target , message: newMessage});
-			setNewMessage('');
-		}
-	};
 
 	useEffect(() => {
 		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
