@@ -89,6 +89,11 @@ export class UserController {
 		return this.userService.myFriends(req.user);
 	}
 
+	@Get('me/friend/requests')
+	myFriendRequests(@Req() req: Request) {
+		return this.userService.myFriendRequests(req.user);
+	}
+
 	// @Get('friend/:nickname')
 	@Get('friend/:id')
 	checkFriend(@Param('id', ParseIntPipe) userId: number, @Req() req: Request) {
@@ -132,8 +137,9 @@ export class UserController {
 		return this.userService.myMatches(req.user);
 	}
 
-	@Get('matches/:nickname')  // :id ?? CHECK LATER
-	getMatches(@Param('nickname') nickname: string, @Req() req: Request) {
-		return this.userService.getMatches(nickname);
+	// @Get('matches/:nickname')  // :id ?? CHECK LATER
+	@Get('matches/:id')
+	getMatches(@Param('id', ParseIntPipe) userId: number, @Req() req: Request) {
+		return this.userService.getMatches(userId);
 	}
 }

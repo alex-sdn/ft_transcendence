@@ -26,6 +26,7 @@ export class AuthService {
 		console.log('Query=' + code);
 		const tokenEndpoint = 'https://api.intra.42.fr/oauth/token';
 
+		const redirectUri = this.config.get('FORTYTWO_REDIRECT');
 		const clientId = this.config.get('FORTYTWO_ID');
 		const clientSecret = this.config.get('FORTYTWO_SECRET');
 
@@ -36,7 +37,7 @@ export class AuthService {
 				client_id: clientId,
 				client_secret: clientSecret,
 				code: code,
-				redirect_uri: 'http://localhost:3000/login',
+				redirect_uri: redirectUri,
 			});
 
 			const accessToken = tokenResponse.data.access_token;
