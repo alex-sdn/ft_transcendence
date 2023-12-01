@@ -1,0 +1,15 @@
+.first-log {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.first-log-nickname {
+    padding: 30px;
+}
+
+.first-log-picture {
+    padding: 30px;
+}

@@ -33,7 +33,7 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
     useEffect(() => {
         const getBlocked = async () => {
             if (selectedMember) {
-                const response = await axios.get(`/api/user/block/${selectedMember.name}`, {
+                const response = await axios.get(`/api/user/block/${selectedMember.id}`, {
                     headers: {
                         'Authorization': 'Bearer ' + jwtToken,
                     },
@@ -44,7 +44,7 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
             }
         }
         getBlocked();
-    }, [blockModal, selectedMember])
+    }, [blockModal, selectedMember]);
 
     return (
         <div>
@@ -57,7 +57,9 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
                                     setSelectedMember(member);
                                     setProfileModal(true);
                                 }}>
-                                {member.name}
+                                <span className="members-list-name">
+                                    {member.name}
+                                </span>
                                 {member.owner &&
                                     <span className="material-symbols-outlined">
                                         family_star
@@ -177,7 +179,8 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
                 />
             }
             {selectedMember &&
-                <Block nickname={selectedMember.name}
+                <Block id={selectedMember.id}
+                    nickname={selectedMember.name}
                     isBlocked={isBlocked}
                     isChannel={true}
                     blockModal={blockModal}

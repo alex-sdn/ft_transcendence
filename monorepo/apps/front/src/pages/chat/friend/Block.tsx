@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
 
 interface blockProps {
+    id: string,
     nickname: string,
     isBlocked: boolean,
     isChannel: boolean,
@@ -12,6 +13,7 @@ interface blockProps {
 }
 
 const Block: React.FC<blockProps> = ({
+    id,
     nickname,
     isBlocked,
     isChannel,
@@ -24,7 +26,7 @@ const Block: React.FC<blockProps> = ({
     const blockUser = async () => {
         let response;
         if (!isBlocked) {
-            response = await axios.post(`/api/user/block/${nickname}`, { nickname: nickname }, {
+            response = await axios.post(`/api/user/block/${id}`, { nickname: nickname }, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + jwtToken,
@@ -38,7 +40,7 @@ const Block: React.FC<blockProps> = ({
             }
         }
         else {
-            response = await axios.delete(`/api/user/block/${nickname}`, {
+            response = await axios.delete(`/api/user/block/${id}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + jwtToken,
