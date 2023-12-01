@@ -4,6 +4,8 @@ import Block from "./Block";
 import axios from "axios";
 import Cookies from "js-cookie";
 import SocketContext from '../../../Socket';
+import PrivMessages from "./PrivMessages";
+import Nickname from "../../Nickname";
 
 const Friend: React.FC = () => {
     const [message, setMessage] = useState<string>("");
@@ -63,6 +65,9 @@ const Friend: React.FC = () => {
                     block
                 </button>
             </div>
+            {userName &&
+                <PrivMessages sender={userName} />
+            }
             {/* <div id='chat' >
                 <p>
                     <input type='text'
