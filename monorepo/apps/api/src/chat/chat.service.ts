@@ -266,9 +266,11 @@ export class ChatService {
 		if (checkTaken) {
 			throw new Error('channel name already taken');
 		}
-		// IF MISSING PASSWORD
-		if (message.access === 'protected' && !message.password) {
-			throw new Error('missing password for protected access');
+		// IF MISSING PASSWORD OR WRONG FORMAT
+		if (message.access === 'protected') {
+			if (!message.password)
+				throw new Error('missing password for protected access');
+			// this.validateName(message.password);  // RAJOUTER CA !!!!!!!!!!!!!
 		}
 		// IF WRONG ACCESS TYPE
 		if (!['public', 'private', 'protected'].includes(message.access)) {
@@ -402,9 +404,10 @@ export class ChatService {
 			});
 		}
 		else if (access === 'protected') {
-			//check password format ?
 			if (!password)
-				throw new Error('Missing password for protected access');
+			throw new Error('Missing password for protected access');
+			//check password format ?
+			// this.validateName(password);
 			const pwHash = await argon.hash(password);
 			await this.prisma.channel.update({
 				where: { id: channel.id },
