@@ -1,8 +1,14 @@
 export const width: number = 600;
 export const height: number = 400;
 
-export let leftscore: number = 0;
-export let rightscore: number = 0;
+//export let leftscore: number = 0;
+//export let rightscore: number = 0;
+
+export enum POINT {
+    Left,
+    Right,
+    Nobody,
+}
 
 /******************************************************************************
 *                                  PADDLE                                     *
@@ -142,22 +148,22 @@ export class Puck {
         }
     }
 
-    checkEdges(): boolean {
+    checkEdges(): POINT {
         if (this.y < 5 || this.y > height - 5) {
             this.yspeed *= -1;
-            return (false);
+            return (POINT.Nobody);
         }
 
         if (this.x - this.r - 5 > width) {
-            leftscore++;
+            //leftscore++;
             this.reset();
-            return (true);
+            return (POINT.Left);
         }
 
         if (this.x + this.r + 5 < 0) {
-            rightscore++;
+            //rightscore++;
             this.reset();
-            return (true);
+            return (POINT.Right);
         }
     }
 
