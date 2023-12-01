@@ -232,6 +232,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         //both players are ready --> start game loop
         if (room.getReady() >= 2)
         {
+            this.gameService.statusIngame(room.getLeftUser().id);
+            this.gameService.statusIngame(room.getRightUser().id);
+            //set count down
             isPlaying = true;
 
             const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
@@ -265,6 +268,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
             //update database
             this.gameService.createMatch(room.getLeftUser().id, room.getRightUser().id, room.getLeftScore(), room.getRightScore(), "ranked");
+            this.gameService.statusOnline(room.getLeftUser().id);
+            this.gameService.statusOnline(room.getRightUser().id);
         }
     }
 
