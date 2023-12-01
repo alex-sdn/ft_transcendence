@@ -177,13 +177,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 const firstClient = this.userToSocket.get(firstPlayer.value.id);
                 const secondClient = this.userToSocket.get(secondPlayer.value.id);
 
+                const room = new Room(roomName, firstPlayer.value, secondPlayer.value);
+
                 await firstClient.join(roomName);
                 await secondClient.join(roomName);
 
-                firstClient.emit('Room', { name: roomName, role: ROLE.Left });
-                secondClient.emit('Room', { name: roomName, role: ROLE.Right });
-
-                const room = new Room(roomName, firstPlayer.value, secondPlayer.value);
+                firstClient.emit('Room', { name: roomName, role: ROLE.Left, leftNickname: room.getLeftNickname(), rightNickname: room.getRightNickname() });
+                secondClient.emit('Room', { name: roomName, role: ROLE.Right, leftNickname: room.getLeftNickname(), rightNickname: room.getRightNickname() });
 
                 this.roomsList.set(roomName, room);
 
