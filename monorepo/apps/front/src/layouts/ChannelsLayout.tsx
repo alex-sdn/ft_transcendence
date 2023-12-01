@@ -32,6 +32,8 @@ const ChannelsLayout: React.FC = () => {
         getMyChannels();
     }, []);
 
+    // socket listen for 'message'
+
     return (
         <div>
             <div>
