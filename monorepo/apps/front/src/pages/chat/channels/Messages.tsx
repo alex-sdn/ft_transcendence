@@ -2,7 +2,6 @@ import React, { useContext, useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import SocketContext from "../../../Socket";
-import Channel from "./Channel";
 
 export interface Message {
 	sender: string;
