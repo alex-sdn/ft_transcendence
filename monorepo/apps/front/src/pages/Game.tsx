@@ -12,7 +12,6 @@ export const gameConst = {
     PADDLE_HEIGHT: 100,
     PADDLE_WIDTH: 10,
     PADDLE_OFFSET: 10,
-    //BALL_RADIUS: 6,
 };
 
 export interface PuckPos {
@@ -80,7 +79,6 @@ const Game: React.FC = () => {
                 }: Puck) => {
                     setPuckPos(puckPos);
                     setPuckDir(puckDir);
-                    //console.log("PUCK");
                     //render animation from here for optimization
                 }
             );
@@ -120,8 +118,6 @@ const Game: React.FC = () => {
                     rightPos
                 }: Paddle) => {
                     setPaddle({ leftPos: leftPos, rightPos: rightPos});
-                    //console.log("PADDLE");
-                    //console.log(paddle.leftPos);
                 }
             );
         }
@@ -184,9 +180,6 @@ const Game: React.FC = () => {
                 if (event.key === 'ArrowDown') {
                     socket?.emit('keys', { action: 'downPressed', roomName : roomName, role : role });
                 }
-                // if (event.key === ' ') {
-                //     socket?.emit('gameStart', { action: 'gameStart', room.name, room.role });
-                // }
             } 
             else if (event.type === 'keyup') {
                 if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
@@ -261,10 +254,10 @@ const Game: React.FC = () => {
             ctxt.stroke();
     
             // both paddles
-            //ctxt.fillStyle = "#262f69";
+            // ctxt.fillStyle = "#262f69"; --> color for bonus
             ctxt.fillStyle = "black";
             ctxt.fillRect(10, paddle.leftPos - gameConst.PADDLE_HEIGHT / 2, gameConst.PADDLE_WIDTH, gameConst.PADDLE_HEIGHT);
-            //ctxt.fillStyle = "#482669";
+            // ctxt.fillStyle = "#482669"; --> color for bonus
             ctxt.fillRect(
               canvas.width - gameConst.PADDLE_WIDTH - gameConst.PADDLE_OFFSET,
               paddle.rightPos - gameConst.PADDLE_HEIGHT / 2,
@@ -273,7 +266,6 @@ const Game: React.FC = () => {
             );
     
             // puck
-            //if (!isWaiting) {
               ctxt.fillStyle = "black";
               ctxt.fillRect(
                 puckPos.x - gameConst.PADDLE_WIDTH / 2,
@@ -289,7 +281,6 @@ const Game: React.FC = () => {
             ctxt.textBaseline = "top";
             ctxt.fillText(score.left, canvas.width * 0.25, 20);
             ctxt.fillText(score.right, canvas.width * 0.75, 20);
-            //}
           }
         }
       }, [paddle, puckPos, puckDir, score, AskReady]);

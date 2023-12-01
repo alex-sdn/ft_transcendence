@@ -22,8 +22,6 @@ export enum ROLE {
     Undefined,
 }
 
-//let intervalId;
-
 @WebSocketGateway({
     cors: {
         origin: '*',
@@ -75,18 +73,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// add to maps
 			this.userToSocket.set(user.id, client);
 			this.idToUser.set(client.id, user);
-            
-            console.log("USER ID : "+user.id+" ");
-            console.log("CLIENT ID : "+client.id+" ");
 
-            //console.log("****USER TO SOCKET****");
-            //this.userToSocket.forEach((socket, userId) => {
-            //    console.log(`User ID: ${userId}, Socket:`, socket);
-            //});
-            //console.log("****ID TO USER****");
-            //this.idToUser.forEach((user, userId) => {
-            //    console.log(`User ID: ${userId}, User:`, user);
-            //})
 		}
 	}
 
@@ -117,10 +104,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const user = this.idToUser.get(client.id);
         this.defaultWaitingList.set(client.id, user);
 
-        // this.defaultWaitingList.forEach((user, key) => {
-        //     console.log(`Key: ${key}, User:`, user);
-        // });
-
         await this.matchmaking(OPTION.Default);
 
     }
@@ -140,44 +123,33 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         //launch game against robot
     }
 
-	@SubscribeMessage('keys') //change for socket room
+	@SubscribeMessage('keys')
     async onKeys(@ConnectedSocket() client: Socket, @MessageBody('action') action: string,
     @MessageBody('roomName') roomName: string, @MessageBody('role') role: ROLE) {
-
-        console.log("----ROOM NAME----");
-        console.log(roomName);
 
         const room = this.roomsList.get(roomName);      
 
         if (role == ROLE.Left)
         {
             if (action === 'upPressed') {
-                //console.log('up pressed');
                 room.getLeftPaddle().move(-10);
             } else if (action === 'downPressed') {
-                //console.log('down pressed');
                 room.getLeftPaddle().move(10);;
             } else if (action === 'released') {
-                //console.log('released');
                 room.getLeftPaddle().move(-10);
             }
             room.getLeftPaddle().update();
-            //console.log(this.left.getY());
         }
         if (role == ROLE.Right)
         {
             if (action === 'upPressed') {
-                //console.log('up pressed');
                 room.getRightPaddle().move(-10);
             } else if (action === 'downPressed') {
-                //console.log('down pressed');
                 room.getRightPaddle().move(10);;
             } else if (action === 'released') {
-                //console.log('released');
                 room.getRightPaddle().move(-10);
             }
             room.getRightPaddle().update();
-            //console.log(this.left.getY());
         }
     }
 
@@ -200,19 +172,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 const secondId = iteratorId.next();
                 const secondPlayer = iteratorPlayer.next();
 
-                // console.log("****FIRST PLAYER****");                
-                // console.log(firstId);
-
-                // console.log("****SECOND PLAYER****");                
-                // console.log(secondId);
-
                 const roomName = `default-${firstId.value}-${secondId.value}`;
-
-                // console.log("****ROOM NAME****");
-                // console.log(roomName);
-
-                // console.log("DEBUG");
-                // console.log(firstPlayer.value.id);
 
                 const firstClient = this.userToSocket.get(firstPlayer.value.id);
                 const secondClient = this.userToSocket.get(secondPlayer.value.id);
@@ -232,11 +192,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 this.defaultWaitingList.delete(firstId.value);
                 this.defaultWaitingList.delete(secondId.value);
 
-                // console.log("****EMPTY WAITING LIST****");
-                // this.defaultWaitingList.forEach((user, key) => {
-                //     console.log(`Key: ${key}, User:`, user);
-                // });
-            }
+           }
         }
     }
 
@@ -284,16 +240,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                         const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
                         const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
                         this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
-                        //console.log("PUCK COORDINATES");
-                        //console.log(this.puck.getX());
-                        //console.log(this.puck.getY());
                     //}
                 //}, 1000 / 60);
-                //const newPos = { leftPos: this.left.getY(), rightPos: this.right.getY() };
                 this.server.to(roomName).emit('Paddle', { leftPos: room.getLeftPaddle().getY(), rightPos: room.getRightPaddle().getY() });
-                //console.log(newPos.leftPos);
                 await this.sleep(20);
             }
         }
     }
+
+    @SubscribeMessage('leave')
+    async onLeave(@ConnectedSocket() client: Socket, @MessageBody('roomName') roomName: string) {
+        client.leave(roomName);
+        //delete room from map
+    }
+
 }  
