@@ -1,19 +1,38 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Block from "./Block";
 import axios from "axios";
 import Cookies from "js-cookie";
+import SocketContext from '../../../Socket';
 
 const Friend: React.FC = () => {
     const [message, setMessage] = useState<string>("");
     const [isBlocked, setIsBlocked] = useState<boolean>(false);
     const [blockModal, setBlockModal] = useState<boolean>(false);
-    const { userName } = useParams<{ userName: string }>();
+    const [userName, setUserName] = useState<string>("");
+    const [eventData, setEventData] = useState<string>("");
     const jwtToken = Cookies.get('jwt-token');
+    const { id } = useParams<{ id: string }>();
+    const socket = useContext(SocketContext);
+
+    useEffect(() => {
+        const getUserName = async () => {
+            const response = await axios.get(`/api/user/id/${id}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + jwtToken,
+                },
+            })
+            if (response.status === 200) {
+                setUserName(response.data.nickname);
+                setEventData("");
+            }
+        }
+        getUserName();
+    }, [id, jwtToken, eventData]);
 
     useEffect(() => {
         const getBlocked = async () => {
-            const response = await axios.get(`/api/user/block/${userName}`, {
+            const response = await axios.get(`/api/user/block/${id}`, {
                 headers: {
                     'Authorization': 'Bearer ' + jwtToken,
                 },
@@ -22,8 +41,17 @@ const Friend: React.FC = () => {
                 setIsBlocked(response.data);
             }
         }
-        getBlocked()
-    }, [userName, jwtToken])
+        getBlocked();
+    }, [id, jwtToken]);
+
+    useEffect(() => {
+        socket?.on("refresh", () => {
+            setEventData("refresh");
+        })
+        return () => {
+            socket?.off("refresh");
+        };
+    }, [id, socket]);
 
     return (
         <div className="channel">
@@ -54,8 +82,9 @@ const Friend: React.FC = () => {
                     </button>
                 </p>
             </div> */}
-            {userName &&
-                <Block nickname={userName}
+            {userName && id &&
+                <Block id={id}
+                    nickname={userName}
                     isBlocked={isBlocked}
                     isChannel={false}
                     blockModal={blockModal}

@@ -6,6 +6,8 @@
     color: black;
     left: 1375px;
     bottom: 3.5%;
+    max-height: 76vh;
+    overflow-y: auto;
 }
 
 .members-list ul {
@@ -25,4 +27,11 @@
 .action-buttons {
     display: flex;
     justify-content: space-around;
+}
+
+.members-list-name {
+    max-width: 134px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
