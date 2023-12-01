@@ -5,7 +5,7 @@ import { AuthService } from "src/auth/auth.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { GameService } from "../game.service";
 import { instrument } from "@socket.io/admin-ui";
-import { width, height, Puck, Paddle, leftscore, rightscore } from '../game.math';
+import { width, height, Puck, Paddle, POINT } from '../game.math';
 import { Room } from '../game.room';
 
 let isPlaying: boolean = false;
@@ -149,20 +149,36 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         const room = await this.roomsList.get(roomName);      
 
-        //if role == ROLE.Left
-
-        if (action === 'upPressed') {
-            //console.log('up pressed');
-            await room.getLeftPaddle().move(-10);
-        } else if (action === 'downPressed') {
-            //console.log('down pressed');
-            await room.getLeftPaddle().move(10);;
-        } else if (action === 'released') {
-            //console.log('released');
-            await room.getLeftPaddle().move(-10);
+        if (role == ROLE.Left)
+        {
+            if (action === 'upPressed') {
+                //console.log('up pressed');
+                room.getLeftPaddle().move(-10);
+            } else if (action === 'downPressed') {
+                //console.log('down pressed');
+                room.getLeftPaddle().move(10);;
+            } else if (action === 'released') {
+                //console.log('released');
+                room.getLeftPaddle().move(-10);
+            }
+            room.getLeftPaddle().update();
+            //console.log(this.left.getY());
         }
-        await room.getLeftPaddle().update();
-        //console.log(this.left.getY());  
+        if (role == ROLE.Right)
+        {
+            if (action === 'upPressed') {
+                //console.log('up pressed');
+                room.getRightPaddle().move(-10);
+            } else if (action === 'downPressed') {
+                //console.log('down pressed');
+                room.getRightPaddle().move(10);;
+            } else if (action === 'released') {
+                //console.log('released');
+                room.getRightPaddle().move(-10);
+            }
+            room.getRightPaddle().update();
+            //console.log(this.left.getY());
+        }
     }
 
     /******************************************************************************
@@ -253,9 +269,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                     room.getPuck().update();
                     //if (this.puck.checkPaddleRight(this.right) || this.puck.checkPaddleLeft(this.left) || this.puck.checkEdges()) {
                         room.getPuck().checkPaddleRight(room.getRightPaddle());
-                        room.getPuck().checkPaddleLeft(room.getLeftPaddle()); 
-                        if (room.getPuck().checkEdges())
-                            this.server.to(roomName).emit('Score', { left: 1, right: 0 });
+                        room.getPuck().checkPaddleLeft(room.getLeftPaddle());
+                        const point = room.getPuck().checkEdges();
+                        if (point == POINT.Left)
+                        {
+                            room.leftPoint();
+                            this.server.to(roomName).emit('Score', { left: room.getLeftScore(), right: room.getRightScore() });
+                        }
+                        if (point == POINT.Right)
+                        {
+                            room.rightPoint();
+                            this.server.to(roomName).emit('Score', { left: room.getLeftScore(), right: room.getRightScore() });
+                        }
                         const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
                         const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
                         await this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });

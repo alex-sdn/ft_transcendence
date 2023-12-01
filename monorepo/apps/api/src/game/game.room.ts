@@ -3,10 +3,10 @@ import { width, height, Puck, Paddle } from './game.math';
 
 let isPlaying: boolean = false;
 
-export interface Score {
-    left: number;
-    right: number;
-}
+// export interface Score {
+//     left: number;
+//     right: number;
+// }
 
 /******************************************************************************
 *                               SOCKET ROOMS                                  *
@@ -26,7 +26,8 @@ export class Room {
 
     private puck: Puck;
 
-    private score: Score;
+    private leftScore: number;
+    private rightScore: number;
 
     constructor(name: string, left: User, right: User) {
 
@@ -40,11 +41,24 @@ export class Room {
         this.leftPaddle = new Paddle(true);
         this.rightPaddle = new Paddle(false);
         
+        this.leftScore = 0;
+        this.rightScore = 0;
+
         this.ready = 0;
     }
 
     async isReady(): Promise<void> {
         this.ready++;
+    }
+
+    leftPoint()
+    {
+        this.leftScore++;
+    }
+
+    rightPoint()
+    {
+        this.rightScore++;
     }
 
     //getters
@@ -65,6 +79,12 @@ export class Room {
         return this.rightPaddle;
     }
 
+    getLeftScore(): number {
+        return this.leftScore;
+    }
 
+    getRightScore(): number {
+        return this.rightScore;
+    }
 
 }
