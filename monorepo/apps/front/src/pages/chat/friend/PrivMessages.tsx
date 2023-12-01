@@ -18,7 +18,7 @@ const PrivMessages: React.FC<PrivMessageProps> = ({ sender }) => {
 	const [newMessage, setNewMessage] = useState("");
 	const socket = useContext(SocketContext);
 	const [error, setError] = useState<string>("");
-	const messagesEndRef = useRef(null);
+	const messagesEndRef = useRef<HTMLDivElement>(null);
 
 	console.log(sender);
 	useEffect(() => {
@@ -83,18 +83,18 @@ const PrivMessages: React.FC<PrivMessageProps> = ({ sender }) => {
 	}, [privmessages]);
 
 	return (
-		<div className="messages-container">
-			<div className="messages-list">
+		<div className="privmessages-container">
+			<div className="privmessages-list">
 				{privmessages.map((msg, index) => (
-					<div key={index} className={"regular-message"}>
+					<div key={index} className={"privregular-message"}>
 						<strong>{msg.sender}</strong>{":"} <span>{msg.message}</span>
 					</div>
 				))}
 				<div ref={messagesEndRef} />
 			</div>
-			<form className="message-form" onSubmit={handleSendMessage}>
+			<form className="privmessage-form" onSubmit={handleSendMessage}>
 				<input
-					className="message-input"
+					className="privmessage-input"
 					type="text"
 					value={newMessage}
 					onChange={(e) => setNewMessage(e.target.value)}

@@ -21,7 +21,7 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 	const [newMessage, setNewMessage] = useState("");
 	const socket = useContext(SocketContext);
 	const [error, setError] = useState<string>("");
-	const messagesEndRef = useRef(null);
+	const messagesEndRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		const handleMessageReceive = (message: Message) => {
@@ -147,8 +147,11 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 	}, [target, jwtToken]);
 
 	useEffect(() => {
-		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+		if (messagesEndRef.current) {
+			messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+		}
 	}, [messages]);
+	
 
 	return (
 		<div className="messages-container">
