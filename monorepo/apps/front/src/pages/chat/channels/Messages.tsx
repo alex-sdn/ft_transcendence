@@ -57,11 +57,10 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 	useEffect(() => {
 		socket?.on("join", data => {
 			if (data.target === target){
-				console.log(data);
 				const joinMessage = {
 					sender: data.sender,
 					target: data.target, 
-					message: ` has joined the channel (new)`, 
+					message: ` has joined the channel`, 
 					isCommand: true
 				};
 				setMessages(prevMessages => [...prevMessages, joinMessage]);
@@ -69,11 +68,10 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 		})
 		socket?.on("leave", data => {
 			if (data.target === target){
-				console.log(data);
 				const leaveMessage = {
 					sender: data.sender,
 					target: data.target, 
-					message: ` has left the channel (new)`, 
+					message: ` has left the channel`, 
 					isCommand: true
 				};
 				setMessages(prevMessages => [...prevMessages, leaveMessage]);
@@ -81,11 +79,10 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 		})
 		socket?.on("mute", data => {
 			if (data.target === target){
-				console.log(data);
 				const muteMessage = {
 					sender: data.sender,
 					target: data.target, 
-					message: ` muted ${data.target} (new)`, 
+					message: ` muted ${data.target}`, 
 					isCommand: true
 				};
 				setMessages(prevMessages => [...prevMessages, muteMessage]);
@@ -93,12 +90,10 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 		})
 		socket?.on("kick", data => {
 			if (data.target === target){
-				console.log("Enter mute:")
-				console.log(data);
 				const kickMessage = {
 					sender: data.sender,
 					target: data.target, 
-					message: ` kicked ${data.target} from the channel (new)`, 
+					message: ` kicked ${data.target} from the channel`, 
 					isCommand: true
 				};
 				setMessages(prevMessages => [...prevMessages, kickMessage]);
@@ -106,11 +101,10 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 		})
 		socket?.on("ban", data => {
 			if (data.target === target){
-				console.log(data);
 				const banMessage = {
 					sender: data.sender,
 					target: data.target, 
-					message: ` banned ${data.target} from the channel (new)`, 
+					message: ` banned ${data.target} from the channel`, 
 					isCommand: true
 				};
 				setMessages(prevMessages => [...prevMessages, banMessage]);
@@ -136,7 +130,6 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 						'Authorization': 'Bearer ' + jwtToken,
 					},
 				});
-				console.log(response);
 				if (response.status === 200) {
 					const previousmessages: Message[] = response.data.map(msg => ({
 						sender: msg.sender.nickname,
