@@ -13,7 +13,7 @@
 	overflow-y: auto;
 	background-color: white;
 	padding: 10px;
-	border: 1px solid #ccc; /* Light grey border */
+	border: 1px solid white; /* Light grey border */
 	margin-bottom: 10px; /* Add space between list and form */
 }
 
