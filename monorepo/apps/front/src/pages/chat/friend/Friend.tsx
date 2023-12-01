@@ -65,9 +65,6 @@ const Friend: React.FC = () => {
                     block
                 </button>
             </div>
-            {userName &&
-                <PrivMessages sender={userName} />
-            }
             {/* <div id='chat' >
                 <p>
                     <input type='text'
@@ -96,6 +93,11 @@ const Friend: React.FC = () => {
                     onClose={() => setBlockModal(false)}
                 />
             }
+            <div className='privmessages-container' >
+                {userName &&
+                    <PrivMessages sender={userName} />
+                }
+            </div>
         </div>
     );
 }

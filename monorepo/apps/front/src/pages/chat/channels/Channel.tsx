@@ -148,17 +148,17 @@ const Channel: React.FC = () => {
 					settings
 				</button>
 				{me && channelName && currentChannel &&
-					<Settings me={me}
-						currentChannel={currentChannel}
-						settingsModal={settingsModal}
-						onClose={() => setSettingsModal(false)}
-					/>}
-				{me && channelName && currentChannel &&
-					<Messages sender={me} target={channelName} />
-				}
-			</div>
-			<div>
-				{members && me && currentChannel &&
+                    <Settings me={me}
+                        currentChannel={currentChannel}
+                        settingsModal={settingsModal}
+                        onClose={() => setSettingsModal(false)}
+                    />}
+                {me && channelName &&
+                    <Messages sender={me} target={channelName} />
+                }
+            </div>
+            <div>
+                {members && me && currentChannel &&
 					<ChannelMembers me={me}
 						members={members}
 						currentChannel={currentChannel}
