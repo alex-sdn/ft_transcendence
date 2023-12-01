@@ -405,7 +405,7 @@ export class ChatService {
 		}
 		else if (access === 'protected') {
 			if (!password)
-			throw new Error('Missing password for protected access');
+				throw new Error('Missing password for protected access');
 			//check password format ?
 			// this.validateName(password);
 			const pwHash = await argon.hash(password);
