@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import SocketContext from "../../../Socket";
-import Kick, { kickProps } from "./Kick";
+import Channel from "./Channel";
 
 export interface Message {
 	sender: string;
@@ -31,11 +31,13 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 			}
 		};
 
-		const handleKickEvent = (kickData: kickProps) => {
+		const handleKickEvent = (kickData) => { // is not working now
+			console.log("kickdata=");
+			console.log(kickData);
 			const kickMessage = {
-				sender: sender,
-				target: target,
-				message: `${sender} has kicked ${kickData.selectedMember.name} from the channel.`,
+				sender: kickData.sender,
+				target: kickData.channel,
+				message: `${kickData.sender} has kicked ${kickData.target} from the channel ${kickData.channel}.`,
 				isCommand: true
 			};
 			setMessages(prevMessages => [...prevMessages, kickMessage]);
@@ -95,22 +97,6 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 	useEffect(() => {
 		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 	}, [messages]);
-
-	//const handleKick = async () => {
-	//	const createPromise = new Promise<{
-	//		sender: string;
-	//		target: string
-	//	}>((resolve, reject) => {
-	//		if (socket) {
-	//			socket.emit("kick", { target: selectedMember.name, channel: selectedChannel });
-	//			socket.on("kick", (data) => {
-	//				resolve(data);
-	//			});
-	//			socket.on("error", data => {
-	//				reject(data);
-	//			});
-	//		}
-	//	});
 
 	return (
 		<div className="messages-container">
