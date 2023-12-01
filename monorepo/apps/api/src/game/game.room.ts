@@ -29,6 +29,9 @@ export class Room {
     private leftScore: number;
     private rightScore: number;
 
+    private leftNickname: string;
+    private rightNickname: string;
+
     private gameEnd: boolean;
 
     constructor(name: string, left: User, right: User) {
@@ -37,6 +40,9 @@ export class Room {
 
         this.leftPlayer = left;
         this.rightPlayer = right;
+
+        this.leftNickname = left.nickname;
+        this.rightNickname = right.nickname;
 
         this.puck = new Puck();
         
@@ -95,5 +101,13 @@ export class Room {
         if (this.leftScore >= 3 || this.rightScore >= 3)
             this.gameEnd = true;
         return this.gameEnd;
+    }
+
+    getLeftNickname(): string {
+        return this.leftNickname;
+    }
+
+    getRightNickname(): string {
+        return this.rightNickname;
     }
 }

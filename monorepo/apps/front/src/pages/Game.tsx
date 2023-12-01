@@ -39,6 +39,11 @@ export interface Score {
     right: number;
 }
 
+export interface Nickname {
+    left: string;
+    right: string;
+}
+
 export enum ROLE {
     Left,
     Right,
@@ -61,6 +66,7 @@ const Game: React.FC = () => {
     const [puckDir, setPuckDir] = useState<PuckDir>({ x: 0, y: 0 });
     const [roomName, setRoomName] = useState<string | null>(null);
     const [role, setRole] = useState<ROLE>(ROLE.Undefined);
+    const [nickname, setNickname] = useState<Nickname>({ left: "", right: ""});
 
     const [AskReady, setAskReady] = useState(false);
 
@@ -134,10 +140,13 @@ const Game: React.FC = () => {
                 "Room",
                 ({
                     name,
-                    role
+                    role,
+                    leftNickname,
+                    rightNickname
                 }: Room) => {
                     setRoomName(name);
                     setRole(role);
+                    setNickname({ left: leftNickname, right: rightNickname});
                 }
             );
         }
@@ -281,6 +290,15 @@ const Game: React.FC = () => {
             ctxt.textBaseline = "top";
             ctxt.fillText(score.left, canvas.width * 0.25, 20);
             ctxt.fillText(score.right, canvas.width * 0.75, 20);
+
+            // nicknames
+            ctxt.font = "20px 'Calibri', bold";
+            ctxt.fillStyle = "black";
+            ctxt.textAlign = "center";
+            ctxt.textBaseline = "bottom";
+            ctxt.fillText(nickname.left, canvas.width * 0.25, 20);
+            ctxt.fillText(nickname.right, canvas.width * 0.75, 20);
+
           }
         }
       }, [paddle, puckPos, puckDir, score, AskReady]);
