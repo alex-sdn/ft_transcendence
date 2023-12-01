@@ -264,7 +264,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
             this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
     
-            while (isPlaying === true) {
+            while (isPlaying === true && !room.getGameEnd()) {
                 //const updatePuckInterval = setInterval(() => {
                     room.getPuck().update();
                     //if (this.puck.checkPaddleRight(this.right) || this.puck.checkPaddleLeft(this.left) || this.puck.checkEdges()) {

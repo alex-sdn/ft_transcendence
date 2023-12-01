@@ -29,6 +29,8 @@ export class Room {
     private leftScore: number;
     private rightScore: number;
 
+    private gameEnd: boolean;
+
     constructor(name: string, left: User, right: User) {
 
         this.name = name;
@@ -45,6 +47,8 @@ export class Room {
         this.rightScore = 0;
 
         this.ready = 0;
+
+        this.gameEnd = false;
     }
 
     async isReady(): Promise<void> {
@@ -87,4 +91,9 @@ export class Room {
         return this.rightScore;
     }
 
+    getGameEnd(): boolean {
+        if (this.leftScore >= 3 || this.rightScore >= 3)
+            this.gameEnd = true;
+        return this.gameEnd;
+    }
 }
