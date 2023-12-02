@@ -43,7 +43,7 @@ const Profile: React.FC = () => {
     getProfileData();
   },);
 
-//REQUETE AVATAR
+  //REQUETE AVATAR
   useEffect(() => {
     const fetchDefaultAvatar = async () => {
       let response = await axios.get('/api/user/me', {
@@ -83,8 +83,8 @@ const Profile: React.FC = () => {
     window.location.reload();
     setIsOpenpic(false);
   };
-  
-    //  MODALE NICKNAME
+
+  //  MODALE NICKNAME
 
   const [isOpennic, setIsOpennic] = useState(false);
 
@@ -99,49 +99,50 @@ const Profile: React.FC = () => {
 
   //2FA activation Modale
 
-    const [isOpenfa, setIsOpenfa] = useState(false);
+  const [isOpenfa, setIsOpenfa] = useState(false);
 
-    const openModalfa = () => {
-      setIsOpenfa(true);
-    };
-  
-    const closeModalfa = () => {
-      window.location.reload();
-      setIsOpenfa(false);
-    };
+  const openModalfa = () => {
+    setIsOpenfa(true);
+  };
 
-    //2FA deactivation Modale
+  const closeModalfa = () => {
+    window.location.reload();
+    setIsOpenfa(false);
+  };
 
-    const [isOpenNofa, setIsOpenNofa] = useState(false);
+  //2FA deactivation Modale
 
-    const openModalNofa = () => {
-      setIsOpenNofa(true);
-    };
-  
-    const closeModalNofa = () => {
-      window.location.reload();
-      setIsOpenNofa(false);
-    };
+  const [isOpenNofa, setIsOpenNofa] = useState(false);
 
-    const handleClic = () => {
-      deac2fabutton();
-    }
+  const openModalNofa = () => {
+    setIsOpenNofa(true);
+  };
 
-      const deac2fabutton = async () => {
-        try{
-          console.log('token = ', jwtToken);
-          const response = await axios.delete('/api/user/me/edit2fa', {
-              headers : {
-                  'Authorization': 'Bearer ' + jwtToken,
-              },
-          },);
-        if (response.status === 200) {
-          console.log('2FA successfully deactivated');
-          window.location.reload();
-        }}
-        catch (error) {console.log('Error encountered when deactivating 2FA');}
-      } 
+  const closeModalNofa = () => {
+    window.location.reload();
+    setIsOpenNofa(false);
+  };
+
+  const handleClic = () => {
+    deac2fabutton();
+  }
+
+  const deac2fabutton = async () => {
+    try {
       console.log('token = ', jwtToken);
+      const response = await axios.delete('/api/user/me/edit2fa', {
+        headers: {
+          'Authorization': 'Bearer ' + jwtToken,
+        },
+      },);
+      if (response.status === 200) {
+        console.log('2FA successfully deactivated');
+        window.location.reload();
+      }
+    }
+    catch (error) { console.log('Error encountered when deactivating 2FA'); }
+  }
+  console.log('token = ', jwtToken);
   const customStyles = {
     content: {
       top: '50%',
@@ -196,35 +197,35 @@ const Profile: React.FC = () => {
 
         <p>Ladder Points : <span className='_score'>{lp}</span> </p>
         <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <p>Two factor authentification : {twofa ? <span className='_score'>activated</span> :<span className='_score'> deactivated</span>  }</p> &emsp;
-        {twofa ? 
-<div>
-            <button className="button-29" onClick={openModalNofa}> ⚙️ </button>
+          <p>Two factor authentification : {twofa ? <span className='_score'>activated</span> : <span className='_score'> deactivated</span>}</p> &emsp;
+          {twofa ?
+            <div>
+              <button className="button-29" onClick={openModalNofa}> ⚙️ </button>
 
-            <Modal 
-              isOpen={isOpenNofa}
-              onRequestClose={closeModalNofa}
-              style={customStyles}>
-             <div>Are you sure you want to deactivate 2fa ?</div>
-            <button className='button-29' onClick={handleClic}>YES</button>
-            <button onClick={closeModalNofa} className='button-29'>NO</button>
-            </Modal>
-          </div>
-          :          <div>
-            <button className="button-29" onClick={openModalfa}> ⚙️ </button>
-            <Modal 
-              isOpen={isOpenfa}
-              onRequestClose={closeModalfa}
-              style={customStyles}>
-            <button onClick={closeModalfa}>x</button>
-            <Twofa/>
-            </Modal>
-          </div>
-        }
+              <Modal
+                isOpen={isOpenNofa}
+                onRequestClose={closeModalNofa}
+                style={customStyles}>
+                <div>Are you sure you want to deactivate 2fa ?</div>
+                <button className='button-29' onClick={handleClic}>YES</button>
+                <button onClick={closeModalNofa} className='button-29'>NO</button>
+              </Modal>
+            </div>
+            : <div>
+              <button className="button-29" onClick={openModalfa}> ⚙️ </button>
+              <Modal
+                isOpen={isOpenfa}
+                onRequestClose={closeModalfa}
+                style={customStyles}>
+                <button onClick={closeModalfa}>x</button>
+                <Twofa />
+              </Modal>
+            </div>
+          }
         </div>
+      </div>
     </div>
-</div>
-      )
+  )
 }
 
 export default Profile;
