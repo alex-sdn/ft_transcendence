@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
+import Cookies from "js-cookie";
 
 import { user } from './Channel.tsx';
 import { channel } from "../../../layouts/ChannelsLayout.tsx";
@@ -8,6 +9,8 @@ import Mute from './Mute.tsx';
 import Kick from './Kick.tsx';
 import Ban from './Ban.tsx';
 import Admin from "./Admin.tsx";
+import axios from "axios";
+import Block from "../friend/Block.tsx";
 
 interface channelUsersProps {
     me: user;
@@ -16,13 +19,32 @@ interface channelUsersProps {
 }
 
 const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel }) => {
+    const jwtToken = Cookies.get('jwt-token');
     const [selectedMember, setSelectedMember] = useState<user | null>(null);
+    const [isBlocked, setIsBlocked] = useState<boolean>(false);
     // Modals:
     const [profileModal, setProfileModal] = useState<boolean>(false);
     const [muteModal, setMuteModal] = useState<boolean>(false);
     const [kickModal, setKickModal] = useState<boolean>(false);
     const [banModal, setBanModal] = useState<boolean>(false);
     const [adminModal, setAdminModal] = useState<boolean>(false);
+    const [blockModal, setBlockModal] = useState<boolean>(false);
+
+    useEffect(() => {
+        const getBlocked = async () => {
+            if (selectedMember) {
+                const response = await axios.get(`/api/user/block/${selectedMember.name}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + jwtToken,
+                    },
+                })
+                if (response.status === 200) {
+                    setIsBlocked(response.data);
+                }
+            }
+        }
+        getBlocked();
+    }, [blockModal, selectedMember])
 
     return (
         <div>
@@ -79,6 +101,24 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
                         <p>
                             <button className="button-59">Let's play!</button>
                         </p>
+                        {!isBlocked &&
+                            <p>
+                                <button onClick={() => {
+                                    setBlockModal(true);
+                                }}
+                                    className="button-59">
+                                    Block
+                                </button>
+                            </p>
+                        }
+                        {isBlocked &&
+                            <p>
+                                <button onClick={() => setBlockModal(true)}
+                                    className="button-59">
+                                    Unblock
+                                </button>
+                            </p>
+                        }
                         {me.admin && (
                             <div>
                                 <p className="action-buttons">
@@ -134,6 +174,14 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
                     selectedChannel={currentChannel.name}
                     banModal={banModal}
                     onClose={() => setBanModal(false)}
+                />
+            }
+            {selectedMember &&
+                <Block nickname={selectedMember.name}
+                    isBlocked={isBlocked}
+                    isChannel={true}
+                    blockModal={blockModal}
+                    onClose={() => setBlockModal(false)}
                 />
             }
             {me.owner && selectedMember &&

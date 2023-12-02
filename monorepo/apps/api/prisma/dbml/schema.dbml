@@ -10,11 +10,14 @@ Table User {
   createdAt DateTime [default: `now()`, not null]
   has2fa Boolean [not null, default: false]
   secret2fa String
+  status Statuses [not null, default: 'offline']
   win Int [not null, default: 0]
   loss Int [not null, default: 0]
   LP Int [not null, default: 100]
   friends1 Friendship [not null]
   friends2 Friendship [not null]
+  requester FriendRequest [not null]
+  requested FriendRequest [not null]
   blocked Blocked [not null]
   blockedBy Blocked [not null]
   matchesP1 Match [not null]
@@ -64,6 +67,18 @@ Table Friendship {
 
   indexes {
     (user1Id, user2Id) [unique]
+  }
+}
+
+Table FriendRequest {
+  id Int [pk, increment]
+  requester User [not null]
+  requesterId Int [not null]
+  requested User [not null]
+  requestedId Int [not null]
+
+  indexes {
+    (requesterId, requestedId) [unique]
   }
 }
 
@@ -166,6 +181,10 @@ Ref: Match.user2Id > User.id
 Ref: Friendship.user1Id > User.id
 
 Ref: Friendship.user2Id > User.id
+
+Ref: FriendRequest.requesterId > User.id
+
+Ref: FriendRequest.requestedId > User.id
 
 Ref: Blocked.blockerId > User.id
 

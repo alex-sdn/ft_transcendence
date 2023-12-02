@@ -5,12 +5,16 @@ import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bo
 
 interface blockProps {
     nickname: string,
+    isBlocked: boolean,
+    isChannel: boolean,
     blockModal: boolean,
     onClose: () => void;
 }
 
 const Block: React.FC<blockProps> = ({
     nickname,
+    isBlocked,
+    isChannel,
     blockModal,
     onClose
 }) => {
@@ -18,13 +22,9 @@ const Block: React.FC<blockProps> = ({
     const jwtToken = Cookies.get('jwt-token');
 
     const blockUser = async () => {
-        const isBlocked = await axios.get(`/api/user/block/${nickname}`, {
-            headers: {
-                'Authorization': 'Bearer ' + jwtToken,
-            },
-        })
-        if (!isBlocked.data) {
-            const response = await axios.post(`/api/user/block/${nickname}`, { nickname: nickname }, {
+        let response;
+        if (!isBlocked) {
+            response = await axios.post(`/api/user/block/${nickname}`, { nickname: nickname }, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + jwtToken,
@@ -33,10 +33,24 @@ const Block: React.FC<blockProps> = ({
             if (response.status === 201) {
                 setError("");
                 onClose();
+                if (!isChannel)
+                    window.location.assign('/chat/@me');
             }
         }
         else {
-            setError("User already blocked");
+            response = await axios.delete(`/api/user/block/${nickname}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + jwtToken,
+                },
+                data: {
+                    nickname: nickname,
+                },
+            });
+            if (response.status === 200) {
+                setError("");
+                onClose();
+            }
         }
     }
 
@@ -48,14 +62,26 @@ const Block: React.FC<blockProps> = ({
                 className="text-center"
             >
                 <ModalHeader>
-                    <ModalTitle>
-                        Do you want to block <strong>{nickname}</strong>?
-                    </ModalTitle>
+                    {!isBlocked &&
+                        <ModalTitle>
+                            Do you want to block <strong>{nickname}</strong>?
+                        </ModalTitle>
+                    }
+                    {isBlocked &&
+                        <ModalTitle>
+                            Do you want to unblock <strong>{nickname}</strong>?
+                        </ModalTitle>
+                    }
                 </ModalHeader>
                 <ModalBody>
-                    <p>You wont be abble to see this user's messages anymore</p>
+                    {!isBlocked &&
+                        <p>You wont be abble to see this user's messages anymore</p>
+                    }
+                    {isBlocked &&
+                        <p>You will see this user's messages again</p>
+                    }
                     <p className="action-buttons">
-                        <button className="button-59"
+                        < button className="button-59"
                             onClick={blockUser}
                         >
                             Yes
@@ -80,7 +106,7 @@ const Block: React.FC<blockProps> = ({
                     </button>
                 </ModalFooter>
             </Modal>
-        </div>
+        </div >
     );
 }
 
