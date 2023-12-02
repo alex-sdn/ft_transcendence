@@ -16,6 +16,7 @@ const Profile: React.FC = () => {
   const [lp, setLp] = useState<number>();
   const [twofa, setTwofa] = useState<boolean>();
   const [gameNb, setGameNb] = useState<number>();
+  const [matches, setMatches] = useState<number>();
 
 
   const jwtToken = Cookies.get('jwt-token');
@@ -68,6 +69,8 @@ const Profile: React.FC = () => {
     fetchDefaultAvatar();
   }, []);
 
+  //SCORING
+  
 
   //MODALE PP {
   const [isOpenpic, setIsOpenpic] = useState(false);
