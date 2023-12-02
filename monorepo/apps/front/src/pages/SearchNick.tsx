@@ -32,7 +32,6 @@ const SearchNick: React.FC = () => {
           {console.log("Error")}
         }
       const handleValidation = async () => {
-
         await getProfileData();
         return navigate(`/profileUser/${ID}`);
       }
