@@ -5,6 +5,7 @@ import ProfilePicture from './ProfilePicture';
 import Modal from 'react-modal';
 import Nickname from './Nickname';
 import Twofa from './2fa';
+import ProfileMatch from './ProfileMatch';
 import SearchNick from './SearchNick';
 
 const Profile: React.FC = () => {
@@ -224,6 +225,10 @@ const Profile: React.FC = () => {
           }
         </div>
       </div>
+      <div className='_info'>
+        <p>Recent Games</p>
+        <p> <ProfileMatch/> </p>
+        </div>
     </div>
   )
 }
