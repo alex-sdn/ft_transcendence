@@ -54,19 +54,37 @@ useEffect(() => {
                     {matches.map((match, index) =>
                     (
                         <ul key={index + 1}>
-                        {match.id = match.user1.id ? 
+                        {id === match.user1.id ? 
+
                         // ecrire si victory ou defeat
-                        <div>{match.user1.win ? <span>VICTORY&nbsp;</span> : <span>DEFEAT&nbsp;</span>}
+                        <div>
+                        {/* <div>ID = {id}&nbsp;&nbsp;MATCH USER1 ID = {match.user1.id}</div> */}
+                        {match.p1score < match.p2score ? <span className='_defeat'> {match.p1score} / {match.p2score} : &nbsp;DEFEAT</span> : <span className='_victory'>  {match.p1score} / {match.p2score} : &nbsp; VICTORY</span>}
                         {/* ecrire against qui ? */}
-                         against&nbsp; {match.user2.nickname}&nbsp;
-                        {/*ecrire le score */}
-                        <div>Score : {match.p1score} / {match.p2score} </div>
+                        &nbsp;against&nbsp;<span className='_nickname'> {match.user2.nickname}</span>
                         {/* ecrire la date */}
-                        <div>&nbsp;On&nbsp; {match.date} </div>
+                        &nbsp;<span className='_date'> {new Date(match.date).toLocaleDateString(undefined, {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                        })} </span> 
+                       
                         </div>
-                          : 2
+
+                          : 
+
+                        // ecrire si victory ou defeat
+                        <div>
+                          
+                        {match.p1score > match.p2score ? <span className='_defeat'>{match.p2score} / {match.p1score} &nbsp; DEFEAT</span> : <span className='_victory'>{match.p2score} / {match.p1score} &nbsp; VICTORY</span>}
+                        {/* ecrire against qui ? */}
+                        &nbsp; against&nbsp; <span className='_whiteTab'>{match.user1.nickname} </span>
+                        {/* ecrire la date */}
+                        &nbsp;On&nbsp; <span className='_blackTab'>{match.date} </span>
+
+                        </div>
+
                         }
-                        {/* {match.user1.nickname} against {match.user2.nickname} */}
                         </ul>
                     )
                     )}
