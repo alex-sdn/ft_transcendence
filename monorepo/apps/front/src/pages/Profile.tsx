@@ -225,8 +225,8 @@ const Profile: React.FC = () => {
           }
         </div>
       </div>
-      <div className='_info'>
-        <p>Recent Games</p>
+      <div className='_scoreTab'>
+        <h1>Recent Games</h1>
         <p> <ProfileMatch/> </p>
         </div>
     </div>
