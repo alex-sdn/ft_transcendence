@@ -1,27 +1,37 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ChannelMembers from './ChannelMembers'
 import Cookies from "js-cookie";
 import axios from 'axios';
+import Messages from './Messages';
 
 import Settings from './Settings';
 import { channel } from '../../../layouts/ChannelsLayout';
+import SocketContext from '../../../Socket';
 
-export interface user {
+export interface User {
     name: string;
     owner: boolean;
     admin: boolean;
     avatar: string;
+    id: string;
+}
+
+export interface Channel {
+    name: string;
+    access: string; // add other necessary fields from your channel model
 }
 
 const Channel: React.FC = () => {
     const jwtToken = Cookies.get('jwt-token');
     const [members, setMembers] = useState<user[]>([]);
+    const [eventData, setEventData] = useState<string>("");
     const [currentChannel, setCurrentChannel] = useState<channel>();
     const [message, setMessage] = useState<string>("");
     const [me, setMe] = useState<user>();
     const [settingsModal, setSettingsModal] = useState<boolean>(false);
     const { channelName } = useParams<{ channelName: string }>();
+    const socket = useContext(SocketContext);
 
     useEffect(() => {
         const getChannelInfos = async () => {
@@ -44,12 +54,14 @@ const Channel: React.FC = () => {
                         owner: member.owner,
                         admin: member.admin,
                         avatar: member.user.avatar,
+                        id: member.user.id,
                     }))
                     const currentUser = members.find((member) => member.name === currentUserName);
                     setMe(currentUser);
 
                     const otherUsers = members.filter((member) => member.name !== currentUserName);
                     setMembers(otherUsers);
+                    setEventData("");
                 }
             }
 
@@ -70,51 +82,89 @@ const Channel: React.FC = () => {
             }
         }
         getChannelInfos();
-    }, [channelName, jwtToken]);
+    }, [channelName, jwtToken, eventData]);
+
+    useEffect(() => {
+        socket?.on("join", (data) => {
+            if (data.target === channelName) {
+                setEventData(data.sender);
+            }
+        });
+
+        socket?.on("leave", (data) => {
+            if (data.target === channelName) {
+                setEventData(data.sender);
+            }
+        });
+
+        socket?.on("mute", (data) => {
+            if (data.channel === channelName) {
+                window.location.reload();
+            }
+        });
+
+        socket?.on("kick", (data) => {
+            if (data.channel === channelName) {
+                window.location.reload();
+            }
+        });
+
+        socket?.on("ban", (data) => {
+            if (data.channel === channelName) {
+                window.location.reload();
+            }
+        });
+
+        socket?.on("admin", (data) => {
+            if (data.channel === channelName) {
+                window.location.reload();
+            }
+        });
+
+        // event changement de nickname -> refresh
+        socket?.on("refresh", () => {
+            setEventData("refresh");
+        })
+
+        return () => {
+            socket?.off("join");
+            socket?.off("leave");
+            socket?.off("mute");
+            socket?.off("kick");
+            socket?.off("ban");
+            socket?.off("admin");
+            socket?.off("refresh");
+        };
+    }, [channelName, socket]);
+
 
     return (
         <div>
             <div className='name-settings'>
-                <h2>{channelName}</h2>
-                <button className="material-symbols-outlined"
-                    onClick={() => setSettingsModal(true)}
-                >
-                    settings
-                </button>
-                {me && channelName && currentChannel &&
+				<h2>{channelName}</h2>
+				<button className="material-symbols-outlined"
+					onClick={() => setSettingsModal(true)}
+				>
+					settings
+				</button>
+				{me && channelName && currentChannel &&
                     <Settings me={me}
                         currentChannel={currentChannel}
                         settingsModal={settingsModal}
                         onClose={() => setSettingsModal(false)}
                     />}
-            </div>
-            <div className='chat-messages' >
-                {/* <p>
-                    <input type='text'
-                        name='message'
-                        placeholder='Send a message'
-                        onChange={(e) => setMessage(e.target.value)} />
-                </p>
-                <p>
-                    <button
-                        className="material-symbols-outlined"
-                        id='send-button'
-                        type='submit'
-                        value={message}
-                        disabled={!message}
-                    >
-                        send
-                    </button>
-                </p> */}
+                {me && channelName &&
+                    <Messages sender={me} target={channelName} />
+                }
             </div>
             <div>
                 {members && me && currentChannel &&
-                    <ChannelMembers me={me}
-                        members={members}
-                        currentChannel={currentChannel}
-                    />}
-            </div>
-        </div>
+					<ChannelMembers me={me}
+						members={members}
+						currentChannel={currentChannel}
+					/>}
+			</div>
+		</div>
     );
 }
 
