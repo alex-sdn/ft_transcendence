@@ -88,6 +88,7 @@ export class AuthService {
 			}
 		} catch (error) {
 			// console.error('Token exchange failed:', error);
+			// CHANGE ERROR STATUS ?????????????
 			throw new HttpException('TOKEN_EXCHANGE_FAILED', HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -130,6 +131,10 @@ export class AuthService {
 				avatar
 			},
 		});
+		// // Create achievements table
+		// await this.prisma.achievements.create({
+		// 	data: {id: user.id}
+		// });
 		return user;
 	}
 
