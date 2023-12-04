@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import axios from 'axios'
 import { useParams } from 'react-router-dom';
 
-const Profile: React.FC = () => {
+const ProfileUser: React.FC = () => {
     const { ID } = useParams<{ ID?: string }>();
 
   const [nickname, setNickname] = useState<string>('');
@@ -98,4 +98,4 @@ const Profile: React.FC = () => {
       )
 }
 
-export default Profile;
+export default ProfileUser;

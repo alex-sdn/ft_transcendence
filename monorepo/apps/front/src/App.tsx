@@ -44,6 +44,7 @@ const router = createBrowserRouter(
         </Route>
       </Route>
       <Route path="profile" element={jwtToken ? <Profile /> : <Navigate to='/login' />} />
+      <Route path="profileUser/:ID" element={jwtToken ? <ProfileUser /> : <Navigate to='/login' />} />
       <Route path="login2fa" element={jwt2faToken ? <Login2fa /> : <Navigate to='/login' />} />
       <Route path="login" element={<Login />} />
       <Route path="nickname" element={jwtToken ? <Nickname /> : <Navigate to='/login' />} />
