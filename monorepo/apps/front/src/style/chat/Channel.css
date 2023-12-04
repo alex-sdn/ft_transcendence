@@ -1,5 +1,6 @@
 /* owner and admin icons */
 @import url(https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0);
+@import 'normalize.css/normalize.css';
 
 .name-settings {
     display: flex;
@@ -29,7 +30,7 @@
     margin: 4px;
 }
 
-.chat-messages {
+/* .chat-messages {
     display: flex;
     position: absolute;
     background: white;
@@ -37,7 +38,7 @@
     height: 76vh;
     left: 14lh;
     bottom: 3vh;
-}
+} */
 
 .channel input {
     position: absolute;
@@ -48,13 +49,13 @@
     transform: translate(-50%, 0);
 }
 
-#send-button {
+/* #send-button {
     position: absolute;
     display: flex;
     left: 95%;
     bottom: 3%;
     transform: translate(-85%, 0);
-}
+} */
 
 .channel #members {
     display: flex;

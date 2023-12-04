@@ -3,17 +3,23 @@ import { useParams } from 'react-router-dom';
 import ChannelMembers from './ChannelMembers'
 import Cookies from "js-cookie";
 import axios from 'axios';
+import Messages from './Messages';
 
 import Settings from './Settings';
 import { channel } from '../../../layouts/ChannelsLayout';
 import SocketContext from '../../../Socket';
 
-export interface user {
+export interface User {
     name: string;
     owner: boolean;
     admin: boolean;
     avatar: string;
     id: string;
+}
+
+export interface Channel {
+    name: string;
+    access: string; // add other necessary fields from your channel model
 }
 
 const Channel: React.FC = () => {
@@ -135,46 +141,30 @@ const Channel: React.FC = () => {
     return (
         <div>
             <div className='name-settings'>
-                <h2>{channelName}</h2>
-                <button className="material-symbols-outlined"
-                    onClick={() => setSettingsModal(true)}
-                >
-                    settings
-                </button>
-                {me && channelName && currentChannel &&
+				<h2>{channelName}</h2>
+				<button className="material-symbols-outlined"
+					onClick={() => setSettingsModal(true)}
+				>
+					settings
+				</button>
+				{me && channelName && currentChannel &&
                     <Settings me={me}
                         currentChannel={currentChannel}
                         settingsModal={settingsModal}
                         onClose={() => setSettingsModal(false)}
                     />}
-            </div>
-            <div className='chat-messages' >
-                {/* <p>
-                    <input type='text'
-                        name='message'
-                        placeholder='Send a message'
-                        onChange={(e) => setMessage(e.target.value)} />
-                </p>
-                <p>
-                    <button
-                        className="material-symbols-outlined"
-                        id='send-button'
-                        type='submit'
-                        value={message}
-                        disabled={!message}
-                    >
-                        send
-                    </button>
-                </p> */}
+                {me && channelName &&
+                    <Messages sender={me} target={channelName} />
+                }
             </div>
             <div>
                 {members && me && currentChannel &&
-                    <ChannelMembers me={me}
-                        members={members}
-                        currentChannel={currentChannel}
-                    />}
-            </div>
-        </div>
+					<ChannelMembers me={me}
+						members={members}
+						currentChannel={currentChannel}
+					/>}
+			</div>
+		</div>
     );
 }
 

@@ -81,6 +81,7 @@ export class ChatService {
 		for (var i in members) {
 			delete members[i].user.has2fa;
 			delete members[i].user.secret2fa;
+			delete members[i].user.status;
 		}
 		return members;
 	}
@@ -115,6 +116,7 @@ export class ChatService {
 		for (var i in messages) {
 			delete messages[i].sender.has2fa;
 			delete messages[i].sender.secret2fa;
+			delete messages[i].sender.status;
 		}
 
 		return messages;
@@ -169,6 +171,7 @@ export class ChatService {
 		for (var i in messages) {
 			delete messages[i].sender.has2fa;
 			delete messages[i].sender.secret2fa;
+			delete messages[i].sender.status;
 		}
 
 		return messages;
@@ -643,6 +646,28 @@ export class ChatService {
 			}
 		});
 		await this.saveChanmsg(channel.id, user.id, 'made '+target.nickname+' an admin', true);
+	}
+
+	async statusOnline(userId: number) {
+		try {
+			await this.prisma.user.update({
+				where: {id: userId},
+				data: {status: 'online'}
+			});
+		} catch(error) {
+			console.log('Failed to update user status');
+		}
+	}
+
+	async statusOffline(userId: number) {
+		try {
+			await this.prisma.user.update({
+				where: {id: userId},
+				data: {status: 'offline'}
+			});
+		} catch(error) {
+			console.log('Failed to update user status');
+		}
 	}
 
 

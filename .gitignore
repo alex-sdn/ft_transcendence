@@ -1,1 +1,5 @@
 node_modules
+monorepo/Makefile
+monorepo/apps/api/package.json
+monorepo/package-lock.json
+monorepo/package.json

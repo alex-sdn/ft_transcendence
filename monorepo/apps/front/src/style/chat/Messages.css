@@ -1,0 +1,56 @@
+@import 'normalize.css/normalize.css';
+
+.messages-container {
+	display: flex;
+	flex-direction: column; /* Stack children vertically */
+	background: white;
+	width: 1000px;
+	height: 76vh;
+	left: 0px;
+	top: 58px;
+	position: absolute;
+}
+
+.messages-list {
+	flex-grow: 1; /* Allow it to take up available space */
+	overflow-y: auto;
+	background-color: white;
+	padding: 10px;
+	border: 1px solid white; /* Light grey border */
+	margin-bottom: 10px; /* Add space between list and form */
+}
+
+.regular-message {
+	padding: 5px;
+	margin-bottom: 10px;
+	color: black;
+}
+
+.command-message {
+	padding: 5px;
+	margin-bottom: 10px;
+	color: grey;
+}
+
+.message-form {
+	display: flex;
+	align-items: center;
+	padding: 10px;
+	gap: 10px; /* Space between input and button */
+}
+
+.message-input {
+	flex-grow: 1; /* Allow input to fill available space */
+}
+
+#send-button {
+	position: absolute;
+	display: flex;
+	left: 95%;
+	bottom: 3%;
+	transform: translate(-85%, 0);
+}
+
+.send-button:disabled {
+	background-color: #aaa; /* Disabled button color */
+}
