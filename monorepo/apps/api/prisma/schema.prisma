@@ -62,6 +62,8 @@ model User {
 	matchesP1	Match[] @relation("UserMatchesP1")
 	matchesP2	Match[] @relation("UserMatchesP2")
 
+	// achievements Achievements?
+
 	channels	Member[]
 	bans		Banned[]
 	invites		Invited[]
@@ -90,6 +92,25 @@ model Match {
 
 	type		GameType
 }
+
+// model Achievements {
+// 	id			Int @id @default(autoincrement())
+	
+// 	user		User @relation(fields: [userId], references: [id])
+// 	userId		Int @unique
+
+// 	playOne		Boolean @default(false)
+// 	win3to0		Boolean @default(false)
+// 	win5inRow	Boolean @default(false)
+// 	reach500LP	Boolean @default(false)
+
+// 	win5		Boolean @default(false)
+// 	win10		Boolean @default(false)
+// 	win20		Boolean @default(false)
+// 	win50		Boolean @default(false)
+
+// 	//add more ?
+// }
 
 model Channel {
 	id			Int @id @default(autoincrement())
