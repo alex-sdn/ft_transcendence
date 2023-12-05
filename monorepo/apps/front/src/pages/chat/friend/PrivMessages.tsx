@@ -2,51 +2,49 @@ import React, { useContext, useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import SocketContext from "../../../Socket";
+import { Message } from "../channels/Messages";
+import { useParams } from "react-router-dom";
 
-export interface PrivMessage {
+interface PrivMessage {
 	sender: string;
 	message: string;
 }
 
-export interface PrivMessageProps {
+interface PrivMessageProps {
 	sender: string;
 }
 
 const PrivMessages: React.FC<PrivMessageProps> = ({ sender }) => {
 	const jwtToken = Cookies.get('jwt-token');
-	const [privmessages, setMessages] = useState<PrivMessage[]>([]);
-	const [newMessage, setNewMessage] = useState("");
+	const [privmessages, setPrivmessages] = useState<PrivMessage[]>([]);
+	const [newMessage, setNewMessage] = useState<string>("");
 	const socket = useContext(SocketContext);
-	const [error, setError] = useState<string>("");
+	// const [error, setError] = useState<string>("");
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 
-	console.log(sender);
 	useEffect(() => {
+		setNewMessage("");
 		const handleMessageReceive = (privmessage: PrivMessage) => {
-			console.log("enter handle message receive");
-			console.log(privmessage);
-			setMessages(prevMessages => [...prevMessages, privmessage]);
+			setPrivmessages(prevMessages => [...prevMessages, privmessage]);
 		};
 
 		if (socket) {
 			socket.on("privmsg", handleMessageReceive);
-			console.log("listening privmsg");
-			socket.on("error", (error) => {
-				setError(error.message);
-			});
+			// socket.on("error", (error) => {
+			// 	setError(error.message);
+			// });
 		}
 
 		return () => {
 			if (socket) {
 				socket.off("privmsg", handleMessageReceive);
-				socket.off("error");
+				// socket.off("error");
 			}
 		};
-	}, [socket, jwtToken]);
+	}, [socket, jwtToken, sender]);
 
 	const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		console.log("enter handle send message");
 		if (newMessage.trim() && socket) {
 			socket.emit("privmsg", { target: sender, message: newMessage });
 			setNewMessage('');
@@ -55,7 +53,6 @@ const PrivMessages: React.FC<PrivMessageProps> = ({ sender }) => {
 
 	useEffect(() => {
 		const fetchMessages = async () => {
-			console.log("start fetching messages");
 			try {
 				const response = await axios.get(`/api/chat/${sender}/privmsg`, {
 					headers: {
@@ -63,12 +60,11 @@ const PrivMessages: React.FC<PrivMessageProps> = ({ sender }) => {
 					},
 				});
 				if (response.status === 200) {
-					console.log(response)
-					const previousmessages: PrivMessage[] = response.data.map(msg => ({
+					const previousmessages: PrivMessage[] = response.data.map((msg: any) => ({
 						sender: msg.sender.nickname,
 						message: msg.message,
 					}));
-					setMessages(previousmessages);
+					setPrivmessages(previousmessages);
 				}
 			} catch (error) {
 				console.error('Error fetching messages:', error);
@@ -76,7 +72,7 @@ const PrivMessages: React.FC<PrivMessageProps> = ({ sender }) => {
 		};
 
 		fetchMessages();
-	}, [privmessages, jwtToken]);
+	}, [sender, jwtToken]);
 
 	useEffect(() => {
 		if (messagesEndRef.current) {
@@ -104,7 +100,7 @@ const PrivMessages: React.FC<PrivMessageProps> = ({ sender }) => {
 				/>
 				<button
 					className="material-symbols-outlined"
-					id='send-button'
+					id='send-button-privmsg'
 					type='submit'
 				>
 					send

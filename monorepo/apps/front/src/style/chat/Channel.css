@@ -11,12 +11,6 @@
     white-space: nowrap;
 }
 
-@-moz-document {
-    .name-settings {
-        left: 14lh;
-    }
-}
-
 .name-settings button {
     width: 30px;
     display: flex;
@@ -30,31 +24,13 @@
     margin: 4px;
 }
 
-/* .chat-messages {
-    display: flex;
-    position: absolute;
-    background: white;
-    width: 40lh;
-    height: 76vh;
-    left: 14lh;
-    bottom: 3vh;
-} */
-
-.channel input {
+/* .channel input {
     position: absolute;
     display: flex;
     width: 85%;
     left: 50%;
     bottom: 3%;
     transform: translate(-50%, 0);
-}
-
-/* #send-button {
-    position: absolute;
-    display: flex;
-    left: 95%;
-    bottom: 3%;
-    transform: translate(-85%, 0);
 } */
 
 .channel #members {

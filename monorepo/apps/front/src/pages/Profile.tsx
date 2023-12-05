@@ -58,7 +58,7 @@ const Profile: React.FC = () => {
         },
         responseType: 'arraybuffer',
       });
-      console.log('RESP PROFILE  ==> '+ response.data);
+      console.log('RESP PROFILE  ==> ' + response.data);
       if (response.status === 200) {
         const blob = new Blob([response.data]);
         const file = new File([blob], fileName);
@@ -156,11 +156,11 @@ const Profile: React.FC = () => {
 
   return (
     <div className="_profile">
-      
+
       <div>{/* <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}> */}
-        <p><SearchNick/></p>
+        <p><SearchNick /></p>
         <p>
-        {image && <img className="_avatar-img" src={URL.createObjectURL(image)} alt='profile picture' />}
+          {image && <img className="_avatar-img" src={URL.createObjectURL(image)} alt='profile picture' />}
         </p>
         {<div>
           <button className="button-29" onClick={openModalpic}>⚙️</button>
