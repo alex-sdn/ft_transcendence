@@ -10,6 +10,7 @@ Table User {
   createdAt DateTime [default: `now()`, not null]
   has2fa Boolean [not null, default: false]
   secret2fa String
+  status Statuses [not null, default: 'offline']
   win Int [not null, default: 0]
   loss Int [not null, default: 0]
   LP Int [not null, default: 100]
