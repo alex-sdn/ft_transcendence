@@ -14,6 +14,8 @@ const RootLayout: React.FC = () => {
     window.location.assign('/login');
   }
 
+  
+
   return (
     <div className='root-layout'>
       <header>

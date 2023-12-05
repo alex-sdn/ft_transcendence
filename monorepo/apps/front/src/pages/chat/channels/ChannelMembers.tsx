@@ -49,6 +49,36 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
     return (
         <div>
             <div className="members-list">
+                <p className="members">
+                    <strong>
+                        Members
+                    </strong>
+                </p>
+                <p>
+                    <strong>
+                        You
+                    </strong>
+                </p>
+                <button className="button-59">
+                    <span className="members-list-name">
+                        {me.name}
+                    </span>
+                    {me.owner &&
+                        <span className="material-symbols-outlined">
+                            family_star
+                        </span>
+                    }
+                    {me.admin && !me.owner &&
+                        <span className="material-symbols-outlined">
+                            kid_star
+                        </span>
+                    }
+                </button>
+                <p>
+                    <strong>
+                        Other members
+                    </strong>
+                </p>
                 <ul>
                     {members.map((member, index) => (
                         <li key={index}>

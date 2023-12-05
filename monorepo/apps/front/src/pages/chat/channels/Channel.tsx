@@ -9,7 +9,7 @@ import Settings from './Settings';
 import { channel } from '../../../layouts/ChannelsLayout';
 import SocketContext from '../../../Socket';
 
-export interface User {
+export interface user {
     name: string;
     owner: boolean;
     admin: boolean;
@@ -97,27 +97,21 @@ const Channel: React.FC = () => {
             }
         });
 
-        socket?.on("mute", (data) => {
-            if (data.channel === channelName) {
-                window.location.reload();
-            }
-        });
-
         socket?.on("kick", (data) => {
             if (data.channel === channelName) {
-                window.location.reload();
+                setEventData(data.sender);
             }
         });
 
         socket?.on("ban", (data) => {
             if (data.channel === channelName) {
-                window.location.reload();
+                setEventData(data.sender);
             }
         });
 
         socket?.on("admin", (data) => {
             if (data.channel === channelName) {
-                window.location.reload();
+                setEventData(data.sender);
             }
         });
 
@@ -129,7 +123,6 @@ const Channel: React.FC = () => {
         return () => {
             socket?.off("join");
             socket?.off("leave");
-            socket?.off("mute");
             socket?.off("kick");
             socket?.off("ban");
             socket?.off("admin");
@@ -137,34 +130,33 @@ const Channel: React.FC = () => {
         };
     }, [channelName, socket]);
 
-
     return (
         <div>
             <div className='name-settings'>
-				<h2>{channelName}</h2>
-				<button className="material-symbols-outlined"
-					onClick={() => setSettingsModal(true)}
-				>
-					settings
-				</button>
-				{me && channelName && currentChannel &&
+                <h2>{channelName}</h2>
+                <button className="material-symbols-outlined"
+                    onClick={() => setSettingsModal(true)}
+                >
+                    settings
+                </button>
+                {me && channelName && currentChannel &&
                     <Settings me={me}
                         currentChannel={currentChannel}
                         settingsModal={settingsModal}
                         onClose={() => setSettingsModal(false)}
                     />}
                 {me && channelName &&
-                    <Messages sender={me} target={channelName} />
+                    <Messages sender={me.name} target={channelName} />
                 }
             </div>
             <div>
                 {members && me && currentChannel &&
-					<ChannelMembers me={me}
-						members={members}
-						currentChannel={currentChannel}
-					/>}
-			</div>
-		</div>
+                    <ChannelMembers me={me}
+                        members={members}
+                        currentChannel={currentChannel}
+                    />}
+            </div>
+        </div>
     );
 }
 
