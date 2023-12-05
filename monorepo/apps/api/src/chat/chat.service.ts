@@ -249,7 +249,7 @@ export class ChatService {
 				friend2Id: id2,
 				userId: sender.id,
 				message: message,
-				// isCommand: false
+				isCommand: false
 			}
 		});
 	}
@@ -640,7 +640,7 @@ export class ChatService {
 				friend2Id: id2,
 				userId: user.id,
 				message: `invited ${target.nickname} to ${channel.name}`,
-				// isCommand: true
+				isCommand: true
 			}
 		});
 	}
