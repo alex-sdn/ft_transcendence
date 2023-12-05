@@ -17,8 +17,6 @@ const Profile: React.FC = () => {
   const [lp, setLp] = useState<number>();
   const [twofa, setTwofa] = useState<boolean>();
   const [gameNb, setGameNb] = useState<number>();
-  const [matches, setMatches] = useState<number>();
-
 
   const jwtToken = Cookies.get('jwt-token');
 
@@ -161,13 +159,11 @@ const Profile: React.FC = () => {
   return (
     <div className="_profile">
       
-      <div>{/* <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}> */}
         <p><SearchNick/></p>
-        <p>
-        {image && <img className="_avatar-img" src={URL.createObjectURL(image)} alt='profile picture' />}
-        </p>
-        {<div>
-          <button className="button-29" onClick={openModalpic}>⚙️</button>
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+          {image && <img className="_avatar-img" src={URL.createObjectURL(image)} alt='profile picture' /> }
+        {<span>
+          <button style={{ position: 'absolute', bottom: 0, right: 0 }} className="button-29" onClick={openModalpic}>⚙️</button>
           <Modal
             isOpen={isOpenpic}
             onRequestClose={closeModalpic}
@@ -175,8 +171,9 @@ const Profile: React.FC = () => {
             style={customStyles}>
             <button onClick={closeModalpic}>x</button>
             <ProfilePicture />
-          </Modal>
-        </div>} </div>
+          </Modal></span>}
+        </div>
+
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <h1>{nickname}</h1> &emsp;

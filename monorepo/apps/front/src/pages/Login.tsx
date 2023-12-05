@@ -41,7 +41,7 @@ const Login: React.FC = () => {
             // set cookie
             Cookies.set("jwt-token", data.access_token, { expires: 1 });
             if (data.newUser) {
-                window.location.assign('/nickname');
+                window.location.assign('/profile');
                 return;
                 // return navigate2('/nickname')
             }
