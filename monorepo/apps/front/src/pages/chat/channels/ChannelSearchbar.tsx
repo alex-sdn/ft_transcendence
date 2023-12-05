@@ -172,19 +172,21 @@ const ChannelSearchbar: React.FC<channelSearchBarProps> = ({ myChannels }) => {
                         </div>
                     </ModalTitle>
                 </ModalHeader>
-                <ModalBody className="action-buttons">
-                    <button className="button-59"
-                        onClick={() => {
-                            setJoinModal(false);
-                            setError("");
-                        }}>
-                        No
-                    </button>
-                    <button className="button-59"
-                        onClick={joinChannel}>
-                        Yes
-                    </button>
-                    {error && <div className="text-danger">{error}</div>}
+                <ModalBody>
+                    <p className="action-buttons">
+                        <button className="button-59"
+                            onClick={() => {
+                                setJoinModal(false);
+                                setError("");
+                            }}>
+                            No
+                        </button>
+                        <button className="button-59"
+                            onClick={joinChannel}>
+                            Yes
+                        </button>
+                    </p>
+                    {error && <p className="text-danger">{error}</p>}
                 </ModalBody>
                 <ModalFooter>
                     <button className="button-59"
