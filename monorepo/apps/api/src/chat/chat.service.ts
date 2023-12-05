@@ -245,7 +245,8 @@ export class ChatService {
 				friend1Id: id1,
 				friend2Id: id2,
 				userId: sender.id,
-				message: message
+				message: message,
+				isCommand: false
 			}
 		});
 	}
@@ -263,9 +264,11 @@ export class ChatService {
 		if (checkTaken) {
 			throw new Error('channel name already taken');
 		}
-		// IF MISSING PASSWORD
-		if (message.access === 'protected' && !message.password) {
-			throw new Error('missing password for protected access');
+		// IF MISSING PASSWORD OR WRONG FORMAT
+		if (message.access === 'protected') {
+			if (!message.password)
+				throw new Error('missing password for protected access');
+			// this.validateName(message.password);  // RAJOUTER CA !!!!!!!!!!!!!
 		}
 		// IF WRONG ACCESS TYPE
 		if (!['public', 'private', 'protected'].includes(message.access)) {
@@ -399,9 +402,10 @@ export class ChatService {
 			});
 		}
 		else if (access === 'protected') {
-			//check password format ?
 			if (!password)
 				throw new Error('Missing password for protected access');
+			//check password format ?
+			// this.validateName(password);
 			const pwHash = await argon.hash(password);
 			await this.prisma.channel.update({
 				where: { id: channel.id },
@@ -601,7 +605,41 @@ export class ChatService {
 			}
 		});
 
-		// + ADD TO PRIVMSG HISTORY
+		// + Add to privmsg history
+		const friendship1 = await this.prisma.friendship.findUnique({
+			where: {
+				user1Id_user2Id: {
+					user1Id: user.id,
+					user2Id: target.id
+				}
+			}
+		});
+		const friendship2 = await this.prisma.friendship.findUnique({
+			where: {
+				user1Id_user2Id: {
+					user1Id: target.id,
+					user2Id: user.id
+				}
+			}
+		});
+		var id1: number;
+		var id2: number;
+		if (friendship1.id < friendship2.id) {
+			id1 = friendship1.id;
+			id2 = friendship2.id;
+		} else {
+			id1 = friendship2.id;
+			id2 = friendship1.id;
+		}
+		await this.prisma.privmsg.create({
+			data: {
+				friend1Id: id1,
+				friend2Id: id2,
+				userId: user.id,
+				message: `invited ${target.nickname} to ${channel.name}`,
+				isCommand: true
+			}
+		});
 	}
 
 	async addAdmin(user: User, target: User, channel) {
