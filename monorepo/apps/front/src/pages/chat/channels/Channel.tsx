@@ -27,7 +27,6 @@ const Channel: React.FC = () => {
     const [members, setMembers] = useState<user[]>([]);
     const [eventData, setEventData] = useState<string>("");
     const [currentChannel, setCurrentChannel] = useState<channel>();
-    const [message, setMessage] = useState<string>("");
     const [me, setMe] = useState<user>();
     const [settingsModal, setSettingsModal] = useState<boolean>(false);
     const { channelName } = useParams<{ channelName: string }>();
