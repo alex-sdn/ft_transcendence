@@ -22,7 +22,7 @@ const Login: React.FC = () => {
                 }
                 Cookies.set("jwt-token", data.access_token, { expires: 1 });
                 if (data.newUser) {
-                    window.location.assign('/nickname');
+                    window.location.assign('/first-log');
                     return;
                 }
                 window.location.assign('/');
@@ -41,7 +41,7 @@ const Login: React.FC = () => {
             // set cookie
             Cookies.set("jwt-token", data.access_token, { expires: 1 });
             if (data.newUser) {
-                window.location.assign('/nickname');
+                window.location.assign('/first-log');
                 return;
                 // return navigate2('/nickname')
             }

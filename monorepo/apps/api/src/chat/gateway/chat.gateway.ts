@@ -31,8 +31,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 		else {
 			console.log('Connection accepted for', user.nickname);
-			// status Online
-			this.chatService.statusOnline(user.id);
 			// add to maps
 			this.userToSocket.set(user.id, client);
 			this.idToUser.set(client.id, user);
@@ -43,8 +41,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log(client.id, "disconnected");
 		// rm from maps (if in)
 		if (this.idToUser.has(client.id)) {
-			// status Offline
-			this.chatService.statusOffline(this.idToUser.get(client.id).id);
 			this.userToSocket.delete(this.idToUser.get(client.id).id);
 			this.idToUser.delete(client.id);
 		}
