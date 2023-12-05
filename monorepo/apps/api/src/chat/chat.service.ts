@@ -248,7 +248,8 @@ export class ChatService {
 				friend1Id: id1,
 				friend2Id: id2,
 				userId: sender.id,
-				message: message
+				message: message,
+				// isCommand: false
 			}
 		});
 	}
@@ -607,7 +608,41 @@ export class ChatService {
 			}
 		});
 
-		// + ADD TO PRIVMSG HISTORY
+		// + Add to privmsg history
+		const friendship1 = await this.prisma.friendship.findUnique({
+			where: {
+				user1Id_user2Id: {
+					user1Id: user.id,
+					user2Id: target.id
+				}
+			}
+		});
+		const friendship2 = await this.prisma.friendship.findUnique({
+			where: {
+				user1Id_user2Id: {
+					user1Id: target.id,
+					user2Id: user.id
+				}
+			}
+		});
+		var id1: number;
+		var id2: number;
+		if (friendship1.id < friendship2.id) {
+			id1 = friendship1.id;
+			id2 = friendship2.id;
+		} else {
+			id1 = friendship2.id;
+			id2 = friendship1.id;
+		}
+		await this.prisma.privmsg.create({
+			data: {
+				friend1Id: id1,
+				friend2Id: id2,
+				userId: user.id,
+				message: `invited ${target.nickname} to ${channel.name}`,
+				// isCommand: true
+			}
+		});
 	}
 
 	async addAdmin(user: User, target: User, channel) {

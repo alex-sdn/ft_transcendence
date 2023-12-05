@@ -206,7 +206,6 @@ model Invited {
 	@@unique([chanId, userId])
 }
 
-// WIP
 model Chanmsg {
 	id			Int @id @default(autoincrement())
 	createdAt	DateTime @default(now())
@@ -235,4 +234,5 @@ model Privmsg {
 	userId		Int
 
 	message		String
+	// isCommand	Boolean
 }
