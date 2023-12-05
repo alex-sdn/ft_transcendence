@@ -44,7 +44,7 @@ export interface Nickname {
     right: string;
 }
 
-export enum ROLE {
+export enum ROLE {        
     Left,
     Right,
     Undefined,
@@ -66,6 +66,8 @@ const Game: React.FC = () => {
     const [nickname, setNickname] = useState<Nickname>({ left: "", right: ""});
 
     const [AskReady, setAskReady] = useState(false);
+
+    const [LogOut, setLogOut] = useState(false);
 
     const canvasRef = useRef<any>(null);
 
@@ -89,7 +91,7 @@ const Game: React.FC = () => {
         return () => {
             if (socket)
                 socket.off("Puck");
-        }
+            }
         }, [roomName]);
 
     useEffect(() => {
@@ -166,9 +168,26 @@ const Game: React.FC = () => {
         }
         return () => {
             if (socket)
-                socket.off("Ready");
+                socket.off("AreYouReady");
         };
     }, []);
+
+    useEffect(() => {
+        if (socket)
+        {
+            socket.on(
+                "LogOut",
+                () => {
+                    console.log("Oops, your competitor has just logged out...");
+                    setLogOut(true);
+                }
+            );
+        }
+        return () => {
+            if (socket)
+                socket.off("LogOut");
+        };
+    }, [roomName]);
 
     /******************************************************************************
     *                              KEYS HANDLING                                  *
@@ -228,6 +247,29 @@ const Game: React.FC = () => {
         console.log(role);
         socket?.emit('ready', { roomName: roomName });
         setAskReady(false);
+    };
+
+    /******************************************************************************
+    *                               INITIALIZATION                                *
+    ******************************************************************************/
+
+    const NewGame = () => {
+        
+        console.log('****NEW GAME****');
+
+        // clean all in back
+        socket?.emit('clean', { roomName: roomName });
+        
+        //init all
+        setPaddle({ leftPos: gameConst.PLAYGROUND_HEIGHT / 2, rightPos: gameConst.PLAYGROUND_HEIGHT / 2});
+        setScore({ left: 0, right: 0});
+        setPuckPos({ x: gameConst.PLAYGROUND_WIDTH / 2, y: gameConst.PLAYGROUND_HEIGHT / 2 });
+        setPuckDir({ x: 0, y: 0 });
+        setRoomName(null);
+        setRole(ROLE.Undefined);
+        setNickname({ left: "", right: ""});
+        setAskReady(false);
+        setLogOut(false);
     };
 
     /******************************************************************************
@@ -295,10 +337,9 @@ const Game: React.FC = () => {
             ctxt.textBaseline = "bottom";
             ctxt.fillText(nickname.left, canvas.width * 0.25, 20);
             ctxt.fillText(nickname.right, canvas.width * 0.75, 20);
-
           }
         }
-      }, [paddle, puckPos, puckDir, score, AskReady]);
+      }, [paddle, puckPos, puckDir, score, AskReady, LogOut]);
 
     return (
         <div>
@@ -317,6 +358,12 @@ const Game: React.FC = () => {
                 <button onClick={playUpgradedGame}>Upgraded</button>
                 {AskReady && 
                     (<button onClick={IAmReady}>Ready</button>)
+                }
+                {LogOut && 
+                    (<div>Oops, your competitor has just logged out... So you've just won!</div>)
+                }
+                {LogOut && 
+                    (<button onClick={NewGame}>New Game</button>)
                 }
             </div>
 

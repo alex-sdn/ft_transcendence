@@ -79,20 +79,28 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// add to maps
 			this.userToSocket.set(user.id, client);
 			this.idToUser.set(client.id, user);
-
 		}
 	}
 
-	handleDisconnect(client: any) {
-		console.log(client.id, "disconnected");
+	async handleDisconnect(client: any) {
 
-        //check if client was in a room if so set Game.End
+        console.log(client.id, "disconnected");
+
+        //check if client was in a room if so set Game.End and send info to front of other player
         if (this.roomsParticipants.has(client.id))
         {
-            console.log("****HAS****");
+            const roomName = this.roomsParticipants.get(client.id).getName();
+            this.server.to(roomName).emit("LogOut");
             this.roomsParticipants.get(client.id).setGameEnd();
+
         }
+
         //check if client was in a waiting room if so remove from it
+        if (this.defaultWaitingList.has(client.id))
+            this.defaultWaitingList.delete(client.id);
+
+        if (this.upgradedWaitingList.has(client.id))
+            this.upgradedWaitingList.delete(client.id);
 
 		// rm from maps (if in)
 		if (this.idToUser.has(client.id)) {
@@ -210,10 +218,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 secondClient.emit('Room', { name: roomName, role: ROLE.Right, leftNickname: room.getLeftNickname(), rightNickname: room.getRightNickname() });
 
                 this.roomsList.set(roomName, room);
-
-                // console.log("PARTICIPANTS");
-                // console.log(firstId.value);
-                // console.log(secondId.value);
                 
                 this.roomsParticipants.set(firstId.value, room);
                 this.roomsParticipants.set(secondId.value, room);
@@ -255,7 +259,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	async sleep(ms: number) {
         return new Promise((resolve) => setTimeout(resolve, ms));
-    }	
+    }
 
     @SubscribeMessage('ready')
     async onReady(@ConnectedSocket() client: Socket, @MessageBody('roomName') roomName: string) {
@@ -269,7 +273,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         {
             this.gameService.statusIngame(room.getLeftUser().id);
             this.gameService.statusIngame(room.getRightUser().id);
+
+        if (this.defaultWaitingList.has(client.id))
+            this.defaultWaitingList.delete(client.id);
+
+        if (this.upgradedWaitingList.has(client.id))
+            this.upgradedWaitingList.delete(client.id);
+
             //set count down
+            
             isPlaying = true; // change for setGameStart() for code consistency
 
             const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
@@ -304,6 +316,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
             //if end of game due to deconnection (find method to identify deconnected socket) --> set the one who deconnected as loser
 
+            if (this.userToSocket.has(room.getLeftUser().id))
+                room.setLeftAsWinner();
+            
+            if (this.userToSocket.has(room.getRightUser().id))
+                room.setRightAsWinner();
+            
             // send results of match & status to db for profiles
             this.gameService.createMatch(room.getLeftUser().id, room.getRightUser().id, room.getLeftScore(), room.getRightScore(), "ranked");
             this.gameService.statusOnline(room.getLeftUser().id);
@@ -312,11 +330,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     // clean end of game
-    @SubscribeMessage('leave')
+    @SubscribeMessage('clean')
     async onLeave(@ConnectedSocket() client: Socket, @MessageBody('roomName') roomName: string) {
+        
         client.leave(roomName);
-        // delete room from map
-        // socket.emit (init all)
-    }
+        
+        if (this.roomsList.has(roomName))
+            this.roomsList.delete(roomName);
 
+        if (this.roomsParticipants.has(client.id))
+            this.roomsParticipants.delete(client.id);
+    }
 }  
