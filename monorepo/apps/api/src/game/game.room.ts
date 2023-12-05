@@ -98,7 +98,7 @@ export class Room {
     }
 
     getGameEnd(): boolean {
-        if (this.leftScore >= 3 || this.rightScore >= 3)
+        if (this.leftScore >= 7 || this.rightScore >= 7)
             this.gameEnd = true;
         return this.gameEnd;
     }
@@ -124,4 +124,9 @@ export class Room {
     setGameEnd(): void {
         this.gameEnd = true;
     }
+
+    setGameStart(): void {
+        this.gameEnd = false;
+    }
+
 }

@@ -86,7 +86,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	handleDisconnect(client: any) {
 		console.log(client.id, "disconnected");
 
-        //check if client was in a room if so send Game.End
+        //check if client was in a room if so set Game.End
         if (this.roomsParticipants.has(client.id))
         {
             console.log("****HAS****");
@@ -110,7 +110,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     /******************************************************************************
-    *                                   EVENTS                                    *
+    *                                GAME OPTIONS                                 *
     ******************************************************************************/
 
 	@SubscribeMessage('default')
@@ -136,7 +136,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage('robot')
     async onRobot(@ConnectedSocket() client: Socket) {
         await this.matchmaking(OPTION.Robot);
+
+        //add robot user in db
     }
+
+    /******************************************************************************
+    *                                KEYS HANDLING                                *
+    ******************************************************************************/
 
 	@SubscribeMessage('keys')
     async onKeys(@ConnectedSocket() client: Socket, @MessageBody('action') action: string,
@@ -151,7 +157,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             } else if (action === 'downPressed') {
                 room.getLeftPaddle().move(10);;
             } else if (action === 'released') {
-                room.getLeftPaddle().move(-10);
+                room.getLeftPaddle().move(0);
             }
             room.getLeftPaddle().update();
         }
@@ -162,7 +168,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             } else if (action === 'downPressed') {
                 room.getRightPaddle().move(10);;
             } else if (action === 'released') {
-                room.getRightPaddle().move(-10);
+                room.getRightPaddle().move(0);
             }
             room.getRightPaddle().update();
         }
@@ -187,24 +193,27 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 const secondId = iteratorId.next();
                 const secondPlayer = iteratorPlayer.next();
 
+                // generate unique room name
                 const roomName = `default-${firstId.value}-${secondId.value}`;
 
                 const firstClient = this.userToSocket.get(firstPlayer.value.id);
                 const secondClient = this.userToSocket.get(secondPlayer.value.id);
 
+                // create room
                 const room = new Room(roomName, firstPlayer.value, secondPlayer.value);
 
                 await firstClient.join(roomName);
                 await secondClient.join(roomName);
 
+                // send room initial info to front
                 firstClient.emit('Room', { name: roomName, role: ROLE.Left, leftNickname: room.getLeftNickname(), rightNickname: room.getRightNickname() });
                 secondClient.emit('Room', { name: roomName, role: ROLE.Right, leftNickname: room.getLeftNickname(), rightNickname: room.getRightNickname() });
 
                 this.roomsList.set(roomName, room);
 
-                console.log("PARTICIPANTS");
-                console.log(firstId.value);
-                console.log(secondId.value);
+                // console.log("PARTICIPANTS");
+                // console.log(firstId.value);
+                // console.log(secondId.value);
                 
                 this.roomsParticipants.set(firstId.value, room);
                 this.roomsParticipants.set(secondId.value, room);
@@ -216,6 +225,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
            }
         }
+
+    /******************************************************************************
+    *                                   ROBOT                                     *
+    ******************************************************************************/
 
         // //ROBOT ROOM CREATION
         // else if (option == OPTION.Robot)
@@ -257,7 +270,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.gameService.statusIngame(room.getLeftUser().id);
             this.gameService.statusIngame(room.getRightUser().id);
             //set count down
-            isPlaying = true;
+            isPlaying = true; // change for setGameStart() for code consistency
 
             const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
             const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
@@ -286,24 +299,23 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                     //}
                 //}, 1000 / 60);
                 this.server.to(roomName).emit('Paddle', { leftPos: room.getLeftPaddle().getY(), rightPos: room.getRightPaddle().getY() });
-                await this.sleep(10);
+                await this.sleep(1000/60);
             }
 
-            //if end of game due to deconnection --> set the one who deconnected as loser
+            //if end of game due to deconnection (find method to identify deconnected socket) --> set the one who deconnected as loser
 
-
-
+            // send results of match & status to db for profiles
             this.gameService.createMatch(room.getLeftUser().id, room.getRightUser().id, room.getLeftScore(), room.getRightScore(), "ranked");
             this.gameService.statusOnline(room.getLeftUser().id);
             this.gameService.statusOnline(room.getRightUser().id);
         }
     }
 
-    // clean leave
+    // clean end of game
     @SubscribeMessage('leave')
     async onLeave(@ConnectedSocket() client: Socket, @MessageBody('roomName') roomName: string) {
         client.leave(roomName);
-        //delete room from map
+        // delete room from map
         // socket.emit (init all)
     }
 

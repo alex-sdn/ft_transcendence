@@ -54,7 +54,7 @@ aim: visualize statistics of sockets connection
 - go to https://admin.socket.io/#/ and fill Server URL with "http://localhost:3000"
 - then Advanced options > WebSocket only
 
-### INSOMNIA
+### INSOMNIA / POSTMAN
 
 aim: send test requests
 
@@ -71,3 +71,6 @@ aim: code formatters
 ### CADDY
 
 aim: caddy server can be used as a scalable reverse proxy
+
+## RESOURCES
+
