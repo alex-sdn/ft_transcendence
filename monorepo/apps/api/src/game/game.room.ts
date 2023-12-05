@@ -55,6 +55,7 @@ export class Room {
         this.ready = 0;
 
         this.gameEnd = false;
+
     }
 
     async isReady(): Promise<void> {
@@ -72,6 +73,10 @@ export class Room {
     }
 
     //getters
+
+    getName(): string {
+        return this.name;
+    }
 
     getReady(): number {
         return this.ready;
@@ -128,5 +133,14 @@ export class Room {
     setGameStart(): void {
         this.gameEnd = false;
     }
+
+    setLeftAsWinner(): void {
+        this.leftScore = 7;
+    }
+
+    setRightAsWinner(): void {
+        this.rightScore = 7;
+    }
+
 
 }

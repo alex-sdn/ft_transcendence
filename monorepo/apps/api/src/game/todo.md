@@ -14,11 +14,10 @@ NOT URGENT:
 - [ ] : robot
 - [ ] : set countdown
 - [ ] : maths optimization (render animation + canva by entities + better keys handling)
-- [ ] : learn about web socket adapter
 - [X] : admin-ui socket
 - [X] : CORS (check if problem with sockets)
 - [X] : check file change weird detection ("File change detected. Starting incremental compilation...") --> cors ? npm prebuild ? --> getaround --> npm run start
-- [ ] : redis / redux
+- [ ] : redis / redux --> learn about web socket adapter
 - [ ] : improve front with bootstrap, modals, props, etc
 - [ ] : upgrade design of game (p5js)
 - [ ] : compare features with original pong
