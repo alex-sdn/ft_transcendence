@@ -131,10 +131,10 @@ export class AuthService {
 				avatar
 			},
 		});
-		// // Create achievements table
-		// await this.prisma.achievements.create({
-		// 	data: {id: user.id}
-		// });
+		// Create achievements table
+		await this.prisma.achievements.create({
+			data: {userId: user.id}
+		});
 		return user;
 	}
 

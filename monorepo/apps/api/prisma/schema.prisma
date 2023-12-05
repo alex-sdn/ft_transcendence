@@ -62,7 +62,7 @@ model User {
 	matchesP1	Match[] @relation("UserMatchesP1")
 	matchesP2	Match[] @relation("UserMatchesP2")
 
-	// achievements Achievements?
+	achievements Achievements?
 
 	channels	Member[]
 	bans		Banned[]
@@ -78,11 +78,9 @@ model Match {
 
 	user1     	User @relation("UserMatchesP1", fields: [user1Id], references: [id])
 	user1Id   	Int
-	user1nick	String  //necessaire?
 
 	user2     	User @relation("UserMatchesP2", fields: [user2Id], references: [id])
 	user2Id   	Int
-	user2nick	String
 
 	p1LP		Int  //at start of game ? save gain/loss ?
 	p2LP		Int
@@ -93,24 +91,24 @@ model Match {
 	type		GameType
 }
 
-// model Achievements {
-// 	id			Int @id @default(autoincrement())
+model Achievements {
+	id			Int @id @default(autoincrement())
 	
-// 	user		User @relation(fields: [userId], references: [id])
-// 	userId		Int @unique
+	user		User @relation(fields: [userId], references: [id])
+	userId		Int @unique
 
-// 	playOne		Boolean @default(false)
-// 	win3to0		Boolean @default(false)
-// 	win5inRow	Boolean @default(false)
-// 	reach500LP	Boolean @default(false)
+	playOne		Boolean @default(false)
+	win3to0		Boolean @default(false)
+	win3inRow	Boolean @default(false)
+	reach500LP	Boolean @default(false)
 
-// 	win5		Boolean @default(false)
-// 	win10		Boolean @default(false)
-// 	win20		Boolean @default(false)
-// 	win50		Boolean @default(false)
+	win5		Boolean @default(false)
+	win10		Boolean @default(false)
+	win20		Boolean @default(false)
+	win50		Boolean @default(false)
 
-// 	//add more ?
-// }
+	//add more ?
+}
 
 model Channel {
 	id			Int @id @default(autoincrement())
@@ -234,5 +232,5 @@ model Privmsg {
 	userId		Int
 
 	message		String
-	// isCommand	Boolean
+	isCommand	Boolean
 }
