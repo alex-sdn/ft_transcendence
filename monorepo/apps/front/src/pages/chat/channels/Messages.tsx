@@ -65,6 +65,7 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 					message: ` has joined the channel`,
 					isCommand: true
 				};
+				console.log("join");
 				setMessages(prevMessages => [...prevMessages, joinMessage]);
 			}
 		})
@@ -76,28 +77,33 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 					message: ` has left the channel`,
 					isCommand: true
 				};
+				console.log("leave");
 				setMessages(prevMessages => [...prevMessages, leaveMessage]);
 			}
 		})
 		socket?.on("mute", data => {
-			if (data.target === target) {
-				const muteMessage = {
-					sender: data.sender,
-					target: data.target,
-					message: ` muted ${data.target}`,
-					isCommand: true
-				};
-				setMessages(prevMessages => [...prevMessages, muteMessage]);
-			}
-		})
+            console.log("mute1");
+            console.log(data);
+            if (data.channel === target) {
+                const muteMessage = {
+                    sender: data.sender, 
+                    target: data.target ,
+                    message: `muted ${data.target}`,
+                    isCommand: true
+                };
+                console.log("mute2");
+                setMessages(prevMessages => [...prevMessages, muteMessage]);
+            }
+        })
 		socket?.on("kick", data => {
-			if (data.target === target) {
+			if (data.channel === target) {
 				const kickMessage = {
 					sender: data.sender,
 					target: data.target,
 					message: ` kicked ${data.target} from the channel`,
 					isCommand: true
 				};
+				console.log("kick");
 				setMessages(prevMessages => [...prevMessages, kickMessage]);
 			}
 		})
@@ -109,6 +115,7 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 					message: ` banned ${data.target} from the channel`,
 					isCommand: true
 				};
+				console.log("ban");
 				setMessages(prevMessages => [...prevMessages, banMessage]);
 			}
 		})
