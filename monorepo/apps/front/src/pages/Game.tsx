@@ -50,10 +50,7 @@ export enum ROLE {
     Undefined,
 }
 
-// export interface Room {
-//     name: string;
-//     role: ROLE;
-// }
+// add game options
 
 /******************************************************************************
 *                                   GAME                                      *
@@ -85,7 +82,7 @@ const Game: React.FC = () => {
                 }: Puck) => {
                     setPuckPos(puckPos);
                     setPuckDir(puckDir);
-                    //render animation from here for optimization
+                    // render animation from here for optimization
                 }
             );
         }
