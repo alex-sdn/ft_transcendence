@@ -39,6 +39,7 @@ export class UserService {
 
 		delete user.has2fa;
 		delete user.secret2fa;
+		delete user.status;
 		return user;
 	}
 
@@ -51,6 +52,7 @@ export class UserService {
 
 		delete user.has2fa;
 		delete user.secret2fa;
+		delete user.status;
 		return user;
 	}
 
@@ -61,6 +63,7 @@ export class UserService {
 			delete users[i].createdAt;
 			delete users[i].has2fa;
 			delete users[i].secret2fa;
+			delete users[i].status;
 			delete users[i].LP;
 			delete users[i].win;
 			delete users[i].loss;
@@ -216,6 +219,7 @@ export class UserService {
 		for (var i in requested) {
 			delete requested[i].requester.has2fa;
 			delete requested[i].requester.secret2fa;
+			delete requested[i].requester.status;
 		}
 		return requested;
 	}
@@ -462,8 +466,10 @@ export class UserService {
 		for (var i in matches) {
 			delete matches[i].user1.has2fa;
 			delete matches[i].user1.secret2fa;
+			delete matches[i].user1.status;
 			delete matches[i].user2.has2fa;
 			delete matches[i].user2.secret2fa;
+			delete matches[i].user2.status;
 		};
 
 		return matches;
