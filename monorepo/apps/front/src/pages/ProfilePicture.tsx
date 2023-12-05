@@ -8,6 +8,7 @@ const ProfilePicture: React.FC = () => {
     const jwtToken = Cookies.get('jwt-token');
     const [image, setImage] = useState<File>();
     const [error, setError] = useState<string>("");
+    const [newImage, setNewImage] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchAvatar = async () => {
@@ -36,6 +37,7 @@ const ProfilePicture: React.FC = () => {
     const selectImageHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files?.[0]) {
             setImage(event.target.files?.[0]);
+            setNewImage(true);
         }
     };
 
@@ -50,7 +52,7 @@ const ProfilePicture: React.FC = () => {
         event.preventDefault();
         if (image && image.size > 100000)
             setError("File too large");
-        else if (image) {
+        else if (image && newImage) {
             const formData = new FormData();
             formData.append("avatar", image);
             try {
@@ -66,6 +68,8 @@ const ProfilePicture: React.FC = () => {
                 setError((error as any).response.data.message)
             }
         }
+        else
+            window.location.assign('/profile');
     };
 
     return (

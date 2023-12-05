@@ -2,7 +2,8 @@
 
 .privmessages-container {
 	display: flex;
-	flex-direction: column; /* Stack children vertically */
+	flex-direction: column;
+	/* Stack children vertically */
 	background: white;
 	width: 1500px;
 	height: 76vh;
@@ -12,12 +13,15 @@
 }
 
 .privmessages-list {
-	flex-grow: 1; /* Allow it to take up available space */
+	flex-grow: 1;
+	/* Allow it to take up available space */
 	overflow-y: auto;
 	background-color: white;
 	padding: 10px;
-	border: 1px solid white; /* Light grey border */
-	margin-bottom: 10px; /* Add space between list and form */
+	border: 1px solid white;
+	/* Light grey border */
+	margin-bottom: 10px;
+	/* Add space between list and form */
 }
 
 .privregular-message {
@@ -30,21 +34,28 @@
 	display: flex;
 	align-items: center;
 	padding: 10px;
-	gap: 10px; /* Space between input and button */
+	gap: 10px;
+	/* Space between input and button */
 }
 
 .privmessage-input {
-	flex-grow: 1; /* Allow input to fill available space */
+	flex-grow: 0.96;
+	/* Allow input to fill available space */
+	height: 30px;
 }
 
-#send-button {
+#send-button-privmsg {
 	position: absolute;
 	display: flex;
-	left: 95%;
-	bottom: 3%;
-	transform: translate(-85%, 0);
+	left: 1435px;
+	bottom: 6px;
+	color: black;
+	background: white;
+	border: solid 1px black;
+	width: 30px;
 }
 
 .send-button:disabled {
-	background-color: #aaa; /* Disabled button color */
+	background-color: #aaa;
+	/* Disabled button color */
 }
