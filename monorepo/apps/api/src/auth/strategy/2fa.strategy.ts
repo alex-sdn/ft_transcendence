@@ -14,17 +14,11 @@ export class TwoFactorStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
 	}
 
 	async validate(payload: {userId: number, nickname: string, need2fa: boolean}) {
-		// only if signin not finished (tmp)
-		if (payload.need2fa === false)
-			return null;
 
 		const user = await this.prisma.user.findUnique({
-			where: {
-				id: payload.userId,
-			},
+			where: { id: payload.userId }
 		});
 
-		// delete unnecessary info
 		return user;
 	}
 }
