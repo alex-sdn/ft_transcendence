@@ -1,0 +1,39 @@
+._date {
+    font-size: 0.7em;
+}
+
+._nickname {
+  font-size: 1.2em;
+  color: rgb(0, 0, 0);
+  text-shadow: 0 0 10px #1a1a1a, 0 0 20px #0505056e;
+}
+
+._victory {
+  /* font-size: 1.5em; */
+  /* margin: 2px; */
+  padding: 4px;
+  color: rgb(0, 168, 0);
+  text-shadow: 0 0 10px #1eff00, 0 0 20px rgba(51, 255, 0, 0.431);
+  /* text-align: left; */
+  border-radius: 5px;
+  border-style: double;
+  /* box-shadow: rgba(0, 0, 0, 0.3) 0px 30px 38px, rgba(0, 0, 0, 0.22) 0px 20px 12px; */
+  background: linear-gradient(172deg, rgb(36, 36, 36), rgb(10, 10, 10, 1));
+  /* border: 1px solid rgba(0, 0, 0, 0.5); */
+
+}
+
+._defeat {
+  /* font-size: 1.5em; */
+  /* margin: 2px; */
+  padding: 4px;
+  color: rgb(197, 2, 2);
+  text-shadow: 0 0 10px #f80101, 0 0 20px rgba(252, 2, 2, 0.431);
+  /* text-align: left; */
+  border-radius: 5px;
+  border-style: double;
+  /* box-shadow: rgba(0, 0, 0, 0.3) 0px 30px 38px, rgba(0, 0, 0, 0.22) 0px 20px 12px; */
+  background: linear-gradient(172deg, rgb(36, 36, 36), rgb(10, 10, 10, 1));
+  /* border: 1px solid rgba(0, 0, 0, 0.5); */
+}
+

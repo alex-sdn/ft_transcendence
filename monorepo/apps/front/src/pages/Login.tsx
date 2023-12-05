@@ -40,10 +40,16 @@ const Login: React.FC = () => {
             const data = response.data;
             // set cookie
             Cookies.set("jwt-token", data.access_token, { expires: 1 });
-            if (data.newUser)
-                return navigate2('/nickname')
-            else
-                return navigate2('/'); // Use navigate here
+            if (data.newUser) {
+                window.location.assign('/nickname');
+                return;
+                // return navigate2('/nickname')
+            }
+            else {
+                window.location.assign('/');
+                return;
+                // return navigate2('/'); // Use navigate here
+            }
         } catch (error) {
             console.error('ERRORFAKE:', error);
         }

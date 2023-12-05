@@ -89,35 +89,46 @@ export class UserController {
 		return this.userService.myFriends(req.user);
 	}
 
-	@Get('friend/:nickname')
-	checkFriend(@Param('nickname') nickname: string, @Req() req: Request) {
-		return this.userService.checkFriend(nickname, req.user);
+	@Get('me/friend/requests')
+	myFriendRequests(@Req() req: Request) {
+		return this.userService.myFriendRequests(req.user);
 	}
 
-	@Post('friend/:nickname')
-	addFriend(@Param('nickname') nickname: string, @Req() req: Request) {
-		return this.userService.addFriend(nickname, req.user);
+	// @Get('friend/:nickname')
+	@Get('friend/:id')
+	checkFriend(@Param('id', ParseIntPipe) userId: number, @Req() req: Request) {
+		return this.userService.checkFriend(userId, req.user);
 	}
 
-	@Delete('friend/:nickname')
-	deleteFriend(@Param('nickname') nickname: string, @Req() req: Request) {
-		return this.userService.deleteFriend(nickname, req.user);
+	// @Post('friend/:nickname')
+	@Post('friend/:id')
+	addFriend(@Param('id', ParseIntPipe) userId: number, @Req() req: Request) {
+		return this.userService.addFriend(userId, req.user);
+	}
+
+	// @Delete('friend/:nickname')
+	@Delete('friend/:id')
+	deleteFriend(@Param('id', ParseIntPipe) userId: number, @Req() req: Request) {
+		return this.userService.deleteFriend(userId, req.user);
 	}
 
 	/**  BLOCK  **/
-	@Get('block/:nickname')
-	checkBlock(@Param('nickname') nickname: string, @Req() req: Request) {
-		return this.userService.checkBlock(nickname, req.user);
+	// @Get('block/:nickname')
+	@Get('block/:id')
+	checkBlock(@Param('id', ParseIntPipe) userId: number, @Req() req: Request) {
+		return this.userService.checkBlock(userId, req.user);
 	}
 
-	@Post('block/:nickname')
-	addBlock(@Param('nickname') nickname: string, @Req() req: Request) {
-		return this.userService.addBlock(nickname, req.user);
+	// @Post('block/:nickname')
+	@Post('block/:id')
+	addBlock(@Param('id', ParseIntPipe) userId: number, @Req() req: Request) {
+		return this.userService.addBlock(userId, req.user);
 	}
 
-	@Delete('block/:nickname')
-	deleteBlock(@Param('nickname') nickname: string, @Req() req: Request) {
-		return this.userService.deleteBlock(nickname, req.user);
+	// @Delete('block/:nickname')
+	@Delete('block/:id')
+	deleteBlock(@Param('id', ParseIntPipe) userId: number, @Req() req: Request) {
+		return this.userService.deleteBlock(userId, req.user);
 	}
 
 	/**  MATCHES  **/
@@ -126,8 +137,9 @@ export class UserController {
 		return this.userService.myMatches(req.user);
 	}
 
-	@Get('matches/:nickname')
-	getMatches(@Param('nickname') nickname: string, @Req() req: Request) {
-		return this.userService.getMatches(nickname);
+	// @Get('matches/:nickname')  // :id ?? CHECK LATER
+	@Get('matches/:id')
+	getMatches(@Param('id', ParseIntPipe) userId: number, @Req() req: Request) {
+		return this.userService.getMatches(userId);
 	}
 }

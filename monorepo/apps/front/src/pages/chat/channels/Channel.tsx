@@ -70,7 +70,7 @@ const Channel: React.FC = () => {
             }
         }
         getChannelInfos();
-    }, [channelName, me, jwtToken]); // fonction appelee chaque fois que les elements entre [] changent
+    }, [channelName, jwtToken]);
 
     return (
         <div>
