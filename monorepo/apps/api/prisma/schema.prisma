@@ -44,7 +44,7 @@ model User {
 	has2fa		Boolean @default(false)
 	secret2fa	String?
 
-	status		Statuses @default(offline)
+	// status		Statuses  ???
 
 	win			Int @default(0)
 	loss		Int @default(0)
