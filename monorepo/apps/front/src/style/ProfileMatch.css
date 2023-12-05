@@ -37,3 +37,26 @@
   /* border: 1px solid rgba(0, 0, 0, 0.5); */
 }
 
+.searchResultsUser {
+  position: absolute;
+  top: 255px;
+  background: white;
+  width: 236px;
+  background-color: white;
+  max-height: 250px;
+  /* overflow-y: auto; */
+  left: 48.4%;
+  transform: translate(-48.4%);
+  z-index: 1;
+  padding: 0;
+}
+
+/* .searchBarUser ul {
+  padding: 0;
+} */
+
+.searchResultsUser li {
+  list-style-type: none;
+  color: black;
+  width: 268px;
+}

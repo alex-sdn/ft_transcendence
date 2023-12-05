@@ -59,7 +59,7 @@ useEffect(() => {
                         // ecrire si victory ou defeat
                         <div>
                         {/* <div>ID = {id}&nbsp;&nbsp;MATCH USER1 ID = {match.user1.id}</div> */}
-                        {match.p1score < match.p2score ? <span className='_defeat'> {match.p1score} / {match.p2score} : &nbsp;DEFEAT</span> : <span className='_victory'>  {match.p1score} / {match.p2score} : &nbsp; VICTORY</span>}
+                        {match.p1score < match.p2score ? <span className='_defeat'> {match.p1score} / {match.p2score} : &nbsp; {match.type}&nbsp; DEFEAT</span> : <span className='_victory'>  {match.p1score} / {match.p2score} : &nbsp; {match.type}&nbsp; VICTORY</span>}
                         {/* ecrire against qui ? */}
                         &nbsp;against&nbsp;<span className='_nickname'> {match.user2.nickname}</span>
                         {/* ecrire la date */}
