@@ -34,52 +34,65 @@ const Channel: React.FC = () => {
 
     useEffect(() => {
         const getChannelInfos = async () => {
-            const membersResponse = await axios.get(`/api/chat/${channelName}/members`, {
-                headers: {
-                    'Authorization': 'Bearer ' + jwtToken,
-                },
-            },);
-            const meResponse = await axios.get('/api/user/me', {
-                headers: {
-                    'Authorization': 'Bearer ' + jwtToken,
-                },
-            },);
-            if (membersResponse.status === 200 && meResponse.status === 200) {
-                const currentUserName = meResponse.data.nickname;
+            try {
+                const membersResponse = await axios.get(`/api/chat/${channelName}/members`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + jwtToken,
+                    },
+                },);
+                const meResponse = await axios.get('/api/user/me', {
+                    headers: {
+                        'Authorization': 'Bearer ' + jwtToken,
+                    },
+                },);
+                if (membersResponse.status === 200 && meResponse.status === 200) {
+                    const currentUserName = meResponse.data.nickname;
+                    console.log(membersResponse.status)
 
-                if (Array.isArray(membersResponse.data)) {
-                    const members: user[] = membersResponse.data.map((member: any) => ({
-                        name: member.user.nickname,
-                        owner: member.owner,
-                        admin: member.admin,
-                        avatar: member.user.avatar,
-                        id: member.user.id,
-                    }))
-                    const currentUser = members.find((member) => member.name === currentUserName);
-                    setMe(currentUser);
+                    if (Array.isArray(membersResponse.data)) {
+                        const members: user[] = membersResponse.data.map((member: any) => ({
+                            name: member.user.nickname,
+                            owner: member.owner,
+                            admin: member.admin,
+                            avatar: member.user.avatar,
+                            id: member.user.id,
+                        }))
+                        const currentUser = members.find((member) => member.name === currentUserName);
+                        setMe(currentUser);
 
-                    const otherUsers = members.filter((member) => member.name !== currentUserName);
-                    setMembers(otherUsers);
-                    setEventData("");
+                        const otherUsers = members.filter((member) => member.name !== currentUserName);
+                        setMembers(otherUsers);
+                        setEventData("");
+                    }
                 }
             }
+            catch (error) {
+                console.log("catch error: " + error)
+                window.location.assign('/chat/channels');
+            }
 
-            const channelsResponse = await axios.get('/api/chat/channels/me', {
-                headers: {
-                    'Authorization': 'Bearer ' + jwtToken,
-                },
-            },);
-            if (channelsResponse.status === 200) {
-                if (Array.isArray(channelsResponse.data)) {
-                    const channels: channel[] = channelsResponse.data.map((channel: any) => ({
-                        name: channel.channel.name,
-                        access: channel.channel.access,
-                    }))
-                    const res = channels.find((channel) => channel.name === channelName);
-                    setCurrentChannel(res);
+            try {
+                const channelsResponse = await axios.get('/api/chat/channels/me', {
+                    headers: {
+                        'Authorization': 'Bearer ' + jwtToken,
+                    },
+                },);
+                if (channelsResponse.status === 200) {
+                    if (Array.isArray(channelsResponse.data)) {
+                        const channels: channel[] = channelsResponse.data.map((channel: any) => ({
+                            name: channel.channel.name,
+                            access: channel.channel.access,
+                        }))
+                        const res = channels.find((channel) => channel.name === channelName);
+                        setCurrentChannel(res);
+                    }
                 }
+            }
+            catch (error) {
+                console.log(error);
             }
         }
+
         getChannelInfos();
     }, [channelName, jwtToken, eventData]);
 
@@ -97,6 +110,7 @@ const Channel: React.FC = () => {
         });
 
         socket?.on("kick", (data) => {
+            console.log("page channel kick")
             if (data.channel === channelName) {
                 setEventData(data.sender);
             }
