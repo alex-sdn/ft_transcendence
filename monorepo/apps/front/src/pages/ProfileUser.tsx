@@ -17,8 +17,11 @@ const ProfileUser: React.FC = () => {
   const [gameNb, setGameNb] = useState<number>();
   const [id, setId] = useState<number>();
   const [matches, setMatches] = useState<any[]>([]);
+  const [isFriend, SetIsFriend] = useState<boolean>(false);
+  const [isadded, SetIsAdded] = useState<boolean>(false);
   const [isBlocked, setIsBlocked] = useState<boolean>(false);
   const [blockModal, setBlockModal] = useState<boolean>(false);
+  const [showPopup, setShowPopup] = useState(false);
   const jwtToken = Cookies.get('jwt-token');
 
   // REQUETE INFOS
@@ -99,94 +102,162 @@ const ProfileUser: React.FC = () => {
       }
       getBlocked()
   }, [nickname, jwtToken])
+  
+//GET FRIEND
+useEffect(() => {
+  const getFriend = async () => {
+    console.log('token = ', jwtToken);
+    const response = await axios.get(`/api/user/friend/${ID}`, {
+      headers: {
+        'Authorization': 'Bearer ' + jwtToken,
+      },
+    },);
+    if (response.status === 200) {
+      SetIsFriend(response.data)
+    }
+    else 
+    {console.log("Error./ get /api/user/friend/${ID}");}
+  }
+  getFriend();
+},);
+
+//POST FRIEND
+const postClic = () => {
+  postFriend();
+}
+
+const postFriend = async () => {
+  try {
+  const response = await axios.post(
+    `/api/user/friend/${ID}`, 
+    {}, 
+    {
+      headers: {
+        'Authorization': 'Bearer ' + jwtToken,
+      },
+    }
+  );
+  console.log("response status = ");
+  console.log(response.status);
+  if (response.status === 201) 
+  { console.log("request sent");
+   window.location.reload();}
+  }
+  catch (error)
+  { 
+    setShowPopup(true);
+    console.log("Error./ post /api/user/friend/${ID}");}
+};
+
+setTimeout(() => {
+  setShowPopup(false);
+}, 3000);
+
+//DELETE FRIEND
+const dltClic = () => {
+  dltFriend();
+}
+
+  const dltFriend = async () => {
+    console.log('token = ', jwtToken);
+    const response = await axios.delete(`/api/user/friend/${ID}`, {
+      headers: {
+        'Authorization': 'Bearer ' + jwtToken,
+      },
+    },);
+    if (response.status === 200) 
+    {  console.log("friend deleted");
+        window.location.reload();}
+    else 
+    {console.log("Error./ delete /api/user/friend/${ID}");}
+  }
 
 
   return (
   <div>
+
     <div className="_profile">
-    <p><SearchNick/></p>
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-        {image && <img className="_avatar-img" src={URL.createObjectURL(image)} alt='profile picture' />}
- 
- 
-            <div>
+          <p><SearchNick/></p>
+          <div style={{ display: 'flex', alignItems: 'end' }}>
+          {image && <img className="_avatar-img" src={URL.createObjectURL(image)} alt='profile picture' />}
+                <div>
+                    <button className="button-29" onClick={() => setBlockModal(true)}>🚫</button>
+                        {nickname &&
+                            <Block nickname={nickname}
+                                isBlocked={isBlocked}
+                                isChannel={false}
+                                blockModal={blockModal}
+                                onClose={() => setBlockModal(false)}
+                            />
+                        }
 
-                <button className="material-symbols-outlined" onClick={() => setBlockModal(true)}>
-                    block
-                </button>
+                    <div> {isFriend === true ?
+                        <button className="button-29" onClick={dltClic}> 👤➖ </button> 
+                        :
+                        <button className="button-29" onClick={postClic}> 👤➕ </button>}
 
-            {nickname &&
-                <Block nickname={nickname}
-                    isBlocked={isBlocked}
-                    isChannel={false}
-                    blockModal={blockModal}
-                    onClose={() => setBlockModal(false)}
-                />
-            }
-            </div>
-
-
+                        {showPopup && 
+                        ( <div className='popup'> <p>Request already sent</p></div> )
+                        } 
+                    </div>
+                    
+                </div>
+          </div>
     </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div className="_info">
         <h1>{nickname}</h1> &emsp;
-    </div>
-
-      <div className="_info"> <p>Game played : <span className='_score'>{gameNb}</span></p>
+        <p>Game played : <span className='_score'>{gameNb}</span></p>
         <p>Victory : <span className='_score'>{win} </span></p>
         <p>Loss : <span className='_score'>{loss}</span></p>
-
         <p>Ladder Points : <span className='_score'>{lp}</span> </p>
         <div style={{ display: 'flex', flexDirection: 'row' }}>
         </div>
     </div>
-</div>
-<div className='_scoreTab'>
+    <div className='_scoreTab'>
         <h1>Recent Games</h1>
-{matches.length > 0 && (
-    <ul>
-        {matches.map((match, index) =>
-        (
-            <ul key={index + 1}>
-            {id === match.user1.id ? 
+        {matches.length > 0 && (
+            <ul>
+                {matches.map((match, index) =>
+                (
+                    <ul key={index + 1}>
+                    {id === match.user1.id ? 
 
-            // ecrire si victory ou defeat
-            <div>
-            {/* <div>ID = {id}&nbsp;&nbsp;MATCH USER1 ID = {match.user1.id}</div> */}
-            {match.p1score < match.p2score ? <span className='_defeat'> {match.p1score} / {match.p2score} : &nbsp;DEFEAT</span> : <span className='_victory'>  {match.p1score} / {match.p2score} : &nbsp; VICTORY</span>}
-            {/* ecrire against qui ? */}
-            &nbsp;against&nbsp;<span className='_nickname'> {match.user2.nickname}</span>
-            {/* ecrire la date */}
-            &nbsp;<span className='_date'> {new Date(match.date).toLocaleDateString(undefined, {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-            })} </span> 
-           
-            </div>
+                    // ecrire si victory ou defeat
+                    <div>
+                    {/* <div>ID = {id}&nbsp;&nbsp;MATCH USER1 ID = {match.user1.id}</div> */}
+                    {match.p1score < match.p2score ? <span className='_defeat'> {match.p1score} / {match.p2score} : &nbsp;DEFEAT</span> : <span className='_victory'>  {match.p1score} / {match.p2score} : &nbsp; VICTORY</span>}
+                    {/* ecrire against qui ? */}
+                    &nbsp;against&nbsp;<span className='_nickname'> {match.user2.nickname}</span>
+                    {/* ecrire la date */}
+                    &nbsp;<span className='_date'> {new Date(match.date).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                    })} </span> 
 
-              : 
+                    </div>
 
-            // ecrire si victory ou defeat
-            <div>
-              
-            {match.p1score > match.p2score ? <span className='_defeat'>{match.p2score} / {match.p1score} &nbsp; DEFEAT</span> : <span className='_victory'>{match.p2score} / {match.p1score} &nbsp; VICTORY</span>}
-            {/* ecrire against qui ? */}
-            &nbsp; against&nbsp; <span className='_whiteTab'>{match.user1.nickname} </span>
-            {/* ecrire la date */}
-            &nbsp;On&nbsp; <span className='_blackTab'>{match.date} </span>
+                      : 
+                  
+                    // ecrire si victory ou defeat
+                    <div>
+                    
+                    {match.p1score > match.p2score ? <span className='_defeat'>{match.p2score} / {match.p1score} &nbsp; DEFEAT</span> : <span className='_victory'>{match.p2score} / {match.p1score} &nbsp; VICTORY</span>}
+                    {/* ecrire against qui ? */}
+                    &nbsp; against&nbsp; <span className='_whiteTab'>{match.user1.nickname} </span>
+                    {/* ecrire la date */}
+                    &nbsp;On&nbsp; <span className='_blackTab'>{match.date} </span>
+                  
+                    </div>
 
-            </div>
-
-            }
+                    }
+                    </ul>
+                )
+                )}
             </ul>
-        )
         )}
-    </ul>
-)
-
-}
-</div>
+    </div>
 </div>
       )
 }
