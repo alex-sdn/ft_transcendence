@@ -112,14 +112,16 @@ export class ChatService {
 			where: { chanId: chan.id },
 			include: { sender: true }
 		});
+		// remove messages from blocked users
+		const filteredMessages = await this.filterBlockedMessages(user, messages);
 		// delete info
-		for (var i in messages) {
-			delete messages[i].sender.has2fa;
-			delete messages[i].sender.secret2fa;
-			delete messages[i].sender.status;
+		for (var i in filteredMessages) {
+			delete filteredMessages[i].sender.has2fa;
+			delete filteredMessages[i].sender.secret2fa;
+			delete filteredMessages[i].sender.status;
 		}
 
-		return messages;
+		return filteredMessages;
 	}
 
 	async getPrivmessages(nickname: string, user) {
@@ -869,5 +871,16 @@ export class ChatService {
 				isCommand: isCmd
 			}
 		});
+	}
+
+	async filterBlockedMessages(user: User, messages) {
+		const filteredMessages = await Promise.all(
+			messages.map(async (message) => {
+				if (!(await this.isBlocked(user.id, message.userId))) {
+					return message;
+				}
+			})
+		);
+		return filteredMessages.filter((message) => message !== undefined);
 	}
 }
