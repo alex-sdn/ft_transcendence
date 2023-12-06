@@ -1,3 +1,11 @@
 #responsive-canvas {
-    width: 40%;
+    width: 30%;
+    text-align:center;
 }
+canvas {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);               
+}
+ 

@@ -50,7 +50,11 @@ export enum ROLE {
     Undefined,
 }
 
-// add game options
+export enum OPTION {
+    Robot,
+    Default,
+    Upgraded,
+}
 
 /******************************************************************************
 *                                   GAME                                      *
@@ -65,11 +69,13 @@ const Game: React.FC = () => {
     const [role, setRole] = useState<ROLE>(ROLE.Undefined);
     const [nickname, setNickname] = useState<Nickname>({ left: "", right: ""});
 
+    const [gameOption, setGameOption] = useState<OPTION>(OPTION.Default);
+
+    const [AskOption, setAskOption] = useState(true);
+
     const [AskReady, setAskReady] = useState(false);
 
     const [LogOut, setLogOut] = useState(false);
-
-    const [ScreenSize, setScreenSize] = useState(false);
 
     const canvasRef = useRef<any>(null);
 
@@ -143,7 +149,7 @@ const Game: React.FC = () => {
                     name,
                     role,
                     leftNickname,
-                    rightNickname
+                    rightNickname, 
                 }: Room) => {
                     setRoomName(name);
                     setRole(role);
@@ -199,9 +205,6 @@ const Game: React.FC = () => {
         const handleKeyPress = (event: any) => {
             if (event.type === 'keydown') {
                 if (event.key === 'ArrowUp') {
-                    console.log("----ROOM NAME----");
-                    console.log(roomName);
-                    console.log(role);
                     socket?.emit('keys', { action: 'upPressed', roomName : roomName, role : role });
                 }
                 if (event.key === 'ArrowDown') {
@@ -227,26 +230,24 @@ const Game: React.FC = () => {
     ******************************************************************************/
 
     const playWithRobot = () => {
-        console.log('****ROBOT****');
         socket?.emit('robot', { action: 'robot' });
+        setGameOption(OPTION.Robot);
+        setAskOption(false);
     };
     
     const playDefaultGame = () => {
-        console.log('****DEFAULT****');
         socket?.emit('default', { action: 'default' });
+        setGameOption(OPTION.Default);
+        setAskOption(false);
     };
     
     const playUpgradedGame = () => {
-        console.log('****UPGRADED****');
         socket?.emit('upgraded', { action: 'upgraded' });
+        setGameOption(OPTION.Upgraded);
+        setAskOption(false);
     };
 
     const IAmReady = () => {
-        console.log('****READY****');
-        console.log("-ROOM NAME-")
-        console.log(roomName);
-        console.log("-ROOM ROLE-")
-        console.log(role);
         socket?.emit('ready', { roomName: roomName });
         setAskReady(false);
     };
@@ -262,7 +263,7 @@ const Game: React.FC = () => {
         // clean all in back
         socket?.emit('clean', { roomName: roomName });
         
-        //init all
+        // init all in front
         setPaddle({ leftPos: gameConst.PLAYGROUND_HEIGHT / 2, rightPos: gameConst.PLAYGROUND_HEIGHT / 2});
         setScore({ left: 0, right: 0});
         setPuckPos({ x: gameConst.PLAYGROUND_WIDTH / 2, y: gameConst.PLAYGROUND_HEIGHT / 2 });
@@ -272,6 +273,8 @@ const Game: React.FC = () => {
         setNickname({ left: "", right: ""});
         setAskReady(false);
         setLogOut(false);
+        setGameOption(OPTION.Default);
+        setAskOption(true);
     };
 
     /******************************************************************************
@@ -316,13 +319,13 @@ const Game: React.FC = () => {
             );
     
             // puck
-              ctxt.fillStyle = "black";
-              ctxt.fillRect(
-                puckPos.x - gameConst.PADDLE_WIDTH / 2,
-                puckPos.y - gameConst.PADDLE_WIDTH / 2,
-                gameConst.PADDLE_WIDTH,
-                gameConst.PADDLE_WIDTH,
-              );
+            ctxt.fillStyle = "black";
+            ctxt.fillRect(
+              puckPos.x - gameConst.PADDLE_WIDTH / 2,
+              puckPos.y - gameConst.PADDLE_WIDTH / 2,
+              gameConst.PADDLE_WIDTH,
+              gameConst.PADDLE_WIDTH,
+            );
 
             // scores
             ctxt.font = "50px 'Calibri', bold";
@@ -346,27 +349,35 @@ const Game: React.FC = () => {
     return (
         <div>
             
-            <p>Game is working!</p>
-
-            <div>
-
-            </div>
-            
-                <canvas id="responsive-canvas" ref={canvasRef}></canvas>
             
             <div>
-                <button onClick={playWithRobot}>Robot</button>
-                <button onClick={playDefaultGame}>Default</button>
-                <button onClick={playUpgradedGame}>Upgraded</button>
+
+                {AskOption && (
+                <div>
+                    <button onClick={playWithRobot}>Robot</button>
+                    <button onClick={playDefaultGame}>Default</button>
+                    <button onClick={playUpgradedGame}>Upgraded</button>
+                </div>)
+                }
+
                 {AskReady && 
                     (<button onClick={IAmReady}>Ready</button>)
                 }
+
+                {!AskOption && !AskReady && 
+                (<div>            
+                    <canvas id="responsive-canvas" ref={canvasRef}></canvas>
+                </div>)
+                }
+
                 {LogOut && 
                     (<div>Oops, your competitor has just logged out... So you've just won!</div>)
                 }
+
                 {LogOut && 
                     (<button onClick={NewGame}>New Game</button>)
                 }
+
             </div>
 
         </div>
