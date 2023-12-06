@@ -7,6 +7,7 @@ import Nickname from './Nickname';
 import Twofa from './2fa';
 import ProfileMatch from './ProfileMatch';
 import SearchNick from './SearchNick';
+import Profilefriends from './Profilefriends';
 
 const Profile: React.FC = () => {
 
@@ -141,6 +142,20 @@ const Profile: React.FC = () => {
     }
     catch (error) { console.log('Error encountered when deactivating 2FA'); }
   }
+  
+  //MODALE FRIENDS REQUEST
+  const [isOpenfnd, setIsOpenfnd] = useState(false);
+
+  const openModalfnd = () => {
+    setIsOpenfnd(true);
+  };
+
+  const closeModalfnd = () => {
+    window.location.reload();
+    setIsOpenfnd(false);
+  };
+
+  //STYLE
   console.log('token = ', jwtToken);
   const customStyles = {
     content: {
@@ -152,7 +167,7 @@ const Profile: React.FC = () => {
       width: 'auto',
       height: 'auto',
       background: 'black',
-      margin: '30px',
+      margin: '50px',
     },
   };
 
@@ -160,21 +175,32 @@ const Profile: React.FC = () => {
     <div className="_profile">
       
         <p><SearchNick/></p>
-        <div style={{ position: 'relative', display: 'inline-block' }}>
-          {image && <img className="_avatar-img" src={URL.createObjectURL(image)} alt='profile picture' /> }
-        {<span>
-          <button style={{ position: 'absolute', bottom: 0, right: 0 }} className="button-29" onClick={openModalpic}>⚙️</button>
-          <Modal
-            isOpen={isOpenpic}
-            onRequestClose={closeModalpic}
-            contentLabel='Pp change'
-            style={customStyles}>
-            <button onClick={closeModalpic}>x</button>
-            <ProfilePicture />
-          </Modal></span>}
+        <div style={{ display: 'flex', alignItems: 'end' }}>
+        {image && <img className="_avatar-img" src={URL.createObjectURL(image)} alt='profile picture' /> }
+            <div>
+                <button className="button-29" onClick={openModalpic}>⚙️</button>
+                    <Modal
+                      isOpen={isOpenpic}
+                      onRequestClose={closeModalpic}
+                      contentLabel='Pp change'
+                      style={customStyles}>
+                      <button onClick={closeModalpic}>x</button>
+                      <ProfilePicture />
+                    </Modal>
+                <div>
+                  <button onClick={openModalfnd} className="button-29">👤❗</button>
+                      <Modal
+                        isOpen={isOpenfnd}
+                        onRequestClose={closeModalfnd}
+                        style={customStyles}>
+                        <button onClick={closeModalfnd}>x</button>
+                        <Profilefriends />
+                      </Modal>
+                </div>
+            </div>
         </div>
 
-
+      <div className="_info">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <h1>{nickname}</h1> &emsp;
         {<div>
@@ -189,7 +215,8 @@ const Profile: React.FC = () => {
           </Modal>
         </div>} </div>
 
-      <div className="_info"> <p>Game played : <span className='_score'>{gameNb}</span></p>
+ <p>Game played : <span className='_score'>{gameNb}</span></p>
+      
         <p>Victory : <span className='_score'>{win} </span></p>
         <p>Loss : <span className='_score'>{loss}</span></p>
 

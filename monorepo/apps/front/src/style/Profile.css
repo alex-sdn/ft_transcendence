@@ -51,6 +51,7 @@ h1 {
 }
 
 ._score {
+  color: white;
     text-shadow: 0 0 10px #fff, 0 0 20px #ffffff6e;
 }
 
@@ -63,11 +64,12 @@ h1 {
 
 
 .button-29 {
-  color: rgba(255, 255, 255, 0.767);
+  width: 40px; 
+  height: 30px;
+  color: rgba(0, 0, 0, 0.767);
   font-size: 0.8em;
   /* align-items: center; */
-  border-radius: 6px;
-  background: rgb(54, 54, 54);
+  background: rgb(255, 255, 255);
   box-shadow: rgba(45, 35, 66, .4) 0 2px 4px,rgba(45, 35, 66, .3) 0 7px 13px -3px,rgba(58, 65, 111, .5) 0 -3px 0 inset;
   box-sizing: border-box;
   cursor: pointer;
@@ -88,4 +90,12 @@ h1 {
     color: rgba(255, 255, 255, 0.849);
     box-shadow: #ffffff73 0 3px 7px inset;
     transform: translateY(2px);
+  }
+
+  .popup {
+    position: absolute;
+    /* top: 50%; */
+    /* right: 0; */
+    /* transform: translate(0, -50%); */
+    z-index: 999; /* Assurez-vous que z-index est supérieur à ceux des autres éléments de la page */
   }
