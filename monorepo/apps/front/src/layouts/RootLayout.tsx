@@ -9,6 +9,7 @@ const RootLayout: React.FC = () => {
   const [inviteModale, setInviteModale] = useState<boolean>(false);
   const [user, setUser] = useState<string>("");
   var me: string;
+  var status: string;
   const socket = useContext(SocketContext);
   const jwtToken = Cookies.get('jwt-token');
 
@@ -21,13 +22,20 @@ const RootLayout: React.FC = () => {
 
   const getMe = async () => {
     if (jwtToken) {
-      const response = await axios.get('/api/user/me', {
-        headers: {
-          'Authorization': 'Bearer ' + jwtToken,
-        },
-      })
-      if (response.status === 200) {
-        me = response.data.nickname;
+      try {
+        const response = await axios.get('/api/user/me', {
+          headers: {
+            'Authorization': 'Bearer ' + jwtToken,
+          },
+        })
+        if (response.status === 200) {
+          me = response.data.nickname;
+          // status = response.data.
+          console.log(response.data)
+        }
+      }
+      catch (error) {
+        console.log(error);
       }
     }
   }
@@ -39,7 +47,7 @@ const RootLayout: React.FC = () => {
 
       if (socket) {
         socket.on("invite", (data) => {
-          if (me === data.target) {
+          if (me === data.target && status === "online") {
             setInviteModale(true);
             setUser(data.sender);
           }
@@ -52,7 +60,7 @@ const RootLayout: React.FC = () => {
           socket.off("invite");
       }
     }
-    getEvent()
+    getEvent();
   }, []);
 
   return (
