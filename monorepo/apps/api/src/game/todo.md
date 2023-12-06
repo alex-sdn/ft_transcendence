@@ -6,7 +6,7 @@ URGENT:
 - [X] : print scores on screen
 - [X] : socket room / waiting room
 - [X] : send results of game to db for profiles (+ achievements + status in game)
-- [X] : handle deconnection + clean end of game / init + what if switch page during page --> raise the question of socket subspace
+- [X] : handle deconnection + clean end of game / init + what if switch page during game --> raise the question of socket subspace
 - [X] : responsive screen
 - [ ] : extra features (upgraded option)
 
