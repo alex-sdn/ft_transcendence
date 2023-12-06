@@ -69,6 +69,8 @@ const Game: React.FC = () => {
 
     const [LogOut, setLogOut] = useState(false);
 
+    const [ScreenSize, setScreenSize] = useState(false);
+
     const canvasRef = useRef<any>(null);
 
     const socket = useContext(SocketContext);
@@ -350,7 +352,7 @@ const Game: React.FC = () => {
 
             </div>
             
-                <canvas ref={canvasRef} width={600} height={400}></canvas>
+                <canvas id="responsive-canvas" ref={canvasRef}></canvas>
             
             <div>
                 <button onClick={playWithRobot}>Robot</button>

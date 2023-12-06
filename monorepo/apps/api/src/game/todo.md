@@ -6,11 +6,12 @@ URGENT:
 - [X] : print scores on screen
 - [X] : socket room / waiting room
 - [X] : send results of game to db for profiles (+ achievements + status in game)
-- [ ] : handle deconnection / timeout + clean end of game / init + what if switch page during page --> raise the question of socket subspace
-- [ ] : responsive screen
+- [X] : handle deconnection + clean end of game / init + what if switch page during page --> raise the question of socket subspace
+- [X] : responsive screen
 - [ ] : extra features (upgraded option)
 
 NOT URGENT:
+- [ ] : timeout / lag --> OK but what if fake timeout created on purpose in back ? 
 - [ ] : robot
 - [ ] : set countdown
 - [ ] : maths optimization (render animation + canva by entities + better keys handling)
