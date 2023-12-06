@@ -13,6 +13,7 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
+	"start2": "turbo run start",
     "start": "node apps/api/dist/main",
     "db:up": "npm run db:up --workspace apps/api",
     "db:stop": "npm run db:stop --workspace apps/api",
