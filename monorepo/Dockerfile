@@ -9,17 +9,17 @@ WORKDIR ./monorepo
 # RUN npm install
 # RUN npm install turbo --global
 
-WORKDIR ./apps/api
-RUN npm install
+# WORKDIR ./apps/api
+# RUN npm install
 
-WORKDIR ../front
-RUN npm install
+# WORKDIR ../front
+# RUN npm install
 
-WORKDIR ../../
+# WORKDIR ../../
 RUN npm install
 
 EXPOSE 3000
 
 RUN npm run build
 
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]

@@ -11,6 +11,9 @@
 			"outputs": [
 				"dist/**"
 			]
+		},
+		"start": {
+			"cache": false
 		}
 	}
 }

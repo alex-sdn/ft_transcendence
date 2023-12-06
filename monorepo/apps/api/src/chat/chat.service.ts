@@ -112,14 +112,16 @@ export class ChatService {
 			where: { chanId: chan.id },
 			include: { sender: true }
 		});
+		// remove messages from blocked users
+		const filteredMessages = await this.filterBlockedMessages(user, messages);
 		// delete info
-		for (var i in messages) {
-			delete messages[i].sender.has2fa;
-			delete messages[i].sender.secret2fa;
-			delete messages[i].sender.status;
+		for (var i in filteredMessages) {
+			delete filteredMessages[i].sender.has2fa;
+			delete filteredMessages[i].sender.secret2fa;
+			delete filteredMessages[i].sender.status;
 		}
 
-		return messages;
+		return filteredMessages;
 	}
 
 	async getPrivmessages(nickname: string, user) {
@@ -271,7 +273,7 @@ export class ChatService {
 		if (message.access === 'protected') {
 			if (!message.password)
 				throw new Error('missing password for protected access');
-			// this.validateName(message.password);  // RAJOUTER CA !!!!!!!!!!!!!
+			this.validatePassword(message.password);
 		}
 		// IF WRONG ACCESS TYPE
 		if (!['public', 'private', 'protected'].includes(message.access)) {
@@ -281,7 +283,7 @@ export class ChatService {
 		try {
 			// Hash password
 			let pwHash;
-			if (message.password) // && access==protected ?
+			if (message.access === 'protected')
 				pwHash = await argon.hash(message.password);
 			else
 				pwHash = null;
@@ -293,7 +295,7 @@ export class ChatService {
 					password: pwHash
 				}
 			});
-			// Add user  (+set as owner! +admin)
+			// Add user  (+set as owner +admin)
 			await this.prisma.member.create({
 				data: {
 					chanId: channel.id,
@@ -407,8 +409,9 @@ export class ChatService {
 		else if (access === 'protected') {
 			if (!password)
 				throw new Error('Missing password for protected access');
-			//check password format ?
-			// this.validateName(password);
+			// Check password format
+			this.validatePassword(password);
+			// Hash and update channel
 			const pwHash = await argon.hash(password);
 			await this.prisma.channel.update({
 				where: { id: channel.id },
@@ -837,6 +840,15 @@ export class ChatService {
 			throw new Error('Forbidden characters in channel name');
 	}
 
+	validatePassword(pw: string) {
+		if (pw.length < 8 || pw.length > 20)
+			throw new Error('Password must be 8-20 characters');
+		
+		const pattern =  /^[a-zA-Z0-9_-]*$/;
+		if (!pattern.test(pw))
+			throw new Error('Forbidden characters in password');
+	}
+
 	async deleteChannel(chanId: number) {
 		// delete invited
 		await this.prisma.invited.deleteMany({
@@ -869,5 +881,16 @@ export class ChatService {
 				isCommand: isCmd
 			}
 		});
+	}
+
+	async filterBlockedMessages(user: User, messages) {
+		const filteredMessages = await Promise.all(
+			messages.map(async (message) => {
+				if (!(await this.isBlocked(user.id, message.userId))) {
+					return message;
+				}
+			})
+		);
+		return filteredMessages.filter((message) => message !== undefined);
 	}
 }
