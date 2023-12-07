@@ -41,16 +41,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	handleDisconnect(client: any) {
 		console.log(client.id, "disconnected");
-		// rm from maps (if in)
+
 		if (this.idToUser.has(client.id)) {
 			// status Offline
 			this.chatService.statusOffline(this.idToUser.get(client.id).id);
+			// rm from maps
 			this.userToSocket.delete(this.idToUser.get(client.id).id);
 			this.idToUser.delete(client.id);
 		}
 	}
 
-
+	
 	/**  EVENTS  **/
 	@SubscribeMessage('message')  // ==channel
 	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
@@ -449,6 +450,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		for (var i in sockets) {
 			// need json ?
 			sockets[i].emit('refresh');
+		}
+	}
+
+	blockEvent(blocker, blocked) {
+		const blockedSocket = this.userToSocket[blocked.id];
+		// if blocked user is online
+		if (blockedSocket) {
+			blockedSocket.emit('block', {
+				sender: blocker.nickname,
+				target: blocked.nickname
+			});
 		}
 	}
 

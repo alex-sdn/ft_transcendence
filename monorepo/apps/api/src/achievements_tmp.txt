@@ -1,0 +1,91 @@
+
+
+async updateAchievements(userId: number) {
+	const user = await this.prisma.user.findUnique({
+		where: {id: userId}
+	});
+	// if (!user)
+	// 	return;
+
+	// Play first game
+	if (user.achievements.playOne === false) {
+		const check = await this.prisma.match.findMany({
+			where: {user1Id: user.id}
+		});
+		if (check.length > 0) {  // if size === 0 ?
+			await this.prisma.achievements.update({
+				where: {userId: user.id},
+				data: {playOne: true}
+			});
+		}
+	}
+
+	// Win 3-0
+	if (user.achievements.win3to0 === false) {
+		const check = await this.prisma.match.findMany({
+			where: {
+				user1Id: user.id,
+				p1score: 3,
+				p2score: 0
+			},
+		});
+		if (check.length > 0) {
+			await this.prisma.achievements.update({
+				where: {userId: user.id},
+				data: {win3to0: true}
+			});
+		}
+	}
+
+	// Win 3 games in a row
+	if (user.achievements.win3inRow === false) {
+		const matches = await this.prisma.match.findMany({
+			where: {user1Id: user.id}
+		});
+		// iterate through matches
+		for (var i = 0; i < matches.length - 2; i++) {
+			if (i <= matches.length - 3) {
+				if (matches[i].p1score === 3
+					&& matches[i + 1].p1score === 3
+					&& matches[i + 2].p1score === 3) {
+						// add achievement
+						await this.prisma.achievements.update({
+							where: {userId: user.id},
+							data: {win3inRow: true}
+						});
+						break;
+				}
+			}
+		}
+	}
+
+	// Reach 500LP
+	if (user.achievements.reach500LP === false) {
+		if (user.LP >= 500) {
+			await this.prisma.achievements.update({
+				where: {userId: user.id},
+				data: {reach500LP: true}
+			});
+		}
+	}
+
+	// Win 5 matches
+	if (user.achievements.win5 === false) {
+		// 
+	}
+
+	// Win 10 matches
+	if (user.achievements.win5 === false) {
+		// 
+	}
+
+	// Win 20 matches
+	if (user.achievements.win5 === false) {
+		// 
+	}
+
+	// Win 50 matches
+	if (user.achievements.win5 === false) {
+		// 
+	}
+}

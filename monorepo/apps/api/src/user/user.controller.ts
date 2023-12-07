@@ -137,9 +137,19 @@ export class UserController {
 		return this.userService.myMatches(req.user);
 	}
 
-	// @Get('matches/:nickname')  // :id ?? CHECK LATER
+	// @Get('matches/:nickname')
 	@Get('matches/:id')
 	getMatches(@Param('id', ParseIntPipe) userId: number, @Req() req: Request) {
 		return this.userService.getMatches(userId);
+	}
+
+	@Get('me/achievements')
+	myAchievements(@Req() req: Request) {
+		return this.userService.myAchievements(req.user);
+	}
+
+	@Get('achievements/:id')
+	getAchievements(@Param('id', ParseIntPipe) userId: number, @Req() req: Request) {
+		return this.userService.getAchievements(userId);
 	}
 }
