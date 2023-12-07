@@ -17,6 +17,10 @@ import './style/chat/CreateChannel.css';
 import './style/chat/ChannelSearchbar.css'
 import './style/chat/ChannelsLayout.css'
 import './style/chat/ChannelMembers.css'
+
+//game
+import './style/game/Game.css'
+
 import './style/chat/Messages.css'
 import './style/chat/PrivMessages.css'
 
