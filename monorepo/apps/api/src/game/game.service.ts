@@ -24,8 +24,6 @@ export class GameService {
 				data: {
 					user1Id: user1Id,
 					user2Id: user2Id,
-					user1nick: 'enleve',
-					user2nick: 'enleve',
 					p1score: user1score,
 					p2score: user2score,
 					p1LP: user1.LP,
@@ -37,8 +35,6 @@ export class GameService {
 				data: {
 					user1Id: user2Id,
 					user2Id: user1Id,
-					user1nick: 'enleve',
-					user2nick: 'enleve',
 					p1score: user2score,
 					p2score: user1score,
 					p1LP: user2.LP,
