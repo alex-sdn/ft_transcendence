@@ -64,6 +64,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // <client.id, User>
     private upgradedWaitingList = new Map<string, User>();
 
+	// < 'id1-id2', [id1, id2] >
+	private friendWaitingList = new Map<string, number[]>;
+
 	// Add user to maps if jwt OK, disconnect if not
 	async handleConnection(client: any, ...args: any[]) {
 		console.log("New game WS connection attempted ("+client.id+")");
@@ -86,24 +89,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         console.log(client.id, "disconnected");
 
-        //check if client was in a room if so set Game.End and send info to front of other player
-        if (this.roomsParticipants.has(client.id))
-        {
-            const roomName = this.roomsParticipants.get(client.id).getName();
-            this.server.to(roomName).emit("LogOut");
-            this.roomsParticipants.get(client.id).setGameEnd();
-
-        }
-
-        //check if client was in a waiting room if so remove from it
-        if (this.defaultWaitingList.has(client.id))
-            this.defaultWaitingList.delete(client.id);
-
-        if (this.upgradedWaitingList.has(client.id))
-            this.upgradedWaitingList.delete(client.id);
-
-		// rm from maps (if in)
 		if (this.idToUser.has(client.id)) {
+			//check if client was in a room if so set Game.End and send info to front of other player
+			if (this.roomsParticipants.has(client.id))
+			{
+				const roomName = this.roomsParticipants.get(client.id).getName();
+				this.server.to(roomName).emit("LogOut");
+				this.roomsParticipants.get(client.id).setGameEnd();
+	
+			}
+	
+			//check if client was in a waiting room if so remove from it
+			if (this.defaultWaitingList.has(client.id))
+				this.defaultWaitingList.delete(client.id);
+	
+			if (this.upgradedWaitingList.has(client.id))
+				this.upgradedWaitingList.delete(client.id);
+	
+			// rm from maps
 			this.userToSocket.delete(this.idToUser.get(client.id).id);
 			this.idToUser.delete(client.id);
 		}
@@ -147,6 +150,80 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         //add robot user in db
     }
+
+	// INVITE TEST
+	@SubscribeMessage('inviteGame')
+	async handleInviteGame(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
+		const user = await this.prisma.user.findUnique({
+			where: { id: this.idToUser.get(client.id).id }
+		});
+
+		const target = await this.prisma.user.findUnique({
+			where: { nickname: message.target }
+		});
+		const targetSocket = this.userToSocket.get(target.id);
+
+		// if target is offline
+		if (!targetSocket) {
+			client.emit('error', {
+				message: 'This user is not online'
+			});
+		}
+		// if target is ingame
+		if (target.status === 'ingame') {
+			client.emit('error', {
+				message: 'This user is currently in-game'
+			});
+		}
+
+		var listName;
+		if (user.id < target.id)
+			listName = user.id + '-' + target.id;
+		else
+			listName = target.id + '-' + user.id;
+		// if first invite -> create waiting list for private game
+		if (!this.friendWaitingList.has(listName)) {
+			this.friendWaitingList.set(listName, [user.id, target.id]);
+			// renvoyer l'invite a target
+			targetSocket.emit('inviteGame', {
+				sender: user.nickname,
+				target: target.nickname,
+				// game type aussi
+			});
+		} 
+		// Already received invite -> start game
+		else {
+			// create room	
+			const room = new Room(listName, user, target);
+
+            await client.join(listName);
+            await targetSocket.join(listName);
+            // send room initial info to front
+            client.emit('Room', { name: listName, role: ROLE.Left, leftNickname: room.getLeftNickname(), rightNickname: room.getRightNickname() });
+            targetSocket.emit('Room', { name: listName, role: ROLE.Right, leftNickname: room.getLeftNickname(), rightNickname: room.getRightNickname() });
+            this.roomsList.set(listName, room);
+            
+            this.roomsParticipants.set(client.id, room);
+            this.roomsParticipants.set(targetSocket.id, room);
+            this.server.to(listName).emit('AreYouReady');
+            this.friendWaitingList.delete(listName);
+
+			//sacha --> check all waiting lists
+			if (this.defaultWaitingList.has(client.id))
+				this.defaultWaitingList.delete(client.id);
+			if (this.defaultWaitingList.has(targetSocket.id))
+				this.defaultWaitingList.delete(targetSocket.id);
+			if (this.upgradedWaitingList.has(client.id))
+				this.upgradedWaitingList.delete(client.id);
+			if (this.upgradedWaitingList.has(targetSocket.id))
+				this.upgradedWaitingList.delete(targetSocket.id);
+
+
+			// Send startGame event
+			client.emit('startGame');
+			targetSocket.emit('startGame');
+		}
+	}
 
     /******************************************************************************
     *                                KEYS HANDLING                                *
@@ -271,8 +348,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         //both players are ready --> start game loop
         if (room.getReady() >= 2)
         {
-            this.gameService.statusIngame(room.getLeftUser().id);
-            this.gameService.statusIngame(room.getRightUser().id);
+            await this.gameService.statusIngame(room.getLeftUser().id);
+            await this.gameService.statusIngame(room.getRightUser().id);
 
         if (this.defaultWaitingList.has(client.id))
             this.defaultWaitingList.delete(client.id);
@@ -324,8 +401,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             
             // send results of match & status to db for profiles
             await this.gameService.createMatch(room.getLeftUser().id, room.getRightUser().id, room.getLeftScore(), room.getRightScore(), "ranked");
-            this.gameService.statusOnline(room.getLeftUser().id);
-            this.gameService.statusOnline(room.getRightUser().id);
+            await this.gameService.statusOnline(room.getLeftUser().id);
+            await this.gameService.statusOnline(room.getRightUser().id);
 			// update achievements
 			this.gameService.updateAchievements(room.getLeftUser().id);
 			this.gameService.updateAchievements(room.getRightUser().id);
