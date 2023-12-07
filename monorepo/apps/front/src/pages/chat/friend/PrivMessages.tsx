@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom";
 interface PrivMessage {
 	sender: string;
 	message: string;
+	isCommand: boolean;
 }
 
 interface PrivMessageProps {
@@ -50,6 +51,29 @@ const PrivMessages: React.FC<PrivMessageProps> = ({ sender }) => {
 			setNewMessage('');
 		}
 	};
+	useEffect(() => {
+		console.log("invite1");
+
+		socket?.on("invite", data => {
+			console.log("invite2");
+			console.log(sender);
+			console.log(data);
+			if (data.sender === sender) {
+				const inviteMessage = {
+					sender: data.sender,
+					target: data.target,
+					message: ` invited ${data.target} to ${data.channel}`,
+					isCommand: true
+				};
+				console.log("invite3");
+				setPrivmessages(prevMessages => [...prevMessages, inviteMessage]);
+			}
+		})
+		return () => {
+			socket?.off("invite");
+		};
+
+	}, [socket, sender]);
 
 	useEffect(() => {
 		const fetchMessages = async () => {
@@ -63,6 +87,7 @@ const PrivMessages: React.FC<PrivMessageProps> = ({ sender }) => {
 					const previousmessages: PrivMessage[] = response.data.map((msg: any) => ({
 						sender: msg.sender.nickname,
 						message: msg.message,
+						isCommand: msg.isCommand,
 					}));
 					setPrivmessages(previousmessages);
 				}
@@ -84,8 +109,8 @@ const PrivMessages: React.FC<PrivMessageProps> = ({ sender }) => {
 		<div className="privmessages-container">
 			<div className="privmessages-list">
 				{privmessages.map((msg, index) => (
-					<div key={index} className={"privregular-message"}>
-						<strong>{msg.sender}</strong>{":"} <span>{msg.message}</span>
+					<div key={index} className={msg.isCommand ? "privcommand-message" : "privregular-message"}>
+						<strong>{msg.sender}</strong>{!msg.isCommand && ":"} <span>{msg.message}</span>
 					</div>
 				))}
 				<div ref={messagesEndRef} />

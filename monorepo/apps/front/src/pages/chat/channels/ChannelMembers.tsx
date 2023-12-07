@@ -196,6 +196,7 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
             }
             {selectedMember &&
                 <Kick selectedMember={selectedMember}
+                    me={me.name}
                     selectedChannel={currentChannel.name}
                     kickModal={kickModal}
                     onClose={() => setKickModal(false)}

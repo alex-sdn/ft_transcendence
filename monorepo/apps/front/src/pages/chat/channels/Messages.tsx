@@ -82,19 +82,16 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 			}
 		})
 		socket?.on("mute", data => {
-            console.log("mute1");
-            console.log(data);
-            if (data.channel === target) {
-                const muteMessage = {
-                    sender: data.sender, 
-                    target: data.target ,
-                    message: `muted ${data.target}`,
-                    isCommand: true
-                };
-                console.log("mute2");
-                setMessages(prevMessages => [...prevMessages, muteMessage]);
-            }
-        })
+			if (data.channel === target) {
+				const muteMessage = {
+					sender: data.sender,
+					target: data.target,
+					message: ` muted ${data.target}`,
+					isCommand: true
+				};
+				setMessages(prevMessages => [...prevMessages, muteMessage]);
+			}
+		})
 		socket?.on("kick", data => {
 			if (data.channel === target) {
 				const kickMessage = {
@@ -139,9 +136,7 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 						'Authorization': 'Bearer ' + jwtToken,
 					},
 				});
-				console.log(response.status)
 				if (response.status === 200) {
-					console.log(response.data)
 					const previousmessages: Message[] = response.data.map((msg: any) => ({
 						sender: msg.sender.nickname,
 						target: msg.target,
