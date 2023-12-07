@@ -4,8 +4,19 @@
     position: absolute;
     background: white;
     color: black;
-    left: 1375px;
+    left: 1625px;
     bottom: 3.5%;
+    max-height: 76vh;
+    overflow-y: auto;
+    text-align: center;
+}
+
+.members-list p {
+    margin: 4px;
+}
+
+.members {
+    font-size: larger;
 }
 
 .members-list ul {
@@ -13,7 +24,7 @@
     flex-direction: column;
     gap: 10px;
     position: absolute;
-    top: 10px;
+    top: 150px;
     left: 50%;
     transform: translate(-50%, 0);
 }
@@ -25,4 +36,11 @@
 .action-buttons {
     display: flex;
     justify-content: space-around;
+}
+
+.members-list-name {
+    max-width: 134px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
