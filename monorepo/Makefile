@@ -10,6 +10,9 @@ db:
 dev:
 	@npm run dev
 
+start:
+	@npm run start
+
 prisma:
 	@cd apps/api && npx prisma generate
 
