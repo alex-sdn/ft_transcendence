@@ -26,32 +26,42 @@ const Block: React.FC<blockProps> = ({
     const blockUser = async () => {
         let response;
         if (!isBlocked) {
-            response = await axios.post(`/api/user/block/${id}`, { nickname: nickname }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + jwtToken,
-                },
-            });
-            if (response.status === 201) {
-                setError("");
-                onClose();
-                if (!isChannel)
-                    window.location.assign('/chat/@me');
+            try {
+                response = await axios.post(`/api/user/block/${id}`, { nickname: nickname }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + jwtToken,
+                    },
+                });
+                if (response.status === 201) {
+                    setError("");
+                    onClose();
+                    if (!isChannel)
+                        window.location.assign('/chat/@me');
+                }
+            }
+            catch (error) {
+                console.log(error);
             }
         }
         else {
-            response = await axios.delete(`/api/user/block/${id}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + jwtToken,
-                },
-                data: {
-                    nickname: nickname,
-                },
-            });
-            if (response.status === 200) {
-                setError("");
-                onClose();
+            try {
+                response = await axios.delete(`/api/user/block/${id}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + jwtToken,
+                    },
+                    data: {
+                        nickname: nickname,
+                    },
+                });
+                if (response.status === 200) {
+                    setError("");
+                    onClose();
+                }
+            }
+            catch (error) {
+                console.log(error);
             }
         }
     }

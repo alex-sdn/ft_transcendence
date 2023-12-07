@@ -2,12 +2,15 @@ import React, { useContext, useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import Cookies from "js-cookie";
 import SocketContext from "../Socket";
-import { Modal, ModalHeader, ModalTitle } from "react-bootstrap";
+import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 import axios from "axios";
 
 const RootLayout: React.FC = () => {
-  const [inviteModale, setInviteModale] = useState<boolean>(false);
+  const [inviteChannelModale, setInviteChannelModale] = useState<boolean>(false);
+  const [inviteGameModale, setInviteGameModale] = useState<boolean>(false);
   const [user, setUser] = useState<string>("");
+  const [channel, setChannel] = useState<string>("");
+  const [error, setError] = useState<string>("");
   var me: string;
   var status: string;
   const socket = useContext(SocketContext);
@@ -30,8 +33,7 @@ const RootLayout: React.FC = () => {
         })
         if (response.status === 200) {
           me = response.data.nickname;
-          // status = response.data.
-          console.log(response.data)
+          status = response.data.status;
         }
       }
       catch (error) {
@@ -48,8 +50,9 @@ const RootLayout: React.FC = () => {
       if (socket) {
         socket.on("invite", (data) => {
           if (me === data.target && status === "online") {
-            setInviteModale(true);
+            setInviteChannelModale(true);
             setUser(data.sender);
+            setChannel(data.channel);
           }
         });
         //invite game
@@ -63,6 +66,29 @@ const RootLayout: React.FC = () => {
     getEvent();
   }, []);
 
+  const handleJoinChannel = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const createPromise = new Promise<{ target: string }>((resolve, reject) => {
+      if (socket) {
+        socket.emit("join", { target: channel, password: "" });
+        socket.on("join", (data) => {
+          resolve(data);
+        });
+        socket.on("error", (data) => {
+          reject(data);
+        });
+      }
+    });
+
+    createPromise
+      .then((data) => {
+        window.location.assign(`/chat/channels/${data.target}`);
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+  }
+
   return (
     <div className='root-layout'>
       <header>
@@ -75,15 +101,32 @@ const RootLayout: React.FC = () => {
           <button className='button-59' onClick={disconnect}>Logout</button>
         </nav>
       </header>
-      <Modal show={inviteModale}
-        onHide={() => setInviteModale(false)}
+      <Modal show={inviteChannelModale}
+        onHide={() => setInviteChannelModale(false)}
         style={{ color: "black" }}
       >
         <ModalHeader>
           <ModalTitle>
-            Do you want to play with <strong>{user}</strong>?
+            <strong>{user}</strong> invited you to join <strong>channel</strong>
           </ModalTitle>
         </ModalHeader>
+        <ModalBody>
+          Do you want to join <strong>channel</strong>?
+          <p>
+            <button className="button-59"
+              onClick={(e) => handleJoinChannel(e)}
+            >
+              Yes
+            </button>
+            <button className="button-59"
+              onClick={() => {
+                setError("");
+                setInviteChannelModale(false);
+              }}>
+              No
+            </button>
+          </p>
+        </ModalBody>
       </Modal>
       <main>
         <Outlet />
