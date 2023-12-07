@@ -64,6 +64,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // <client.id, User>
     private upgradedWaitingList = new Map<string, User>();
 
+    // <client.id, User>
+    private robotWaitingList = new Map<string, User>();
+
 	// < 'id1-id2', [id1, id2] >
 	private friendWaitingList = new Map<string, number[]>;
 
@@ -146,10 +149,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('robot')
     async onRobot(@ConnectedSocket() client: Socket) {
+
+        const user = this.idToUser.get(client.id);
+        this.robotWaitingList.set(client.id, user);
+
         await this.matchmaking(OPTION.Robot);
 
-        //add robot user in db
     }
+
+    /******************************************************************************
+    *                                INVITATION                                   *
+    ******************************************************************************/
 
 	// INVITE TEST
 	@SubscribeMessage('inviteGame')
@@ -193,7 +203,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		} 
 		// Already received invite -> start game
 		else {
-			// create room	
+			// create room	--> sacha --> create function createRoom for clean code
 			const room = new Room(listName, user, target);
 
             await client.join(listName);
@@ -218,7 +228,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			if (this.upgradedWaitingList.has(targetSocket.id))
 				this.upgradedWaitingList.delete(targetSocket.id);
 
-
 			// Send startGame event
 			client.emit('startGame');
 			targetSocket.emit('startGame');
@@ -240,7 +249,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (action === 'upPressed') {
                 room.getLeftPaddle().move(-10);
             } else if (action === 'downPressed') {
-                room.getLeftPaddle().move(10);;
+                room.getLeftPaddle().move(10);
             } else if (action === 'released') {
                 room.getLeftPaddle().move(0);
             }
@@ -303,7 +312,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
                 this.defaultWaitingList.delete(firstId.value);
                 this.defaultWaitingList.delete(secondId.value);
-
            }
         }
 
@@ -311,23 +319,65 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     *                                   ROBOT                                     *
     ******************************************************************************/
 
-        // //ROBOT ROOM CREATION
-        // else if (option == OPTION.Robot)
-        // {
-        //     const roomName = `default-${client.id}-robot`;
+        //ROBOT ROOM CREATION
+        else if (option == OPTION.Robot)
+        {
+            const iteratorId = this.robotWaitingList.keys();
+            const iteratorPlayer = this.robotWaitingList.values();
 
-        //     const room = new Room(roomName, firstPlayer.value, robot);
+            const firstId = iteratorId.next();
+            const firstPlayer = iteratorPlayer.next();
 
-        //     await client.join(roomName);
+            const robot = await this.prisma.user.findUnique({
+                where: { nickname: 'ROBOT' }
+            });
+        
+            const roomName = `default-${firstId.value}-robot`;
+            
+            const firstClient = this.userToSocket.get(firstPlayer.value.id);
 
-        //     firstClient.emit('Room', { name: roomName, role: ROLE.Left, leftNickname: room.getLeftNickname(), rightNickname: "robot" });
+            const room = new Room(roomName, firstPlayer.value, robot);
+            
+            await firstClient.join(roomName);
 
-        //     this.roomsList.set(roomName, room);
+            firstClient.emit('Room', { name: roomName, role: ROLE.Left, leftNickname: room.getLeftNickname(), rightNickname: "robot" });
+            
+            this.roomsList.set(roomName, room);
+            this.server.to(roomName).emit('AreYouReady');
+            this.defaultWaitingList.delete(firstId.value);
 
-        //     this.server.to(roomName).emit('AreYouReady');
+            firstClient.emit('Room', { name: roomName, role: ROLE.Left, leftNickname: room.getLeftNickname(), rightNickname: room.getRightNickname() });
 
-        //     this.defaultWaitingList.delete(firstId.value);
-        // }
+            this.roomsList.set(roomName, room);
+            
+            this.roomsParticipants.set(firstId.value, room);
+
+            this.server.to(roomName).emit('AreYouReady');
+
+            this.robotWaitingList.delete(firstId.value);
+        }
+    }
+
+    // speed 0.8 * human + weakness --> top
+    async robotLoop(room: Room) {
+    
+        // add check direction of ball ? (human would move by anticipation anyway)
+
+        if (
+            // move down
+            room.getPuck().getY() <
+            room.getRightPaddle().getY()
+        ) {
+            room.getRightPaddle().move(8);
+            room.getRightPaddle().update;
+        } else if (
+            // move up
+            room.getPuck().getY() >
+            room.getRightPaddle().getY()
+        ) {
+            room.getRightPaddle().move(8);
+            room.getRightPaddle().update;
+        }
     }
 
     /******************************************************************************
