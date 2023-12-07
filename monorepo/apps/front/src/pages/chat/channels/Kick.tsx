@@ -2,9 +2,11 @@ import React, { useContext, useState } from "react";
 import { user } from './Channel.tsx';
 import SocketContext from "../../../Socket.js";
 import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
+import { useLocation } from "react-router-dom";
 
 interface kickProps {
     selectedMember: user;
+    me: string;
     selectedChannel: string | undefined;
     kickModal: boolean;
     onClose: () => void;
@@ -12,12 +14,16 @@ interface kickProps {
 
 const Kick: React.FC<kickProps> = ({
     selectedMember,
+    me,
     selectedChannel,
     kickModal,
     onClose
 }) => {
     const socket = useContext(SocketContext);
     const [error, setError] = useState<string>("");
+    const currentUrl = useLocation();
+    console.log("useLocation: " + currentUrl.pathname);
+    console.log(`/chat/channels/${selectedChannel}`);
 
     const handleKick = async () => {
         const createPromise = new Promise<{
@@ -34,9 +40,12 @@ const Kick: React.FC<kickProps> = ({
                 });
             }
         });
+        console.log(me);
 
         createPromise
-            .then(() => {
+            .then((data) => {
+                console.log("data.target: " + data.target)
+                console.log(me);
                 setError("");
                 onClose();
                 window.location.reload();
