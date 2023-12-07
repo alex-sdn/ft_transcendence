@@ -11,7 +11,10 @@ export function initializeSocket(): Socket | null {
     if (!jwtToken) {
         return null;
     }
-    const socket = io("http://localhost:3000/chat1", {
+
+	const socket_url = import.meta.env.VITE_WEBAPPURL;
+
+	const socket = io(socket_url, {
         extraHeaders: {
             'Authorization': 'Bearer ' + jwtToken,
         }
