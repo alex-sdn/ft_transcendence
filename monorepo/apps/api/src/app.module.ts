@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AppService } from './app.service';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
@@ -20,5 +21,6 @@ import { GameModule } from './game/game.module';
 		ChatModule,
 		GameModule,
   	],
+	providers: [AppService],
 })
 export class AppModule {}
