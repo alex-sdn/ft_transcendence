@@ -86,24 +86,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         console.log(client.id, "disconnected");
 
-        //check if client was in a room if so set Game.End and send info to front of other player
-        if (this.roomsParticipants.has(client.id))
-        {
-            const roomName = this.roomsParticipants.get(client.id).getName();
-            this.server.to(roomName).emit("LogOut");
-            this.roomsParticipants.get(client.id).setGameEnd();
-
-        }
-
-        //check if client was in a waiting room if so remove from it
-        if (this.defaultWaitingList.has(client.id))
-            this.defaultWaitingList.delete(client.id);
-
-        if (this.upgradedWaitingList.has(client.id))
-            this.upgradedWaitingList.delete(client.id);
-
-		// rm from maps (if in)
 		if (this.idToUser.has(client.id)) {
+			//check if client was in a room if so set Game.End and send info to front of other player
+			if (this.roomsParticipants.has(client.id))
+			{
+				const roomName = this.roomsParticipants.get(client.id).getName();
+				this.server.to(roomName).emit("LogOut");
+				this.roomsParticipants.get(client.id).setGameEnd();
+	
+			}
+	
+			//check if client was in a waiting room if so remove from it
+			if (this.defaultWaitingList.has(client.id))
+				this.defaultWaitingList.delete(client.id);
+	
+			if (this.upgradedWaitingList.has(client.id))
+				this.upgradedWaitingList.delete(client.id);
+	
+			// rm from maps
 			this.userToSocket.delete(this.idToUser.get(client.id).id);
 			this.idToUser.delete(client.id);
 		}
