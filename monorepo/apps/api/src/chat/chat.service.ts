@@ -70,7 +70,6 @@ export class ChatService {
 		});
 		// check if calling user in channel
 		if (!checkMember) {
-			console.log("back")
 			throw new HttpException('NOT_IN_CHANNEL', HttpStatus.FORBIDDEN);
 		}
 
