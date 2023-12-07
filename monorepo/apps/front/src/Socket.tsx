@@ -12,7 +12,7 @@ export function initializeSocket(): Socket | null {
         return null;
     }
 
-	const socket_url = import.meta.env.VITE_WEBAPPURL + '/chat1';
+	const socket_url = import.meta.env.VITE_WEBAPPURL;
 
 	const socket = io(socket_url, {
         extraHeaders: {

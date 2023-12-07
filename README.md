@@ -41,7 +41,20 @@ aim: visual editor of database
 aim: visualize all our API's resources
 - in your browser, "http://localhost:3000/api"
 
-### INSOMNIA
+### SOCKET.IO ADMIN UI
+
+aim: visualize statistics of sockets connection
+- add following code in your WebsocketGateway:
+> afterInit() {
+    instrument(this.server, {
+        auth: false,
+        mode: "development",
+    });
+}
+- go to https://admin.socket.io/#/ and fill Server URL with "http://localhost:3000"
+- then Advanced options > WebSocket only
+
+### INSOMNIA / POSTMAN
 
 aim: send test requests
 
@@ -58,3 +71,6 @@ aim: code formatters
 ### CADDY
 
 aim: caddy server can be used as a scalable reverse proxy
+
+## RESOURCES
+
