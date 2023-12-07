@@ -9,6 +9,8 @@ URGENT:
 - [X] : handle deconnection + clean end of game / init + what if switch page during game --> raise the question of socket subspace
 - [X] : responsive screen
 - [ ] : extra features (upgraded option)
+- [ ] : check if front send good room name
+- [ ] : when game starts --> withdraw user from all waiting lists
 
 NOT URGENT:
 - [ ] : timeout / lag --> OK but what if fake timeout created on purpose in back ? 
