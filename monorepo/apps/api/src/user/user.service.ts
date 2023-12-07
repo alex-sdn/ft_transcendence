@@ -427,6 +427,8 @@ export class UserService {
 				blockedId: target.id
 			}
 		});
+		// Send socket event to warn of block
+		this.chatGateway.blockEvent(user, target);
 	}
 
 	async deleteBlock(userId: number, user) {

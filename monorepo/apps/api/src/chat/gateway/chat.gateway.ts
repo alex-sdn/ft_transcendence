@@ -453,4 +453,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	blockEvent(blocker, blocked) {
+		const blockedSocket = this.userToSocket[blocked.id];
+		// if blocked user is online
+		if (blockedSocket) {
+			blockedSocket.emit('block', {
+				sender: blocker.nickname,
+				target: blocked.nickname
+			});
+		}
+	}
+
 }
