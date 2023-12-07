@@ -23,47 +23,45 @@ const RootLayout: React.FC = () => {
     window.location.assign('/login');
   }
 
-  const getMe = async () => {
-    if (jwtToken) {
-      try {
-        const response = await axios.get('/api/user/me', {
-          headers: {
-            'Authorization': 'Bearer ' + jwtToken,
-          },
-        })
-        if (response.status === 200) {
-          me = response.data.nickname;
-          status = response.data.status;
+  useEffect(() => {
+    const getMe = async () => {
+      if (jwtToken) {
+        try {
+          const response = await axios.get('/api/user/me', {
+            headers: {
+              'Authorization': 'Bearer ' + jwtToken,
+            },
+          })
+          if (response.status === 200) {
+            me = response.data.nickname;
+            status = response.data.status;
+          }
+        }
+        catch (error) {
+          console.log(error);
         }
       }
-      catch (error) {
-        console.log(error);
-      }
     }
-  }
+    getMe();
+  }, [jwtToken, socket]);
+
 
   useEffect(() => {
-    const getEvent = async () => {
-
-      await getMe();
-
-      if (socket) {
-        socket.on("invite", (data) => {
-          if (me === data.target && status === "online") {
-            setInviteChannelModale(true);
-            setUser(data.sender);
-            setChannel(data.channel);
-          }
-        });
-        //invite game
-      }
-
-      return () => {
-        if (socket)
-          socket.off("invite");
-      }
+    if (socket) {
+      socket.on("invite", (data) => {
+        if (me == data.target && status != "ingame") {
+          setInviteChannelModale(true);
+          setUser(data.sender);
+          setChannel(data.channel);
+        }
+      });
+      //invite game
     }
-    getEvent();
+
+    return () => {
+      if (socket)
+        socket.off("invite");
+    }
   }, []);
 
   const handleJoinChannel = async (event: React.FormEvent) => {
@@ -104,6 +102,7 @@ const RootLayout: React.FC = () => {
       <Modal show={inviteChannelModale}
         onHide={() => setInviteChannelModale(false)}
         style={{ color: "black" }}
+        className="text-center"
       >
         <ModalHeader>
           <ModalTitle>
@@ -112,7 +111,7 @@ const RootLayout: React.FC = () => {
         </ModalHeader>
         <ModalBody>
           Do you want to join <strong>channel</strong>?
-          <p>
+          <p className="action-buttons">
             <button className="button-59"
               onClick={(e) => handleJoinChannel(e)}
             >

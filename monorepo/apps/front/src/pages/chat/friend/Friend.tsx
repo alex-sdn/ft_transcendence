@@ -19,14 +19,20 @@ const Friend: React.FC = () => {
 
     useEffect(() => {
         const getUserName = async () => {
-            const response = await axios.get(`/api/user/id/${id}`, {
-                headers: {
-                    'Authorization': 'Bearer ' + jwtToken,
-                },
-            })
-            if (response.status === 200) {
-                setUserName(response.data.nickname);
-                setEventData("");
+            try {
+                const response = await axios.get(`/api/user/id/${id}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + jwtToken,
+                    },
+                })
+                if (response.status === 200) {
+                    setUserName(response.data.nickname);
+                    setEventData("");
+                }
+            }
+            catch (error) {
+                console.log(error);
+                window.location.assign('/chat/@me');
             }
         }
         getUserName();
@@ -34,13 +40,19 @@ const Friend: React.FC = () => {
 
     useEffect(() => {
         const getBlocked = async () => {
-            const response = await axios.get(`/api/user/block/${id}`, {
-                headers: {
-                    'Authorization': 'Bearer ' + jwtToken,
-                },
-            })
-            if (response.status === 200) {
-                setIsBlocked(response.data);
+            try {
+                const response = await axios.get(`/api/user/block/${id}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + jwtToken,
+                    },
+                })
+                if (response.status === 200) {
+                    setIsBlocked(response.data);
+                }
+            }
+            catch (error) {
+                console.log(error);
+                window.location.assign('/chat/@me');
             }
         }
         getBlocked();
@@ -51,7 +63,7 @@ const Friend: React.FC = () => {
             setEventData("refresh");
         })
 
-        socket?.on("block", (data) =>{
+        socket?.on("block", (data) => {
             if (data.sender == id) {
                 window.location.assign('/chat/@me');
             }
