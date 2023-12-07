@@ -87,7 +87,7 @@ const Block: React.FC<blockProps> = ({
                 </ModalHeader>
                 <ModalBody>
                     {!isBlocked &&
-                        <p>You wont be abble to see this user's messages anymore</p>
+                        <p>You won't be able to see this user's messages anymore</p>
                     }
                     {isBlocked &&
                         <p>You will see this user's messages again</p>

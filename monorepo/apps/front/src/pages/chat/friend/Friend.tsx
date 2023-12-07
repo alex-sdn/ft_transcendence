@@ -50,8 +50,16 @@ const Friend: React.FC = () => {
         socket?.on("refresh", () => {
             setEventData("refresh");
         })
+
+        socket?.on("block", (data) =>{
+            if (data.sender == id) {
+                window.location.assign('/chat/@me');
+            }
+        })
+
         return () => {
             socket?.off("refresh");
+            socket?.off("block");
         };
     }, [id, socket]);
 
@@ -68,25 +76,6 @@ const Friend: React.FC = () => {
                     <PrivMessages sender={userName} />
                 }
             </div>
-            {/* <div id='chat' >
-                <p>
-                    <input type='text'
-                        name='message'
-                        placeholder='Send a message'
-                        onChange={(e) => setMessage(e.target.value)} />
-                </p>
-                <p>
-                    <button
-                        className="material-symbols-outlined"
-                        id='send-button'
-                        type='submit'
-                        value={message}
-                        disabled={!message}
-                    >
-                        send
-                    </button>
-                </p>
-            </div> */}
             {userName && id &&
                 <Block id={id}
                     nickname={userName}
