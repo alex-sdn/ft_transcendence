@@ -356,7 +356,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 where: { nickname: 'ROBOT' }
             });
         
-            const roomName = `default-${firstId.value}-robot`;
+            const roomName = `robot-${firstId.value}-robot`;
             
             const firstClient = this.userToSocket.get(firstPlayer.value.id);
 
