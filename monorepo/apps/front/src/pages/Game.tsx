@@ -44,7 +44,7 @@ export interface Nickname {
     right: string;
 }
 
-export enum ROLE {        
+export enum ROLE {
     Left,
     Right,
     Undefined,
@@ -62,13 +62,13 @@ export enum OPTION {
 ******************************************************************************/
 
 const Game: React.FC = () => {
-    const [paddle, setPaddle] = useState<Paddle>({ leftPos: gameConst.PLAYGROUND_HEIGHT / 2, rightPos: gameConst.PLAYGROUND_HEIGHT / 2});
-    const [score, setScore] = useState<Score>({ left: 0, right: 0});
+    const [paddle, setPaddle] = useState<Paddle>({ leftPos: gameConst.PLAYGROUND_HEIGHT / 2, rightPos: gameConst.PLAYGROUND_HEIGHT / 2 });
+    const [score, setScore] = useState<Score>({ left: 0, right: 0 });
     const [puckPos, setPuckPos] = useState<PuckPos>({ x: gameConst.PLAYGROUND_WIDTH / 2, y: gameConst.PLAYGROUND_HEIGHT / 2 });
     const [puckDir, setPuckDir] = useState<PuckDir>({ x: 0, y: 0 });
     const [roomName, setRoomName] = useState<string | null>(null);
     const [role, setRole] = useState<ROLE>(ROLE.Undefined);
-    const [nickname, setNickname] = useState<Nickname>({ left: "", right: ""});
+    const [nickname, setNickname] = useState<Nickname>({ left: "", right: "" });
 
     const [gameOption, setGameOption] = useState<OPTION>(OPTION.Retro);
 
@@ -89,8 +89,7 @@ const Game: React.FC = () => {
     const socket = useContext(SocketContext);
 
     useEffect(() => {
-        if (socket)
-        {
+        if (socket) {
             socket.on(
                 "Puck",
                 ({
@@ -106,19 +105,18 @@ const Game: React.FC = () => {
         return () => {
             if (socket)
                 socket.off("Puck");
-            }
-        }, [roomName]);
+        }
+    }, [roomName]);
 
     useEffect(() => {
-        if (socket)
-        {
+        if (socket) {
             socket.on(
                 "Score",
                 ({
                     left,
                     right,
                 }: Score) => {
-                    setScore({ left: left, right: right});
+                    setScore({ left: left, right: right });
                 }
             );
         }
@@ -126,18 +124,17 @@ const Game: React.FC = () => {
             if (socket)
                 socket.off("Puck");
         }
-        }, [roomName]);
-    
+    }, [roomName]);
+
     useEffect(() => {
-        if (socket)
-        {
+        if (socket) {
             socket.on(
                 "Paddle",
                 ({
                     leftPos,
                     rightPos
                 }: Paddle) => {
-                    setPaddle({ leftPos: leftPos, rightPos: rightPos});
+                    setPaddle({ leftPos: leftPos, rightPos: rightPos });
                 }
             );
         }
@@ -148,8 +145,7 @@ const Game: React.FC = () => {
     }, [roomName]);
 
     useEffect(() => {
-        if (socket)
-        {
+        if (socket) {
             socket.on(
                 "Room",
                 ({
@@ -160,7 +156,7 @@ const Game: React.FC = () => {
                 }: any) => {
                     setRoomName(name);
                     setRole(role);
-                    setNickname({ left: leftNickname, right: rightNickname});
+                    setNickname({ left: leftNickname, right: rightNickname });
                 }
             );
         }
@@ -171,13 +167,13 @@ const Game: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        if (socket)
-        {
+        if (socket) {
             socket.on(
                 "AreYouReady",
                 () => {
                     console.log("Are you ready ?");
                     setAskReady(true);
+                    setAskOption(false);
                 }
             );
         }
@@ -188,8 +184,7 @@ const Game: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        if (socket)
-        {
+        if (socket) {
             socket.on(
                 "LogOut",
                 () => {
@@ -232,15 +227,15 @@ const Game: React.FC = () => {
         const handleKeyPress = (event: any) => {
             if (event.type === 'keydown') {
                 if (event.key === 'ArrowUp') {
-                    socket?.emit('keys', { action: 'upPressed', roomName : roomName, role : role });
+                    socket?.emit('keys', { action: 'upPressed', roomName: roomName, role: role });
                 }
                 if (event.key === 'ArrowDown') {
-                    socket?.emit('keys', { action: 'downPressed', roomName : roomName, role : role });
+                    socket?.emit('keys', { action: 'downPressed', roomName: roomName, role: role });
                 }
-            } 
+            }
             else if (event.type === 'keyup') {
                 if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-                    socket?.emit('keys', { action: 'released', roomName : roomName, role : role });
+                    socket?.emit('keys', { action: 'released', roomName: roomName, role: role });
                 }
             }
         };
@@ -281,8 +276,10 @@ const Game: React.FC = () => {
     };
 
     const IAmReady = () => {
+        console.log('front emit READY');
         socket?.emit('ready', { roomName: roomName });
         setAskReady(false);
+        setAskOption(false);
     };
 
     /******************************************************************************
@@ -290,20 +287,20 @@ const Game: React.FC = () => {
     ******************************************************************************/
 
     const NewGame = () => {
-        
+
         console.log('****NEW GAME****');
 
         // clean all in back
         socket?.emit('clean', { roomName: roomName });
-        
+
         // init all in front
-        setPaddle({ leftPos: gameConst.PLAYGROUND_HEIGHT / 2, rightPos: gameConst.PLAYGROUND_HEIGHT / 2});
-        setScore({ left: 0, right: 0});
+        setPaddle({ leftPos: gameConst.PLAYGROUND_HEIGHT / 2, rightPos: gameConst.PLAYGROUND_HEIGHT / 2 });
+        setScore({ left: 0, right: 0 });
         setPuckPos({ x: gameConst.PLAYGROUND_WIDTH / 2, y: gameConst.PLAYGROUND_HEIGHT / 2 });
         setPuckDir({ x: 0, y: 0 });
         setRoomName(null);
         setRole(ROLE.Undefined);
-        setNickname({ left: "", right: ""});
+        setNickname({ left: "", right: "" });
         setAskReady(false);
         setLogOut(false);
         setGameOption(OPTION.Retro);
@@ -404,11 +401,10 @@ const Game: React.FC = () => {
             ctxt.fillText(nickname.right, canvas.width * 0.75, 20);
           }
         }
-      }, [paddle, puckPos, puckDir, score, AskReady, LogOut]);
+    }, [paddle, puckPos, puckDir, score, AskReady, LogOut]);
 
     return (
         <div>
-            
             <div>
 
                 {AskOption && (
@@ -420,10 +416,9 @@ const Game: React.FC = () => {
                 </div>)
                 }
 
-                {AskReady && 
+                {AskReady &&
                     (<button onClick={IAmReady}>Ready</button>)
                 }
-
                 {Countdown && 
                     (<div> 
                         {Count}
@@ -440,11 +435,11 @@ const Game: React.FC = () => {
                     (<div>Please increase the size of your screen. The minimum required is: 600 * 400. Thank you!</div>)
                 }
 
-                {LogOut && 
+                {LogOut &&
                     (<div>Oops, your competitor has just logged out... So you've just won!</div>)
                 }
 
-                {LogOut && 
+                {LogOut &&
                     (<button onClick={NewGame}>New Game</button>)
                 }
 

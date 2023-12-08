@@ -30,6 +30,12 @@
 	color: black;
 }
 
+.privcommand-message {
+	padding: 5px;
+	margin-bottom: 10px;
+	color: grey;
+}
+
 .privmessage-form {
 	display: flex;
 	align-items: center;

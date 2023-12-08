@@ -69,6 +69,8 @@ const createChannel: React.FC = () => {
                             <FormControl type="text"
                                 name="channel-name"
                                 value={channelName}
+                                pattern="[a-zA-Z0-9_\-]{4,20}"
+                                title="Channel name can only contain letters, numbers, hyphens, and underscores, and a length between 4 and 20 characters"
                                 onChange={(e) => setChannelName(e.target.value)}
                                 required
                             />
@@ -91,7 +93,8 @@ const createChannel: React.FC = () => {
                                 <FormControl type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    minLength={8}
+                                    pattern="[a-zA-Z0-9_\-]{8,20}"
+                                    title="Password can only contain letters, numbers, hyphens, and underscores, and a length between 8 and 20 characters"
                                     required
                                 />
                             </FormGroup>
