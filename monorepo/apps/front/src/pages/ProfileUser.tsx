@@ -151,7 +151,7 @@ const postFriend = async () => {
 
 setTimeout(() => {
   setShowPopup(false);
-}, 3000);
+}, 4000);
 
 //DELETE FRIEND
 const dltClic = () => {
@@ -177,42 +177,42 @@ const dltClic = () => {
   <div>
 
     <div className="_profile">
+
           <p><SearchNick/></p>
-          <div style={{ display: 'flex', alignItems: 'end' }}>
-          {image && <img className="_avatar-img" src={URL.createObjectURL(image)} alt='profile picture' />}
-                <div>
-                    <button className="button-29" onClick={() => setBlockModal(true)}>🚫</button>
-                        {nickname &&
-                            <Block nickname={nickname}
-                                isBlocked={isBlocked}
-                                isChannel={false}
-                                blockModal={blockModal}
-                                onClose={() => setBlockModal(false)}
-                            />
-                        }
+          <div className='wrapper'>
+              <div className="_info">
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                  {image && <img className="_avatar-img" src={URL.createObjectURL(image)} alt='profile picture' />}
+                        &emsp; <span style={{ display: 'flex', flexDirection: 'column' }}>
+                            <button className="button-29" onClick={() => setBlockModal(true)}>🚫</button>
+                                {nickname &&
+                                    <Block nickname={nickname}
+                                        isBlocked={isBlocked}
+                                        isChannel={false}
+                                        blockModal={blockModal}
+                                        onClose={() => setBlockModal(false)}
+                                    />
+                                }
 
-                    <div> {isFriend === true ?
-                        <button className="button-29" onClick={dltClic}> 👤➖ </button> 
-                        :
-                        <button className="button-29" onClick={postClic}> 👤➕ </button>}
+                            <span> {isFriend === true ?
+                                <button className="button-29" onClick={dltClic}> 👤➖ </button> 
+                                :
+                                <button className="button-29" onClick={postClic}> 👤➕ </button>}
 
-                        {showPopup && 
-                        ( <div className='popup'> <p>Request already sent</p></div> )
-                        } 
-                    </div>
-                    
-                </div>
+                                {showPopup && 
+                                ( <div className='popup'> <p>Request already sent</p></div> )
+                                } 
+                            </span>
+                              
+                        </span>
+                  </div>
+                  <br/><div className='_h1'>{nickname}</div><br/>
+                  <p>Game played : <span className='_score'>{gameNb}</span></p>
+                  <p>Victory : <span className='_score'>{win} </span></p>
+                  <p>Loss : <span className='_score'>{loss}</span></p>
+                  <p>Ladder Points : <span className='_score'>{lp}</span> </p>
+              </div>
           </div>
-    </div>
-
-    <div className="_info">
-        <h1>{nickname}</h1> &emsp;
-        <p>Game played : <span className='_score'>{gameNb}</span></p>
-        <p>Victory : <span className='_score'>{win} </span></p>
-        <p>Loss : <span className='_score'>{loss}</span></p>
-        <p>Ladder Points : <span className='_score'>{lp}</span> </p>
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
-        </div>
     </div>
     <div className='_scoreTab'>
         <h1>Recent Games</h1>
