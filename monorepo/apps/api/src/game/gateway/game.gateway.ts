@@ -51,6 +51,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     /* ROOMS + PARTICIPANTS */
 
+    // <, >
+    private robotInterval = new Map<string, any>();
+
     // <roomName, Room>
     private roomsList = new Map<string, Room>();
     
@@ -419,6 +422,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
+	async countdown(nbr: number, roomName: string) {
+        this.server.to(roomName).emit('Countdown', nbr);
+    }
+
     @SubscribeMessage('ready')
     async onReady(@ConnectedSocket() client: Socket, @MessageBody('roomName') roomName: string) {
 
@@ -430,26 +437,27 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if ((room.getReady() >= 2) || (room.getReady() >= 1 && room.getOption() == OPTION.Robot))
         {
             await this.gameService.statusIngame(room.getLeftUser().id);
-            await this.gameService.statusIngame(room.getRightUser().id);
+            
+            if (room.getOption() != OPTION.Robot)
+                await this.gameService.statusIngame(room.getRightUser().id);
 
             this.withdrawFromAllWaitingLists(client.id);
 
-            //set count down
-            
             isPlaying = true; // change for setGameStart() for code consistency
 
-            // launch robot loop
-            
+            //// set count down
+            //for (let i = 1; i <= 3; i ++)
+            //    setTimeout(this.countdown, 1000, i, room);
 
             const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
             const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
             this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
 
+            // launch robot loop
             if (room.getOption() == OPTION.Robot)
             {
-                if (!nIntervId) {
-                    nIntervId = setInterval(this.robotLoop, 30, room);
-                }
+                if (!this.robotInterval.has(roomName))
+                    this.robotInterval.set(roomName, setInterval(this.robotLoop, 30, room));
             }
 
             while (isPlaying === true && !room.getGameEnd()) {
@@ -482,11 +490,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
             //if end of game due to deconnection, set the one who disconnected as loser
 
-            if (this.userToSocket.has(room.getLeftUser().id))
-                room.setLeftAsWinner();
+            if (!this.userToSocket.has(room.getLeftUser().id) || !this.userToSocket.has(room.getRightUser().id))
+            {
+                if (this.userToSocket.has(room.getLeftUser().id))
+                    room.setLeftAsWinner();
             
-            if (this.userToSocket.has(room.getRightUser().id))
-                room.setRightAsWinner();
+                if (this.userToSocket.has(room.getRightUser().id))
+                    room.setRightAsWinner();    
+            }
             
             // send results of match & status to db for profiles
             await this.gameService.createMatch(room.getLeftUser().id, room.getRightUser().id, room.getLeftScore(), room.getRightScore(), "ranked");
@@ -497,9 +508,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.gameService.updateAchievements(room.getLeftUser().id);
 			this.gameService.updateAchievements(room.getRightUser().id);
 
-            if (nIntervId) {
-                clearInterval(nIntervId);
-                nIntervId = null;
+            if (this.robotInterval.has(roomName)) {
+                clearInterval(this.robotInterval.get(roomName));
+                this.robotInterval.delete(roomName);
             }
         }
     }

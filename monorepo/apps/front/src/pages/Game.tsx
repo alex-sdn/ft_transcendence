@@ -76,6 +76,10 @@ const Game: React.FC = () => {
 
     const [AskReady, setAskReady] = useState(false);
 
+    const [Countdown, setCountdown] = useState(false);
+
+    const [Count, setCount] = useState<number>(0);
+
     const [LogOut, setLogOut] = useState(false);
 
     const [ScreenIssue, setScreenIssue] = useState(false);
@@ -199,6 +203,23 @@ const Game: React.FC = () => {
                 socket.off("LogOut");
         };
     }, [roomName]);
+
+    // useEffect(() => {
+    //     if (socket)
+    //     {
+    //         socket.on(
+    //             "Countdown",
+    //             (nbr: number) => {
+    //                 setCountdown(true);
+    //                 setCount(nbr);
+    //             }
+    //         );
+    //     }
+    //     return () => {
+    //         if (socket)
+    //             socket.off("Countdown");
+    //     };
+    // }, [roomName]);
 
     /******************************************************************************
     *                              KEYS HANDLING                                  *
@@ -362,7 +383,7 @@ const Game: React.FC = () => {
             );
 
             // scores
-            ctxt.font = "50px 'Calibri', bold";
+            ctxt.font = "50px 'Orbitron', bold";
             ctxt.fillStyle = "black";
             ctxt.textAlign = "center";
             ctxt.textBaseline = "top";
@@ -370,7 +391,7 @@ const Game: React.FC = () => {
             ctxt.fillText(score.right, canvas.width * 0.75, 20);
 
             // nicknames
-            ctxt.font = "20px 'Calibri', bold";
+            ctxt.font = "20px 'Orbitron', bold";
             ctxt.fillStyle = "black";
             ctxt.textAlign = "center";
             ctxt.textBaseline = "bottom";
@@ -398,6 +419,10 @@ const Game: React.FC = () => {
                 {AskReady && 
                     (<button onClick={IAmReady}>Ready</button>)
                 }
+
+                {/* {!Countdown && 
+                    (<div> </div>)
+                } */}
 
                 {!AskOption && !AskReady && !ScreenIssue && 
                 (<div>            
