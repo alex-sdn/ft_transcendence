@@ -8,10 +8,6 @@ import { instrument } from "@socket.io/admin-ui";
 import { width, height, Puck, Paddle, POINT } from '../game.math';
 import { Room } from '../game.room';
 
-let isPlaying: boolean = false;
-let nIntervId;
-
-
 export enum OPTION {
     Robot,
     Retro,
@@ -46,7 +42,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     /******************************************************************************
-    *                               WAITING LIST                                  *
+    *                               WAITING LISTS                                 *
     ******************************************************************************/
 
     /* ROOMS + PARTICIPANTS */
@@ -120,7 +116,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
 
             //check if client was in a waiting room if so remove from it
-			      this.withdrawFromAllWaitingLists(client.id);
+			this.withdrawFromAllWaitingLists(client.id);
 
             // rm from maps
             this.userToSocket.delete(this.idToUser.get(client.id).id);
@@ -162,7 +158,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('coolCat')
     async onCoolCat(@ConnectedSocket() client: Socket) {                
-        
 
         const user = this.idToUser.get(client.id);
         this.coolCatWaitingList.set(client.id, user);
@@ -248,7 +243,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
         // Already received invite -> start game
         else {
-            //sacha --> check all waiting lists
+            //remove from all waiting lists
             this.withdrawFromAllWaitingLists(client.id);
             this.withdrawFromAllWaitingLists(targetSocket.id);
 
@@ -322,7 +317,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     *                                MATCHMAKING                                  *
     ******************************************************************************/
 
-    async matchmaking(option: OPTION) // add upgraded features
+    async matchmaking(option: OPTION)
     {
         if (option == OPTION.Retro)
         {
@@ -337,7 +332,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 const secondId = iteratorId.next();
                 const secondPlayer = iteratorPlayer.next();
 
-                // generate unique room name
+                // generate unique room name --> uuid ?
                 const roomName = `retro-${firstId.value}-${secondId.value}`;
 
                 const firstClient = this.userToSocket.get(firstPlayer.value.id);
@@ -367,9 +362,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         else if (option == OPTION.Robot)
         {
-
-            // check if robot not busy or create temporary robot user for each interested player
-
             const iteratorId = this.robotWaitingList.keys();
             const iteratorPlayer = this.robotWaitingList.values();
 
@@ -404,6 +396,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
             this.robotWaitingList.delete(firstId.value);
         }
+
+        else if (option == OPTION.CoolCat)
+        {
+
+        }
+
+        else if (option == OPTION.WeirdCrowd)
+        {
+
+        }
     }
 
     /******************************************************************************
@@ -416,15 +418,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
             // move down
             if (room.getPuck().getY() + 7.5 < room.getRightPaddle().getY()) {
-                                
                 room.getRightPaddle().move(-7);
-                
             }
             // move up
             else if (room.getPuck().getY() - 7.5 > room.getRightPaddle().getY()) {
                 room.getRightPaddle().move(7);
             }
-            // don't move --> add modulo so that human like ?
+            // don't move --> add modulo so that human like ? --> randomization of lag + usleep when ball changes direction
             else {
                 room.getRightPaddle().move(0);
             }
@@ -446,26 +446,26 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         room.isReady();
         console.log('set room ready')
-        //both players are ready --> start game loop
 
+        //both players are ready (or just one player if plays with robot), then start game loop
         if ((room.getReady() >= 2) || (room.getReady() >= 1 && room.getOption() == OPTION.Robot))
         {
             await this.gameService.statusIngame(room.getLeftUser().id);
             
-            if (room.getOption() != OPTION.Robot)
+            if (room.getOption() != OPTION.Robot) // robot user can play with multiple users at the same time
                 await this.gameService.statusIngame(room.getRightUser().id);
 
             this.withdrawFromAllWaitingLists(client.id);
 
+            // set count down
             for (let i = 1; i <= 4; i ++)
             {
                 await this.sleep(1000);
                 this.server.to(roomName).emit('Countdown', i);
             }
 
-            isPlaying = true; // change for setGameStart() for code consistency
+            room.setGameStart();
 
-            // set count down
             const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
             const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
             this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
@@ -477,7 +477,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                     this.robotInterval.set(roomName, setInterval(this.robotLoop, 30, room));
             }
 
-            while (isPlaying === true && !room.getGameEnd()) {
+            while (!room.getGameEnd()) {
                 //const updatePuckInterval = setInterval(() => {
                 room.getPuck().update();
                 //if (this.puck.checkPaddleRight(this.right) || this.puck.checkPaddleLeft(this.left) || this.puck.checkEdges()) {
@@ -503,7 +503,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 await this.sleep(1000/60);
             }
 
-            //if end of game due to deconnection, set the one who disconnected as loser
+            // if end of game due to deconnection, set the one who disconnected as loser
             if (!this.userToSocket.has(room.getLeftUser().id) || !this.userToSocket.has(room.getRightUser().id))
             {
                 if (this.userToSocket.has(room.getLeftUser().id))
@@ -529,7 +529,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
-    // clean end of game
+    // clean end of game --> new game
     @SubscribeMessage('clean')
     async onLeave(@ConnectedSocket() client: Socket, @MessageBody('roomName') roomName: string) {
 
