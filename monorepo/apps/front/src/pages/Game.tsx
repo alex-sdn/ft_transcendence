@@ -52,8 +52,9 @@ export enum ROLE {
 
 export enum OPTION {
     Robot,
-    Default,
-    Upgraded,
+    Retro,
+    CoolCat,
+    WeirdCrowd,
 }
 
 /******************************************************************************
@@ -69,13 +70,19 @@ const Game: React.FC = () => {
     const [role, setRole] = useState<ROLE>(ROLE.Undefined);
     const [nickname, setNickname] = useState<Nickname>({ left: "", right: "" });
 
-    const [gameOption, setGameOption] = useState<OPTION>(OPTION.Default);
+    const [gameOption, setGameOption] = useState<OPTION>(OPTION.Retro);
 
     const [AskOption, setAskOption] = useState(true);
 
     const [AskReady, setAskReady] = useState(false);
 
+    const [Countdown, setCountdown] = useState(false);
+
+    const [Count, setCount] = useState<number>(0);
+
     const [LogOut, setLogOut] = useState(false);
+
+    const [ScreenIssue, setScreenIssue] = useState(false);
 
     const canvasRef = useRef<any>(null);
 
@@ -145,8 +152,8 @@ const Game: React.FC = () => {
                     name,
                     role,
                     leftNickname,
-                    rightNickname,
-                }: Room) => {
+                    rightNickname, 
+                }: any) => {
                     setRoomName(name);
                     setRole(role);
                     setNickname({ left: leftNickname, right: rightNickname });
@@ -192,6 +199,26 @@ const Game: React.FC = () => {
         };
     }, [roomName]);
 
+    useEffect(() => {
+        if (socket)
+        {
+            socket.on(
+                "Countdown",
+                (nbr: number) => {
+                    if(nbr === 4)
+                        setCountdown(false);                    
+                    else
+                        setCountdown(true);
+                    setCount(nbr);                
+                }
+            );
+        }
+        return () => {
+            if (socket)
+                socket.off("Countdown");
+        };
+    }, [roomName]);
+
     /******************************************************************************
     *                              KEYS HANDLING                                  *
     ******************************************************************************/
@@ -229,16 +256,22 @@ const Game: React.FC = () => {
         setGameOption(OPTION.Robot);
         setAskOption(false);
     };
-
-    const playDefaultGame = () => {
-        socket?.emit('default', { action: 'default' });
-        setGameOption(OPTION.Default);
+    
+    const playRetro = () => {
+        socket?.emit('retro', { action: 'retro' });
+        setGameOption(OPTION.Retro);
+        setAskOption(false);
+    };
+    
+    const playCoolCat = () => {
+        socket?.emit('coolCat', { action: 'coolCat' });
+        setGameOption(OPTION.CoolCat);
         setAskOption(false);
     };
 
-    const playUpgradedGame = () => {
-        socket?.emit('upgraded', { action: 'upgraded' });
-        setGameOption(OPTION.Upgraded);
+    const playWeirdCrowd = () => {
+        socket?.emit('weirdCrowd', { action: 'weirdCrowd' });
+        setGameOption(OPTION.WeirdCrowd);
         setAskOption(false);
     };
 
@@ -270,9 +303,36 @@ const Game: React.FC = () => {
         setNickname({ left: "", right: "" });
         setAskReady(false);
         setLogOut(false);
-        setGameOption(OPTION.Default);
+        setGameOption(OPTION.Retro);
         setAskOption(true);
+        setScreenIssue(false);
+        setCountdown(false);
+        setCount(0);
     };
+
+    /******************************************************************************
+    *                               SCREEN SIZE                                   *
+    ******************************************************************************/
+
+    useEffect(() => {
+
+        const handleResize = () => {
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+                    
+            if (viewportWidth < 600 || viewportHeight < 400) {
+                setScreenIssue(true);
+            }
+            else {
+                setScreenIssue(false);
+            }
+
+        }
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
 
     /******************************************************************************
     *                                GAME CANVA                                   *
@@ -281,90 +341,98 @@ const Game: React.FC = () => {
     useEffect(() => {
         const canvas = canvasRef.current;
         if (canvas) {
-            const ctxt = canvas.getContext("2d");
-            if (ctxt) {
-                canvas.width = gameConst.PLAYGROUND_WIDTH;
-                canvas.height = gameConst.PLAYGROUND_HEIGHT;
+          const ctxt = canvas.getContext("2d");
+          if (ctxt) {
+            canvas.width = gameConst.PLAYGROUND_WIDTH;
+            canvas.height = gameConst.PLAYGROUND_HEIGHT;
+    
+            // background canvas white
+            ctxt.fillStyle = "white";
+            ctxt.fillRect(0, 0, canvas.width, canvas.height);
+    
+            // black border
+            ctxt.strokeStyle = "black";
+            ctxt.lineWidth = 3;
+            ctxt.setLineDash([]);
+            ctxt.strokeRect(0, 0, canvas.width, canvas.height);
+    
+            // dashed divider line
+            ctxt.setLineDash([23, 14.7]);
+            ctxt.beginPath();
+            ctxt.moveTo(canvas.width / 2, 0);
+            ctxt.lineTo(canvas.width / 2, canvas.height);
+            ctxt.stroke();
+    
+            // both paddles
+            // ctxt.fillStyle = "#262f69"; --> color for bonus
+            ctxt.fillStyle = "black";
+            ctxt.fillRect(10, paddle.leftPos - gameConst.PADDLE_HEIGHT / 2, gameConst.PADDLE_WIDTH, gameConst.PADDLE_HEIGHT);
+            // ctxt.fillStyle = "#482669"; --> color for bonus
+            ctxt.fillRect(
+              canvas.width - gameConst.PADDLE_WIDTH - gameConst.PADDLE_OFFSET,
+              paddle.rightPos - gameConst.PADDLE_HEIGHT / 2,
+              gameConst.PADDLE_WIDTH,
+              gameConst.PADDLE_HEIGHT,
+            );
+    
+            // puck
+            ctxt.fillStyle = "black";
+            ctxt.fillRect(
+              puckPos.x - gameConst.PADDLE_WIDTH / 2,
+              puckPos.y - gameConst.PADDLE_WIDTH / 2,
+              gameConst.PADDLE_WIDTH,
+              gameConst.PADDLE_WIDTH,
+            );
 
-                // background canvas white
-                ctxt.fillStyle = "white";
-                ctxt.fillRect(0, 0, canvas.width, canvas.height);
+            // scores
+            ctxt.font = "50px 'Orbitron', bold";
+            ctxt.fillStyle = "black";
+            ctxt.textAlign = "center";
+            ctxt.textBaseline = "top";
+            ctxt.fillText(score.left, canvas.width * 0.25, 20);
+            ctxt.fillText(score.right, canvas.width * 0.75, 20);
 
-                // black border
-                ctxt.strokeStyle = "black";
-                ctxt.lineWidth = 3;
-                ctxt.setLineDash([]);
-                ctxt.strokeRect(0, 0, canvas.width, canvas.height);
-
-                // dashed divider line
-                ctxt.setLineDash([23, 14.7]);
-                ctxt.beginPath();
-                ctxt.moveTo(canvas.width / 2, 0);
-                ctxt.lineTo(canvas.width / 2, canvas.height);
-                ctxt.stroke();
-
-                // both paddles
-                // ctxt.fillStyle = "#262f69"; --> color for bonus
-                ctxt.fillStyle = "black";
-                ctxt.fillRect(10, paddle.leftPos - gameConst.PADDLE_HEIGHT / 2, gameConst.PADDLE_WIDTH, gameConst.PADDLE_HEIGHT);
-                // ctxt.fillStyle = "#482669"; --> color for bonus
-                ctxt.fillRect(
-                    canvas.width - gameConst.PADDLE_WIDTH - gameConst.PADDLE_OFFSET,
-                    paddle.rightPos - gameConst.PADDLE_HEIGHT / 2,
-                    gameConst.PADDLE_WIDTH,
-                    gameConst.PADDLE_HEIGHT,
-                );
-
-                // puck
-                ctxt.fillStyle = "black";
-                ctxt.fillRect(
-                    puckPos.x - gameConst.PADDLE_WIDTH / 2,
-                    puckPos.y - gameConst.PADDLE_WIDTH / 2,
-                    gameConst.PADDLE_WIDTH,
-                    gameConst.PADDLE_WIDTH,
-                );
-
-                // scores
-                ctxt.font = "50px 'Calibri', bold";
-                ctxt.fillStyle = "black";
-                ctxt.textAlign = "center";
-                ctxt.textBaseline = "top";
-                ctxt.fillText(score.left, canvas.width * 0.25, 20);
-                ctxt.fillText(score.right, canvas.width * 0.75, 20);
-
-                // nicknames
-                ctxt.font = "20px 'Calibri', bold";
-                ctxt.fillStyle = "black";
-                ctxt.textAlign = "center";
-                ctxt.textBaseline = "bottom";
-                ctxt.fillText(nickname.left, canvas.width * 0.25, 20);
-                ctxt.fillText(nickname.right, canvas.width * 0.75, 20);
-            }
+            // nicknames
+            ctxt.font = "20px 'Orbitron', bold";
+            ctxt.fillStyle = "black";
+            ctxt.textAlign = "center";
+            ctxt.textBaseline = "bottom";
+            ctxt.fillText(nickname.left, canvas.width * 0.25, 20);
+            ctxt.fillText(nickname.right, canvas.width * 0.75, 20);
+          }
         }
     }, [paddle, puckPos, puckDir, score, AskReady, LogOut]);
 
     return (
         <div>
-
-
             <div>
 
                 {AskOption && (
-                    <div>
-                        <button onClick={playWithRobot}>Robot</button>
-                        <button onClick={playDefaultGame}>Default</button>
-                        <button onClick={playUpgradedGame}>Upgraded</button>
-                    </div>)
+                <div>
+                    <button onClick={playWithRobot}>Human vs Machine</button>
+                    <button onClick={playRetro}>Retro Pong Game</button>
+                    <button onClick={playCoolCat}>Cool Cat Version</button>
+                    <button onClick={playWeirdCrowd}>Weird Crowd Edition</button>
+                </div>)
                 }
 
                 {AskReady &&
                     (<button onClick={IAmReady}>Ready</button>)
                 }
-
-                {!AskOption && !AskReady &&
-                    (<div>
-                        <canvas id="responsive-canvas" ref={canvasRef}></canvas>
+                {Countdown && 
+                    (<div> 
+                        {Count}
                     </div>)
+                }
+
+                {!AskOption && !AskReady && !ScreenIssue && !Countdown && (Count >=4 ) &&
+                (<div>            
+                    <canvas id="responsive-canvas" ref={canvasRef}></canvas>
+                </div>)
+                }
+                
+                {ScreenIssue && 
+                    (<div>Please increase the size of your screen. The minimum required is: 600 * 400. Thank you!</div>)
                 }
 
                 {LogOut &&
