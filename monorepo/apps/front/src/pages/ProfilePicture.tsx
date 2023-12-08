@@ -12,24 +12,34 @@ const ProfilePicture: React.FC = () => {
 
     useEffect(() => {
         const fetchAvatar = async () => {
-            let response = await axios.get('/api/user/me', {
-                headers: {
-                    'Authorization': 'Bearer ' + jwtToken,
-                },
-            },);
-            const fileName = response.data.avatar;
-
-            response = await axios.get('/api/user/avatar/' + fileName, {
-                headers: {
-                    'Authorization': 'Bearer ' + jwtToken,
-                },
-                responseType: 'arraybuffer',
-            });
-            if (response.status === 200) {
-                const blob = new Blob([response.data]);
-                const file = new File([blob], fileName);
-                setImage(file);
+            try {
+                let response = await axios.get('/api/user/me', {
+                    headers: {
+                        'Authorization': 'Bearer ' + jwtToken,
+                    },
+                },);
+                const fileName = response.data.avatar;
+                try {
+                    response = await axios.get('/api/user/avatar/' + fileName, {
+                        headers: {
+                            'Authorization': 'Bearer ' + jwtToken,
+                        },
+                        responseType: 'arraybuffer',
+                    });
+                    if (response.status === 200) {
+                        const blob = new Blob([response.data]);
+                        const file = new File([blob], fileName);
+                        setImage(file);
+                    }
+                }
+                catch (error) {
+                    console.log(error);
+                }
             }
+            catch (error) {
+                console.log(error);
+            }
+
         };
         fetchAvatar();
     }, []);
