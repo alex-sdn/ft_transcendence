@@ -101,7 +101,8 @@ const Access: React.FC<accessProps> = ({
                                 <FormControl type="password"
                                     value={password}
                                     onChange={(e) => { setPassword(e.target.value); setError("") }}
-                                    minLength={8}
+                                    pattern="[a-zA-Z0-9_\-]{8,20}"
+                                    title="Password can only contain letters, numbers, hyphens, and underscores, and a length between 8 and 20 characters"
                                     required
                                 />
                             </FormGroup>

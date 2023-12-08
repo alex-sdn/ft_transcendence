@@ -19,22 +19,24 @@ const Login2fa: React.FC = () => {
   const login2fareq = async (code: string) => {
     console.log('??????? CODE ?????? ===>>> ' + code);
 
-    const responsesecret = await axios.post('/api/auth/signin/2fa', { code: code },
-      {
-        headers: {
-          'Authorization': 'Bearer ' + jwtToken,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      });
+    try {
+      const responsesecret = await axios.post('/api/auth/signin/2fa', { code: code },
+        {
+          headers: {
+            'Authorization': 'Bearer ' + jwtToken,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        });
 
-    if (responsesecret.status === 201) {
-      console.log('2FA successful');
-      Cookies.remove('jwt-2fa-token');
-      Cookies.set("jwt-token", responsesecret.data, { expires: 1 });
-      window.location.assign('/');
-      return;
+      if (responsesecret.status === 201) {
+        console.log('2FA successful');
+        Cookies.remove('jwt-2fa-token');
+        Cookies.set("jwt-token", responsesecret.data, { expires: 1 });
+        window.location.assign('/');
+        return;
+      }
     }
-    else {
+    catch {
       console.log('2fa FAILED')
     }
   }
