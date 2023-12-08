@@ -9,7 +9,6 @@ interface PrivMessage {
 	sender: string;
 	message: string;
 	isCommand: boolean;
-	isCommand: boolean;
 }
 
 interface PrivMessageProps {
@@ -88,7 +87,6 @@ const PrivMessages: React.FC<PrivMessageProps> = ({ sender }) => {
 					const previousmessages: PrivMessage[] = response.data.map((msg: any) => ({
 						sender: msg.sender.nickname,
 						message: msg.message,
-						isCommand: msg.isCommand,
 						isCommand: msg.isCommand,
 					}));
 					setPrivmessages(previousmessages);
