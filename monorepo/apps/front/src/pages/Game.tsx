@@ -78,6 +78,8 @@ const Game: React.FC = () => {
 
     const [LogOut, setLogOut] = useState(false);
 
+    const [ScreenIssue, setScreenIssue] = useState(false);
+
     const canvasRef = useRef<any>(null);
 
     const socket = useContext(SocketContext);
@@ -282,7 +284,32 @@ const Game: React.FC = () => {
         setLogOut(false);
         setGameOption(OPTION.Retro);
         setAskOption(true);
+        setScreenIssue(false);
     };
+
+    /******************************************************************************
+    *                               SCREEN SIZE                                   *
+    ******************************************************************************/
+
+    useEffect(() => {
+
+        const handleResize = () => {
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+                    
+            if (viewportWidth < 600 || viewportHeight < 400) {
+                setScreenIssue(true);
+            }
+            else {
+                setScreenIssue(false);
+            }
+
+        }
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
 
     /******************************************************************************
     *                                GAME CANVA                                   *
@@ -372,10 +399,14 @@ const Game: React.FC = () => {
                     (<button onClick={IAmReady}>Ready</button>)
                 }
 
-                {!AskOption && !AskReady && 
+                {!AskOption && !AskReady && !ScreenIssue && 
                 (<div>            
                     <canvas id="responsive-canvas" ref={canvasRef}></canvas>
                 </div>)
+                }
+                
+                {ScreenIssue && 
+                    (<div>Please increase the size of your screen. The minimum required is: 600 * 400. Thank you!</div>)
                 }
 
                 {LogOut && 
