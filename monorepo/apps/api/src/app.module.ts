@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AppService } from './app.service';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
@@ -6,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { ChatModule } from './chat/chat.module';
+import { GameModule } from './game/game.module';
 
 @Module({
 	imports: [
@@ -17,6 +19,8 @@ import { ChatModule } from './chat/chat.module';
 		PrismaModule,
 		UserModule,
 		ChatModule,
+		GameModule,
   	],
+	providers: [AppService],
 })
 export class AppModule {}
