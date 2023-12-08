@@ -1,9 +1,6 @@
 export const width: number = 600;
 export const height: number = 400;
 
-//export let leftscore: number = 0;
-//export let rightscore: number = 0;
-
 export enum POINT {
     Left,
     Right,
@@ -42,7 +39,6 @@ export class Paddle {
     update(): void {
         this.y += this.ychange;
         this.y = this.constrain(this.y, this.h / 2, height - this.h / 2);
-        //console.log(this.y);
     }
 
     private constrain(value: number, min: number, max: number): number {
@@ -50,6 +46,7 @@ export class Paddle {
     }
 
     //GETTERS
+    
     getY(): number {
         return this.y;
     }
