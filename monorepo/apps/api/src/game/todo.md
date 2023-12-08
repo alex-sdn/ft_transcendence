@@ -26,11 +26,11 @@ NOT URGENT:
 - [X] : compare features with original pong
 
 WITH ALEX :
-- [ ] : add achievements
-- [ ] : create robot user
+- [X] : add achievements
+- [X] : create robot user
 
 WITH SOLENE & ALEX :
-- [ ] : send & receive invitation from chat
+- [X] : send & receive invitation from chat
 
 WITH SOLENE :
-- [ ] : .css
+- [X] : .css

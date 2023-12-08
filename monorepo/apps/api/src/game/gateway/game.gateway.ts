@@ -12,8 +12,9 @@ let isPlaying: boolean = false;
 
 export enum OPTION {
     Robot,
-    Default,
-    Upgraded,
+    Retro,
+    CoolCat,
+    WeirdCrowd,
 }
 
 export enum ROLE {
@@ -43,6 +44,35 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
     /******************************************************************************
+    *                               WAITING LIST                                  *
+    ******************************************************************************/
+
+    /* ROOMS + PARTICIPANTS */
+
+    // <roomName, Room>
+    private roomsList = new Map<string, Room>();
+    
+    // <client.id, Room>
+    private roomsParticipants = new Map<string, Room>();
+
+    /* WAITING LISTS */
+
+    // <client.id, User>
+    private robotWaitingList = new Map<string, User>();
+
+    // <client.id, User>
+    private retroWaitingList = new Map<string, User>();
+
+    // <client.id, User>
+    private coolCatWaitingList = new Map<string, User>();
+
+    // <client.id, User>
+    private weirdCrowdWaitingList = new Map<string, User>();
+
+    // < 'id1-id2', [id1, id2] >
+    private friendWaitingList = new Map<string, number[]>;
+    
+    /******************************************************************************
     *                         CONNECTION & DISCONNECTION                          *
     ******************************************************************************/
 
@@ -51,24 +81,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	// < client.id, User >
 	private idToUser = new Map<string, User>();
-
-    // <roomName, Room>
-    private roomsList = new Map<string, Room>();
-
-    // <client.id, Room>
-    private roomsParticipants = new Map<string, Room>();
-
-    // <client.id, User>
-    private defaultWaitingList = new Map<string, User>();
-
-    // <client.id, User>
-    private upgradedWaitingList = new Map<string, User>();
-
-    // <client.id, User>
-    private robotWaitingList = new Map<string, User>();
-
-	// < 'id1-id2', [id1, id2] >
-	private friendWaitingList = new Map<string, number[]>;
 
 	// Add user to maps if jwt OK, disconnect if not
 	async handleConnection(client: any, ...args: any[]) {
@@ -99,15 +111,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				const roomName = this.roomsParticipants.get(client.id).getName();
 				this.server.to(roomName).emit("LogOut");
 				this.roomsParticipants.get(client.id).setGameEnd();
-	
+                
+                // + add rm from rooms participants
+
 			}
 	
-			//check if client was in a waiting room if so remove from it
-			if (this.defaultWaitingList.has(client.id))
-				this.defaultWaitingList.delete(client.id);
-	
-			if (this.upgradedWaitingList.has(client.id))
-				this.upgradedWaitingList.delete(client.id);
+			// check if client was on a waiting list if so remove from it
+			this.withdrawFromAllWaitingLists(client.id);
 	
 			// rm from maps
 			this.userToSocket.delete(this.idToUser.get(client.id).id);
@@ -127,26 +137,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     *                                GAME OPTIONS                                 *
     ******************************************************************************/
 
-	@SubscribeMessage('default')
-    async onDefault(@ConnectedSocket() client: Socket) {
-        
-        const user = this.idToUser.get(client.id);
-        this.defaultWaitingList.set(client.id, user);
-
-        await this.matchmaking(OPTION.Default);
-
-    }
-
-	@SubscribeMessage('upgraded')
-    async onUpgraded(@ConnectedSocket() client: Socket) {                
-        
-        const user = this.idToUser.get(client.id);
-        this.upgradedWaitingList.set(client.id, user);
-
-        await this.matchmaking(OPTION.Upgraded);
-
-    }
-
     @SubscribeMessage('robot')
     async onRobot(@ConnectedSocket() client: Socket) {
 
@@ -157,8 +147,54 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     }
 
+	@SubscribeMessage('retro')
+    async onRetro(@ConnectedSocket() client: Socket) {
+        
+        const user = this.idToUser.get(client.id);
+        this.retroWaitingList.set(client.id, user);
+
+        await this.matchmaking(OPTION.Retro);
+
+    }
+
+	@SubscribeMessage('coolCat')
+    async onCoolCat(@ConnectedSocket() client: Socket) {                
+        
+        const user = this.idToUser.get(client.id);
+        this.coolCatWaitingList.set(client.id, user);
+
+        await this.matchmaking(OPTION.CoolCat);
+
+    }
+
+    @SubscribeMessage('weirdCrowd')
+    async onWeirdCrowd(@ConnectedSocket() client: Socket) {
+
+        const user = this.idToUser.get(client.id);
+        this.weirdCrowdWaitingList.set(client.id, user);
+
+        await this.matchmaking(OPTION.WeirdCrowd);
+
+    }
+
+    async withdrawFromAllWaitingLists(clientId: string)
+    {
+        if (this.robotWaitingList.has(clientId))
+            this.robotWaitingList.delete(clientId);
+
+        if (this.retroWaitingList.has(clientId))
+            this.retroWaitingList.delete(clientId);
+
+        if (this.coolCatWaitingList.has(clientId))
+            this.coolCatWaitingList.delete(clientId);
+    
+        if (this.weirdCrowdWaitingList.has(clientId))
+            this.weirdCrowdWaitingList.delete(clientId);
+
+    }
+
     /******************************************************************************
-    *                                INVITATION                                   *
+    *                              FRIEND INVITATION                              *
     ******************************************************************************/
 
 	// INVITE TEST
@@ -219,14 +255,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.friendWaitingList.delete(listName);
 
 			//sacha --> check all waiting lists
-			if (this.defaultWaitingList.has(client.id))
-				this.defaultWaitingList.delete(client.id);
-			if (this.defaultWaitingList.has(targetSocket.id))
-				this.defaultWaitingList.delete(targetSocket.id);
-			if (this.upgradedWaitingList.has(client.id))
-				this.upgradedWaitingList.delete(client.id);
-			if (this.upgradedWaitingList.has(targetSocket.id))
-				this.upgradedWaitingList.delete(targetSocket.id);
+			this.withdrawFromAllWaitingLists(client.id);
 
 			// Send startGame event
 			client.emit('startGame');
@@ -269,17 +298,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     /******************************************************************************
-    *                                   MATCHMAKING                               *
+    *                                MATCHMAKING                                  *
     ******************************************************************************/
 
     async matchmaking(option:OPTION) // add upgraded features
     {
-        if (option == OPTION.Default)
+        if (option == OPTION.Retro)
         {
-            if (this.defaultWaitingList.size >= 2)
+            if (this.retroWaitingList.size >= 2)
             {
-                const iteratorId = this.defaultWaitingList.keys();
-                const iteratorPlayer = this.defaultWaitingList.values();
+                const iteratorId = this.retroWaitingList.keys();
+                const iteratorPlayer = this.retroWaitingList.values();
 
                 const firstId = iteratorId.next();
                 const firstPlayer = iteratorPlayer.next();
@@ -288,7 +317,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 const secondPlayer = iteratorPlayer.next();
 
                 // generate unique room name
-                const roomName = `default-${firstId.value}-${secondId.value}`;
+                const roomName = `retro-${firstId.value}-${secondId.value}`;
 
                 const firstClient = this.userToSocket.get(firstPlayer.value.id);
                 const secondClient = this.userToSocket.get(secondPlayer.value.id);
@@ -310,16 +339,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
                 this.server.to(roomName).emit('AreYouReady');
 
-                this.defaultWaitingList.delete(firstId.value);
-                this.defaultWaitingList.delete(secondId.value);
+                this.retroWaitingList.delete(firstId.value);
+                this.retroWaitingList.delete(secondId.value);
            }
         }
 
-    /******************************************************************************
-    *                                   ROBOT                                     *
-    ******************************************************************************/
-
-        //ROBOT ROOM CREATION
         else if (option == OPTION.Robot)
         {
             const iteratorId = this.robotWaitingList.keys();
@@ -344,7 +368,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             
             this.roomsList.set(roomName, room);
             this.server.to(roomName).emit('AreYouReady');
-            this.defaultWaitingList.delete(firstId.value);
+            this.robotWaitingList.delete(firstId.value);
 
             firstClient.emit('Room', { name: roomName, role: ROLE.Left, leftNickname: room.getLeftNickname(), rightNickname: room.getRightNickname() });
 
@@ -357,6 +381,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.robotWaitingList.delete(firstId.value);
         }
     }
+
+    /******************************************************************************
+    *                                   ROBOT                                     *
+    ******************************************************************************/
 
     // speed 0.8 * human + weakness --> top
     async robotLoop(room: Room) {
@@ -401,11 +429,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             await this.gameService.statusIngame(room.getLeftUser().id);
             await this.gameService.statusIngame(room.getRightUser().id);
 
-        if (this.defaultWaitingList.has(client.id))
-            this.defaultWaitingList.delete(client.id);
-
-        if (this.upgradedWaitingList.has(client.id))
-            this.upgradedWaitingList.delete(client.id);
+            this.withdrawFromAllWaitingLists(client.id);
 
             //set count down
             
@@ -441,7 +465,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 await this.sleep(1000/60);
             }
 
-            //if end of game due to deconnection (find method to identify deconnected socket) --> set the one who deconnected as loser
+            //if end of game due to deconnection, set the one who disconnected as loser
 
             if (this.userToSocket.has(room.getLeftUser().id))
                 room.setLeftAsWinner();
@@ -453,6 +477,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             await this.gameService.createMatch(room.getLeftUser().id, room.getRightUser().id, room.getLeftScore(), room.getRightScore(), "ranked");
             await this.gameService.statusOnline(room.getLeftUser().id);
             await this.gameService.statusOnline(room.getRightUser().id);
+
 			// update achievements
 			this.gameService.updateAchievements(room.getLeftUser().id);
 			this.gameService.updateAchievements(room.getRightUser().id);
