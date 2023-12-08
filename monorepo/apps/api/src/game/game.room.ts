@@ -1,12 +1,8 @@
 import { User } from "@prisma/client";
 import { width, height, Puck, Paddle } from './game.math';
+import { OPTION } from './gateway/game.gateway';
 
 let isPlaying: boolean = false;
-
-// export interface Score {
-//     left: number;
-//     right: number;
-// }
 
 /******************************************************************************
 *                               SOCKET ROOMS                                  *
@@ -34,7 +30,9 @@ export class Room {
 
     private gameEnd: boolean;
 
-    constructor(name: string, left: User, right: User) {
+    private gameOption: OPTION;
+
+    constructor(name: string, left: User, right: User, option: OPTION) {
 
         this.name = name;
 
@@ -55,6 +53,8 @@ export class Room {
         this.ready = 0;
 
         this.gameEnd = false;
+
+        this.gameOption = option;
 
     }
 
@@ -124,6 +124,10 @@ export class Room {
         return this.rightPlayer;
     }
 
+    getOption(): OPTION {
+        return this.gameOption;
+    }
+
     //setters
 
     setGameEnd(): void {
@@ -141,6 +145,5 @@ export class Room {
     setRightAsWinner(): void {
         this.rightScore = 7;
     }
-
 
 }

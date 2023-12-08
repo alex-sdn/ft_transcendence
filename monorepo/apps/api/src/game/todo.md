@@ -10,11 +10,11 @@ URGENT:
 - [X] : responsive screen
 - [ ] : extra features (upgraded option)
 - [ ] : check if front send good room name
-- [ ] : when game starts --> withdraw user from all waiting lists
+- [X] : when game starts --> withdraw user from all waiting lists
 
 NOT URGENT:
-- [ ] : timeout / lag --> OK but what if fake timeout created on purpose in back ? --> ping pong method
-- [ ] : robot
+- [X] : timeout / lag --> OK but what if fake timeout created on purpose in back ? --> ping pong method
+- [X] : robot
 - [ ] : set countdown
 - [ ] : maths optimization (render animation + canva by entities + better keys handling)
 - [X] : admin-ui socket
