@@ -23,20 +23,25 @@ const Profile: React.FC = () => {
   useEffect(() => {
     const getProfileData = async () => {
       console.log('token = ', jwtToken);
-      const response = await axios.get('/api/user/me', {
-        headers: {
-          'Authorization': 'Bearer ' + jwtToken,
-        },
-      },);
-      if (response.status === 200) {
-        const resp_profile = response.data;
-        setNickname(resp_profile.nickname);
-        setLoss(resp_profile.loss);
-        setWin(resp_profile.win);
-        setLp(resp_profile.LP);
-        setGameNb(resp_profile.loss + resp_profile.win);
-        setTwofa(resp_profile.has2fa);
-        console.log(resp_profile);
+      try {
+        const response = await axios.get('/api/user/me', {
+          headers: {
+            'Authorization': 'Bearer ' + jwtToken,
+          },
+        },);
+        if (response.status === 200) {
+          const resp_profile = response.data;
+          setNickname(resp_profile.nickname);
+          setLoss(resp_profile.loss);
+          setWin(resp_profile.win);
+          setLp(resp_profile.LP);
+          setGameNb(resp_profile.loss + resp_profile.win);
+          setTwofa(resp_profile.has2fa);
+          console.log(resp_profile);
+        }
+      }
+      catch (error) {
+        console.log(error);
       }
     }
     getProfileData();
@@ -45,24 +50,34 @@ const Profile: React.FC = () => {
   //REQUETE AVATAR
   useEffect(() => {
     const fetchDefaultAvatar = async () => {
-      let response = await axios.get('/api/user/me', {
-        headers: {
-          'Authorization': 'Bearer ' + jwtToken,
-        },
-      },);
-      const fileName = response.data.avatar;
-      console.log("response.data PROFILE = " + response.data);
-      response = await axios.get('/api/user/avatar/' + fileName, {
-        headers: {
-          'Authorization': 'Bearer ' + jwtToken,
-        },
-        responseType: 'arraybuffer',
-      });
-      console.log('RESP PROFILE  ==> ' + response.data);
-      if (response.status === 200) {
-        const blob = new Blob([response.data]);
-        const file = new File([blob], fileName);
-        setImage(file);
+      try {
+        let response = await axios.get('/api/user/me', {
+          headers: {
+            'Authorization': 'Bearer ' + jwtToken,
+          },
+        },);
+        const fileName = response.data.avatar;
+        console.log("response.data PROFILE = " + response.data);
+        try {
+          response = await axios.get('/api/user/avatar/' + fileName, {
+            headers: {
+              'Authorization': 'Bearer ' + jwtToken,
+            },
+            responseType: 'arraybuffer',
+          });
+          console.log('RESP PROFILE  ==> ' + response.data);
+          if (response.status === 200) {
+            const blob = new Blob([response.data]);
+            const file = new File([blob], fileName);
+            setImage(file);
+          }
+        }
+        catch (error) {
+          console.log(error);
+        }
+      }
+      catch (error) {
+        console.log(error);
       }
     };
     fetchDefaultAvatar();

@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
 import Cookies from "js-cookie";
+import SocketContext from "../../../Socket";
 
 import { user } from './Channel.tsx';
 import { channel } from "../../../layouts/ChannelsLayout.tsx";
@@ -29,22 +30,64 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
     const [banModal, setBanModal] = useState<boolean>(false);
     const [adminModal, setAdminModal] = useState<boolean>(false);
     const [blockModal, setBlockModal] = useState<boolean>(false);
+    const socket = useContext(SocketContext);
 
     useEffect(() => {
         const getBlocked = async () => {
             if (selectedMember) {
-                const response = await axios.get(`/api/user/block/${selectedMember.id}`, {
-                    headers: {
-                        'Authorization': 'Bearer ' + jwtToken,
-                    },
-                })
-                if (response.status === 200) {
-                    setIsBlocked(response.data);
+                try {
+                    const response = await axios.get(`/api/user/block/${selectedMember.id}`, {
+                        headers: {
+                            'Authorization': 'Bearer ' + jwtToken,
+                        },
+                    })
+                    if (response.status === 200) {
+                        setIsBlocked(response.data);
+                    }
+                }
+                catch (error) {
+                    console.log(error);
                 }
             }
         }
         getBlocked();
     }, [blockModal, selectedMember]);
+
+    const inviteGame = async (event: React.FormEvent) => {
+        event.preventDefault();
+        console.log("button pressed")
+        // const createPromise = new Promise<{
+        //     sender: string;
+        //     target: string;
+        //     channel: string;
+        // }>((resolve, reject) => {
+            if (socket && selectedMember) {
+                socket.emit("inviteGame", { sender: me.name, target: selectedMember.name });
+
+                console.log("me " + me.name)
+                console.log("selected member " + selectedMember.name)
+                console.log("emit")
+            }
+
+        //         socket.on("invite", (data) => {
+        //             resolve(data);
+        //         });
+        //         socket.on("error", (data) => {
+        //             reject(data);
+        //         });
+        //     }
+        // });
+
+        // createPromise
+        //     .then(() => {
+        //         setError("");
+        //         setUserSelected("");
+        //         onClose();
+        //     })
+        //     .catch((error) => {
+        //         setError(error.message);
+        //     })
+    }
 
     return (
         <div>
@@ -131,7 +174,11 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
                 {selectedMember && me &&
                     <ModalBody>
                         <p>
-                            <button className="button-59">Let's play!</button>
+                            <button className="button-59"
+                                onClick={(e) => inviteGame(e)}
+                            >
+                                Let's play!
+                            </button>
                         </p>
                         {!isBlocked &&
                             <p>

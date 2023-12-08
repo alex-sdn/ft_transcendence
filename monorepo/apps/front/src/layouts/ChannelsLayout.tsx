@@ -18,21 +18,6 @@ const ChannelsLayout: React.FC = () => {
     var me: string;
     const socket = useContext(SocketContext);
 
-    const getMe = async () => {
-        try {
-            const response = await axios.get('/api/user/me', {
-                headers: {
-                    'Authorization': 'Bearer ' + jwtToken,
-                },
-            },);
-            if (response.status === 200)
-                me = response.data.nickname;
-        }
-        catch (error) {
-            console.log(error);
-        }
-    }
-
     useEffect(() => {
         const getMyChannels = async () => {
             try {
@@ -57,34 +42,46 @@ const ChannelsLayout: React.FC = () => {
     }, [socket, jwtToken]);
 
     useEffect(() => {
-        const getEvent = async () => {
-
-            await getMe();
-
-            if (socket) {
-                console.log("socket")
-                socket.on("kick", (data) => {
-                    console.log("on kick")
-                    if (data.target === me) {
-                        setMyChannels((prevChannels) => prevChannels.filter(channel => channel !== data.channel));
-                    }
-                });
-
-                socket.on("ban", (data) => {
-                    if (data.target === me) {
-                        setMyChannels((prevChannels) => prevChannels.filter(channel => channel !== data.channel));
-                    }
-                });
+        const getMe = async () => {
+            try {
+                const response = await axios.get('/api/user/me', {
+                    headers: {
+                        'Authorization': 'Bearer ' + jwtToken,
+                    },
+                },);
+                if (response.status === 200)
+                    me = response.data.nickname;
             }
-
-            return () => {
-                if (socket) {
-                    socket.off("kick");
-                    socket.off("ban");
-                }
-            };
+            catch (error) {
+                console.log(error);
+            }
         }
-        getEvent();
+        getMe();
+    }, [socket, jwtToken])
+
+    useEffect(() => {
+        if (socket) {
+            console.log("socket")
+            socket.on("kick", (data) => {
+                
+                if (me == data.target) {
+                    setMyChannels((prevChannels) => prevChannels.filter(channel => channel !== data.channel));
+                }
+            });
+
+            socket.on("ban", (data) => {
+                if (data.target == me) {
+                    setMyChannels((prevChannels) => prevChannels.filter(channel => channel !== data.channel));
+                }
+            });
+        }
+
+        return () => {
+            if (socket) {
+                socket.off("kick");
+                socket.off("ban");
+            }
+        }
     }, []);
     // socket listen for 'message'
 

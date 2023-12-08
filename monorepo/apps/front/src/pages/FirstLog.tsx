@@ -49,23 +49,32 @@ const FirstLog: React.FC = () => {
 
     useEffect(() => {
         const fetchAvatar = async () => {
-            let response = await axios.get('/api/user/me', {
-                headers: {
-                    'Authorization': 'Bearer ' + jwtToken,
-                },
-            },);
-            const fileName = response.data.avatar;
-
-            response = await axios.get('/api/user/avatar/' + fileName, {
-                headers: {
-                    'Authorization': 'Bearer ' + jwtToken,
-                },
-                responseType: 'arraybuffer',
-            });
-            if (response.status === 200) {
-                const blob = new Blob([response.data]);
-                const file = new File([blob], fileName);
-                setImage(file);
+            try {
+                const response = await axios.get('/api/user/me', {
+                    headers: {
+                        'Authorization': 'Bearer ' + jwtToken,
+                    },
+                },);
+                const fileName = response.data.avatar;
+                try {
+                    const response = await axios.get('/api/user/avatar/' + fileName, {
+                        headers: {
+                            'Authorization': 'Bearer ' + jwtToken,
+                        },
+                        responseType: 'arraybuffer',
+                    });
+                    if (response.status === 200) {
+                        const blob = new Blob([response.data]);
+                        const file = new File([blob], fileName);
+                        setImage(file);
+                    }
+                }
+                catch (error) {
+                    console.log(error);
+                }
+            }
+            catch (error) {
+                console.log(error);
             }
         };
         fetchAvatar();
@@ -83,15 +92,12 @@ const FirstLog: React.FC = () => {
             <h2>Welcome to our Pong Game!</h2>
             <p>Set a nickname and choose a profile picture</p>
             <p className="first-log-nickname">
-                {/* <p>
-                    <label htmlFor="nickname">Nickname</label>
-                </p> */}
                 <input type="text"
                     name="nickname"
                     id="nickname"
                     value={newNickname.nickname}
-                    pattern="[a-zA-Z0-9_\-]+"
-                    title="Nickname can only contain letters, numbers, hyphens, and underscores."
+                    pattern="[a-zA-Z0-9_\-]{4,20}"
+                    title="Nickname can only contain letters, numbers, hyphens, and underscores, and a length between 4 and 20 characters"
                     placeholder="Choose a nickname"
                     onChange={(e) => {
                         handleNicknameChange(e);
@@ -131,29 +137,6 @@ const FirstLog: React.FC = () => {
                     </p>
                 }
             </div>
-            {/* <p className="first-log-nickname">
-                <p>
-                    <label htmlFor="nickname">Nickname</label>
-                </p>
-                <input type="text"
-                    name="nickname"
-                    id="nickname"
-                    value={newNickname.nickname}
-                    pattern="[a-zA-Z0-9_\-]+"
-                    title="Nickname can only contain letters, numbers, hyphens, and underscores."
-                    placeholder="Choose a nickname"
-                    onChange={(e) => {
-                        handleNicknameChange(e);
-                        setErrorNickname("");
-                    }}
-                    required
-                />
-            </p>
-            {errorNickname &&
-                <p className="text-danger">
-                    {errorNickname}
-                </p>
-            } */}
             <p>
                 <button type="submit">Save changes</button>
             </p>
