@@ -69,17 +69,17 @@ const ChannelsLayout: React.FC = () => {
                 }
             });
 
-            // socket.on("ban", (data) => {
-            //     if (data.target == me) {
-            //         setMyChannels((prevChannels) => prevChannels.filter(channel => channel !== data.channel));
-            //     }
-            // });
+            socket.on("ban", (data) => {
+                if (data.target == me) {
+                    setMyChannels((prevChannels) => prevChannels.filter(channel => channel !== data.channel));
+                }
+            });
         }
 
         return () => {
             if (socket) {
                 socket.off("kick");
-                // socket.off("ban");
+                socket.off("ban");
             }
         }
     }, []);
