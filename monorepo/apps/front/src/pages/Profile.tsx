@@ -8,6 +8,7 @@ import Twofa from './2fa';
 import ProfileMatch from './ProfileMatch';
 import SearchNick from './SearchNick';
 import Profilefriends from './Profilefriends';
+import ProfileList from './ProfileList';
 
 const Profile: React.FC = () => {
 
@@ -175,86 +176,88 @@ const Profile: React.FC = () => {
     <div className="_profile">
       
         <p><SearchNick/></p>
-        <div style={{ display: 'flex', alignItems: 'end' }}>
-        {image && <img className="_avatar-img" src={URL.createObjectURL(image)} alt='profile picture' /> }
-            <div>
-                <button className="button-29" onClick={openModalpic}>⚙️</button>
-                    <Modal
-                      isOpen={isOpenpic}
-                      onRequestClose={closeModalpic}
-                      contentLabel='Pp change'
-                      style={customStyles}>
-                      <button onClick={closeModalpic}>x</button>
-                      <ProfilePicture />
-                    </Modal>
-                <div>
-                  <button onClick={openModalfnd} className="button-29">👤❗</button>
-                      <Modal
-                        isOpen={isOpenfnd}
-                        onRequestClose={closeModalfnd}
-                        style={customStyles}>
-                        <button onClick={closeModalfnd}>x</button>
-                        <Profilefriends />
-                      </Modal>
-                </div>
+        <div className='wrapper'>
+            <div className="_info">  
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                {image && <img className="_avatar-img" src={URL.createObjectURL(image)} alt='profile picture' /> }
+                &emsp; <span style={{ display: 'flex', flexDirection: 'column' }}>
+                        <button className="button-29" onClick={openModalpic}>⚙️</button>
+                            <Modal
+                              isOpen={isOpenpic}
+                              onRequestClose={closeModalpic}
+                              contentLabel='Pp change'
+                              style={customStyles}>
+                              <button onClick={closeModalpic}>x</button>
+                              <ProfilePicture />
+                            </Modal>
+                        <span>
+                          <button onClick={openModalfnd} className="button-29">👤❗</button>
+                              <Modal
+                                isOpen={isOpenfnd}
+                                onRequestClose={closeModalfnd}
+                                style={customStyles}>
+                                <button onClick={closeModalfnd}>x</button>
+                                <Profilefriends />
+                              </Modal>
+                        </span>
+                    </span>
+                </div><br/>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <span className='_h1'>{nickname}</span>
+                    {<span>
+                         &emsp;<button className="button-29" onClick={openModalnic}>⚙️</button>
+                        <Modal
+                            isOpen={isOpennic}
+                            onRequestClose={closeModalnic}
+                            contentLabel='Nick change'
+                            style={customStyles}>
+                            <button onClick={closeModalnic}>x</button>
+                            <Nickname />
+                        </Modal>
+                    </span>}  
+                </div><br/>
+                <p>Game played : <span className='_score'>{gameNb}</span></p>
+                <p>Victory : <span className='_score'>{win} </span></p>
+                <p>Loss : <span className='_score'>{loss}</span></p>
+                <p>Ladder Points : <span className='_score'>{lp}</span> </p>
+                <p>Two Factor Auth : 
+                    <div style={{ display: 'flex', flexDirection: 'row' }}> 
+                        {twofa ? <span className='_score'>activated</span> : <span className='_score'> deactivated</span>} &emsp;
+                        {twofa ?
+                            <span>
+                              <button className="button-29" onClick={openModalNofa}> ⚙️ </button>
+                              <Modal
+                                  isOpen={isOpenNofa}
+                                  onRequestClose={closeModalNofa}
+                                  style={customStyles}>
+                                  <div>Are you sure you want to deactivate 2fa ?</div>
+                                  <button className='button-29' onClick={handleClic}>YES</button>
+                                  <button onClick={closeModalNofa} className='button-29'>NO</button>
+                              </Modal>
+                            </span>
+                          :
+                            <span>
+                                <button className="button-29" onClick={openModalfa}> ⚙️ </button>
+                                <Modal
+                                    isOpen={isOpenfa}
+                                    onRequestClose={closeModalfa}
+                                    style={customStyles}>
+                                    <button onClick={closeModalfa}>x</button>
+                                    <Twofa />
+                                </Modal>
+                            </span>
+                        }
+                    </div>
+                </p>
             </div>
+            <div><ProfileList/></div>
+        </div>
+        <div className='_scoreTab'>
+            <span className='_h1'>Recent Games</span>
+            <p> <ProfileMatch/> </p>
         </div>
 
-      <div className="_info">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <h1>{nickname}</h1> &emsp;
-        {<div>
-          <button className="button-29" onClick={openModalnic}>⚙️</button>
-          <Modal
-            isOpen={isOpennic}
-            onRequestClose={closeModalnic}
-            contentLabel='Nick change'
-            style={customStyles}>
-            <button onClick={closeModalnic}>x</button>
-            <Nickname />
-          </Modal>
-        </div>} </div>
-
- <p>Game played : <span className='_score'>{gameNb}</span></p>
-      
-        <p>Victory : <span className='_score'>{win} </span></p>
-        <p>Loss : <span className='_score'>{loss}</span></p>
-
-        <p>Ladder Points : <span className='_score'>{lp}</span> </p>
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
-          <p>Two factor authentification : {twofa ? <span className='_score'>activated</span> : <span className='_score'> deactivated</span>}</p> &emsp;
-          {twofa ?
-            <div>
-              <button className="button-29" onClick={openModalNofa}> ⚙️ </button>
-
-              <Modal
-                isOpen={isOpenNofa}
-                onRequestClose={closeModalNofa}
-                style={customStyles}>
-                <div>Are you sure you want to deactivate 2fa ?</div>
-                <button className='button-29' onClick={handleClic}>YES</button>
-                <button onClick={closeModalNofa} className='button-29'>NO</button>
-              </Modal>
-            </div>
-            : <div>
-              <button className="button-29" onClick={openModalfa}> ⚙️ </button>
-              <Modal
-                isOpen={isOpenfa}
-                onRequestClose={closeModalfa}
-                style={customStyles}>
-                <button onClick={closeModalfa}>x</button>
-                <Twofa />
-              </Modal>
-            </div>
-          }
-        </div>
-      </div>
-      <div className='_scoreTab'>
-        <h1>Recent Games</h1>
-        <p> <ProfileMatch/> </p>
-        </div>
     </div>
   )
 }
-
 export default Profile;

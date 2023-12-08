@@ -4,7 +4,7 @@ import axios from 'axios'
 // import Modal from 'react-modal';
 // import SearchNick from './SearchNick';
 
-const Profilefriends: React.FC = () => {
+const ProfileFriends: React.FC = () => {
     const jwtToken = Cookies.get('jwt-token');
     const [requests, setRequests] = useState<any[]>([]);
 
@@ -74,7 +74,24 @@ const closeModalfa = () => {
       
     return (
         <div>
-            {requests.length > 0 &&  (
+          {requests.length > 0 ? 
+                            <ul>
+                            {requests.map((request, index) =>
+                            (
+                                <ul key={index + 1}>
+                                        <div>
+                                            <button className="_victory" onClick={() => postFriend(request.requester.id)}>✅</button>
+                                            <button className="_defeat" onClick={() => dltFriend(request.requester.id)}>❌</button>
+                                            <span className='_score'>{request.requester.nickname}</span>
+                                        </div>
+                                </ul>
+                            ))}
+                        </ul>
+          :
+                <p className='_score'><br/>No Pending Requests <br/></p>
+          }
+
+            {/* {requests.length > 0 &&  (
                 <ul>
                     {requests.map((request, index) =>
                     (
@@ -88,9 +105,10 @@ const closeModalfa = () => {
                     ))}
                 </ul>
             )
-            }
+            } */}
+            
         </div>
         )
       }
       
-      export default Profilefriends;
+      export default ProfileFriends;
