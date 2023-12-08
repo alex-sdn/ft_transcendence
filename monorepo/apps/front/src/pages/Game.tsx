@@ -157,7 +157,7 @@ const Game: React.FC = () => {
                     role,
                     leftNickname,
                     rightNickname, 
-                }: Room) => {
+                }: any) => {
                     setRoomName(name);
                     setRole(role);
                     setNickname({ left: leftNickname, right: rightNickname});
@@ -204,22 +204,25 @@ const Game: React.FC = () => {
         };
     }, [roomName]);
 
-    // useEffect(() => {
-    //     if (socket)
-    //     {
-    //         socket.on(
-    //             "Countdown",
-    //             (nbr: number) => {
-    //                 setCountdown(true);
-    //                 setCount(nbr);
-    //             }
-    //         );
-    //     }
-    //     return () => {
-    //         if (socket)
-    //             socket.off("Countdown");
-    //     };
-    // }, [roomName]);
+    useEffect(() => {
+        if (socket)
+        {
+            socket.on(
+                "Countdown",
+                (nbr: number) => {
+                    if(nbr === 4)
+                        setCountdown(false);                    
+                    else
+                        setCountdown(true);
+                    setCount(nbr);                
+                }
+            );
+        }
+        return () => {
+            if (socket)
+                socket.off("Countdown");
+        };
+    }, [roomName]);
 
     /******************************************************************************
     *                              KEYS HANDLING                                  *
@@ -306,6 +309,8 @@ const Game: React.FC = () => {
         setGameOption(OPTION.Retro);
         setAskOption(true);
         setScreenIssue(false);
+        setCountdown(false);
+        setCount(0);
     };
 
     /******************************************************************************
@@ -412,7 +417,6 @@ const Game: React.FC = () => {
                     <button onClick={playRetro}>Retro Pong Game</button>
                     <button onClick={playCoolCat}>Cool Cat Version</button>
                     <button onClick={playWeirdCrowd}>Weird Crowd Edition</button>
-
                 </div>)
                 }
 
@@ -420,11 +424,13 @@ const Game: React.FC = () => {
                     (<button onClick={IAmReady}>Ready</button>)
                 }
 
-                {/* {!Countdown && 
-                    (<div> </div>)
-                } */}
+                {Countdown && 
+                    (<div> 
+                        {Count}
+                    </div>)
+                }
 
-                {!AskOption && !AskReady && !ScreenIssue && 
+                {!AskOption && !AskReady && !ScreenIssue && !Countdown && (Count >=4 ) &&
                 (<div>            
                     <canvas id="responsive-canvas" ref={canvasRef}></canvas>
                 </div>)

@@ -51,14 +51,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     /* ROOMS + PARTICIPANTS */
 
-    // <, >
-    private robotInterval = new Map<string, any>();
-
     // <roomName, Room>
     private roomsList = new Map<string, Room>();
     
     // <client.id, Room>
     private roomsParticipants = new Map<string, Room>();
+
+    // <roomName, intervalId>
+    private robotInterval = new Map<string, any>();
+
 
     /* WAITING LISTS */
 
@@ -400,6 +401,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
             // move down
             if (room.getPuck().getY() + 7.5 < room.getRightPaddle().getY()) {
+                                
                 room.getRightPaddle().move(-7);
                 
             }
@@ -422,10 +424,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
-	async countdown(nbr: number, roomName: string) {
-        this.server.to(roomName).emit('Countdown', nbr);
-    }
-
     @SubscribeMessage('ready')
     async onReady(@ConnectedSocket() client: Socket, @MessageBody('roomName') roomName: string) {
 
@@ -443,12 +441,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
             this.withdrawFromAllWaitingLists(client.id);
 
+            for (let i = 1; i <= 4; i ++)
+            {
+                await this.sleep(1000);
+                this.server.to(roomName).emit('Countdown', i);
+            }
+
             isPlaying = true; // change for setGameStart() for code consistency
 
-            //// set count down
-            //for (let i = 1; i <= 3; i ++)
-            //    setTimeout(this.countdown, 1000, i, room);
-
+            // set count down
             const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
             const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
             this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
@@ -489,7 +490,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
 
             //if end of game due to deconnection, set the one who disconnected as loser
-
             if (!this.userToSocket.has(room.getLeftUser().id) || !this.userToSocket.has(room.getRightUser().id))
             {
                 if (this.userToSocket.has(room.getLeftUser().id))
