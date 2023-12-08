@@ -249,14 +249,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         // Already received invite -> start game
         else {
             //sacha --> check all waiting lists
-            if (this.defaultWaitingList.has(client.id))
-                this.defaultWaitingList.delete(client.id);
-            if (this.defaultWaitingList.has(targetSocket.id))
-                this.defaultWaitingList.delete(targetSocket.id);
-            if (this.upgradedWaitingList.has(client.id))
-                this.upgradedWaitingList.delete(client.id);
-            if (this.upgradedWaitingList.has(targetSocket.id))
-                this.upgradedWaitingList.delete(targetSocket.id);
+            this.withdrawFromAllWaitingLists(client.id);
+            this.withdrawFromAllWaitingLists(targetSocket.id);
 
             // Send startGame event
             client.emit('startGame');
@@ -272,7 +266,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
 
             // create room	
-            const room = new Room(listName, user, target);
+            const room = new Room(listName, user, target, OPTION.Retro);
 
             // const socketP1 = this.userToSocket.get(user.id);
             // const socketP2 = this.userToSocket.get(target.id)
