@@ -52,8 +52,9 @@ export enum ROLE {
 
 export enum OPTION {
     Robot,
-    Default,
-    Upgraded,
+    Retro,
+    CoolCat,
+    WeirdCrowd,
 }
 
 /******************************************************************************
@@ -69,7 +70,7 @@ const Game: React.FC = () => {
     const [role, setRole] = useState<ROLE>(ROLE.Undefined);
     const [nickname, setNickname] = useState<Nickname>({ left: "", right: ""});
 
-    const [gameOption, setGameOption] = useState<OPTION>(OPTION.Default);
+    const [gameOption, setGameOption] = useState<OPTION>(OPTION.Retro);
 
     const [AskOption, setAskOption] = useState(true);
 
@@ -235,15 +236,21 @@ const Game: React.FC = () => {
         setAskOption(false);
     };
     
-    const playDefaultGame = () => {
-        socket?.emit('default', { action: 'default' });
-        setGameOption(OPTION.Default);
+    const playRetro = () => {
+        socket?.emit('retro', { action: 'retro' });
+        setGameOption(OPTION.Retro);
         setAskOption(false);
     };
     
-    const playUpgradedGame = () => {
-        socket?.emit('upgraded', { action: 'upgraded' });
-        setGameOption(OPTION.Upgraded);
+    const playCoolCat = () => {
+        socket?.emit('coolCat', { action: 'coolCat' });
+        setGameOption(OPTION.CoolCat);
+        setAskOption(false);
+    };
+
+    const playWeirdCrowd = () => {
+        socket?.emit('weirdCrowd', { action: 'weirdCrowd' });
+        setGameOption(OPTION.WeirdCrowd);
         setAskOption(false);
     };
 
@@ -273,7 +280,7 @@ const Game: React.FC = () => {
         setNickname({ left: "", right: ""});
         setAskReady(false);
         setLogOut(false);
-        setGameOption(OPTION.Default);
+        setGameOption(OPTION.Retro);
         setAskOption(true);
     };
 
@@ -349,14 +356,15 @@ const Game: React.FC = () => {
     return (
         <div>
             
-            
             <div>
 
                 {AskOption && (
                 <div>
-                    <button onClick={playWithRobot}>Robot</button>
-                    <button onClick={playDefaultGame}>Default</button>
-                    <button onClick={playUpgradedGame}>Upgraded</button>
+                    <button onClick={playWithRobot}>Human vs Machine</button>
+                    <button onClick={playRetro}>Retro Pong Game</button>
+                    <button onClick={playCoolCat}>Cool Cat Version</button>
+                    <button onClick={playWeirdCrowd}>Weird Crowd Edition</button>
+
                 </div>)
                 }
 
