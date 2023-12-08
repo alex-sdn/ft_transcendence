@@ -12,20 +12,25 @@ const FriendsLayout: React.FC = () => {
 
     useEffect(() => {
         const getMyFriends = async () => {
-            const response = await axios.get('/api/user/me/friend', {
-                headers: {
-                    'Authorization': 'Bearer ' + jwtToken,
-                },
-            },);
-            if (response.status === 200) {
-                if (Array.isArray(response.data)) {
-                    const friends = response.data.map((user) => ({
-                        id: user.user2.id,
-                        userName: user.user2.nickname
-                    }));
-                    setMyFriends(friends);
-                    setEventData("");
+            try {
+                const response = await axios.get('/api/user/me/friend', {
+                    headers: {
+                        'Authorization': 'Bearer ' + jwtToken,
+                    },
+                },);
+                if (response.status === 200) {
+                    if (Array.isArray(response.data)) {
+                        const friends = response.data.map((user) => ({
+                            id: user.user2.id,
+                            userName: user.user2.nickname
+                        }));
+                        setMyFriends(friends);
+                        setEventData("");
+                    }
                 }
+            }
+            catch (error) {
+                console.log(error);
             }
         }
         getMyFriends();

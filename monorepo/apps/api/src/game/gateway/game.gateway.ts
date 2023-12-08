@@ -29,28 +29,28 @@ export enum ROLE {
 })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
-	@WebSocketServer()
-	server: Server;
+    @WebSocketServer()
+    server: Server;
 
-	private puck: Puck;
+    private puck: Puck;
     private left: Paddle;
     private right: Paddle;
 
-	constructor(
-		private gameService: GameService,
-		private authService: AuthService,
-		private prisma: PrismaService) {
-	}
+    constructor(
+        private gameService: GameService,
+        private authService: AuthService,
+        private prisma: PrismaService) {
+    }
 
     /******************************************************************************
     *                         CONNECTION & DISCONNECTION                          *
     ******************************************************************************/
 
-	// < user.id, Socket >
-	private userToSocket = new Map<number, Socket>();
+    // < user.id, Socket >
+    private userToSocket = new Map<number, Socket>();
 
-	// < client.id, User >
-	private idToUser = new Map<string, User>();
+    // < client.id, User >
+    private idToUser = new Map<string, User>();
 
     // <roomName, Room>
     private roomsList = new Map<string, Room>();
@@ -64,55 +64,54 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // <client.id, User>
     private upgradedWaitingList = new Map<string, User>();
 
-	// < 'id1-id2', [id1, id2] >
-	private friendWaitingList = new Map<string, number[]>;
+    // < 'id1-id2', [id1, id2] >
+    private friendWaitingList = new Map<string, number[]>;
 
-	// Add user to maps if jwt OK, disconnect if not
-	async handleConnection(client: any, ...args: any[]) {
-		console.log("New game WS connection attempted ("+client.id+")");
+    // Add user to maps if jwt OK, disconnect if not
+    async handleConnection(client: any, ...args: any[]) {
+        console.log("New game WS connection attempted (" + client.id + ")");
 
-		const user = await this.authService.validateToken(client.handshake.headers.authorization);
-		if (!user) {
-			console.log('Connection to game WS refused');
-			client.disconnect();
-		}
-		else {
-			console.log('Connection accepted for', user.nickname);
+        const user = await this.authService.validateToken(client.handshake.headers.authorization);
+        if (!user) {
+            console.log('Connection to game WS refused');
+            client.disconnect();
+        }
+        else {
+            console.log('Connection accepted for', user.nickname);
 
-			// add to maps
-			this.userToSocket.set(user.id, client);
-			this.idToUser.set(client.id, user);
-		}
-	}
+            // add to maps
+            this.userToSocket.set(user.id, client);
+            this.idToUser.set(client.id, user);
+        }
+    }
 
-	async handleDisconnect(client: any) {
+    async handleDisconnect(client: any) {
 
         console.log(client.id, "disconnected");
 
-		if (this.idToUser.has(client.id)) {
-			//check if client was in a room if so set Game.End and send info to front of other player
-			if (this.roomsParticipants.has(client.id))
-			{
-				const roomName = this.roomsParticipants.get(client.id).getName();
-				this.server.to(roomName).emit("LogOut");
-				this.roomsParticipants.get(client.id).setGameEnd();
-	
-			}
-	
-			//check if client was in a waiting room if so remove from it
-			if (this.defaultWaitingList.has(client.id))
-				this.defaultWaitingList.delete(client.id);
-	
-			if (this.upgradedWaitingList.has(client.id))
-				this.upgradedWaitingList.delete(client.id);
-	
-			// rm from maps
-			this.userToSocket.delete(this.idToUser.get(client.id).id);
-			this.idToUser.delete(client.id);
-		}
-	}
+        if (this.idToUser.has(client.id)) {
+            //check if client was in a room if so set Game.End and send info to front of other player
+            if (this.roomsParticipants.has(client.id)) {
+                const roomName = this.roomsParticipants.get(client.id).getName();
+                this.server.to(roomName).emit("LogOut");
+                this.roomsParticipants.get(client.id).setGameEnd();
+                console.log('set game end bc deco')
+            }
 
-	//for socket.io admin UI
+            //check if client was in a waiting room if so remove from it
+            if (this.defaultWaitingList.has(client.id))
+                this.defaultWaitingList.delete(client.id);
+
+            if (this.upgradedWaitingList.has(client.id))
+                this.upgradedWaitingList.delete(client.id);
+
+            // rm from maps
+            this.userToSocket.delete(this.idToUser.get(client.id).id);
+            this.idToUser.delete(client.id);
+        }
+    }
+
+    //for socket.io admin UI
     afterInit() {
         instrument(this.server, {
             auth: false,
@@ -124,9 +123,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     *                                GAME OPTIONS                                 *
     ******************************************************************************/
 
-	@SubscribeMessage('default')
+    @SubscribeMessage('default')
     async onDefault(@ConnectedSocket() client: Socket) {
-        
+
         const user = this.idToUser.get(client.id);
         this.defaultWaitingList.set(client.id, user);
 
@@ -134,9 +133,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     }
 
-	@SubscribeMessage('upgraded')
-    async onUpgraded(@ConnectedSocket() client: Socket) {                
-        
+    @SubscribeMessage('upgraded')
+    async onUpgraded(@ConnectedSocket() client: Socket) {
+
         const user = this.idToUser.get(client.id);
         this.upgradedWaitingList.set(client.id, user);
 
@@ -151,92 +150,113 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         //add robot user in db
     }
 
-	// INVITE TEST
-	@SubscribeMessage('inviteGame')
-	async handleInviteGame(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
-		const user = await this.prisma.user.findUnique({
-			where: { id: this.idToUser.get(client.id).id }
-		});
+    // INVITE TEST
+    @SubscribeMessage('inviteGame')
+    async handleInviteGame(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
+        console.log("invite game", message)
 
-		const target = await this.prisma.user.findUnique({
-			where: { nickname: message.target }
-		});
-		const targetSocket = this.userToSocket.get(target.id);
+        const user = await this.prisma.user.findUnique({
+            where: { id: this.idToUser.get(client.id).id }
+        });
 
-		// if target is offline
-		if (!targetSocket) {
-			client.emit('error', {
-				message: 'This user is not online'
-			});
-		}
-		// if target is ingame
-		if (target.status === 'ingame') {
-			client.emit('error', {
-				message: 'This user is currently in-game'
-			});
-		}
+        const target = await this.prisma.user.findUnique({
+            where: { nickname: message.target }
+        });
+        // if target is offline
+        if (!target) {
+            client.emit('error', {
+                message: 'This user does not exist'
+            });
+        }
+        const targetSocket = this.userToSocket.get(target.id);
 
-		var listName;
-		if (user.id < target.id)
-			listName = user.id + '-' + target.id;
-		else
-			listName = target.id + '-' + user.id;
-		// if first invite -> create waiting list for private game
-		if (!this.friendWaitingList.has(listName)) {
-			this.friendWaitingList.set(listName, [user.id, target.id]);
-			// renvoyer l'invite a target
-			targetSocket.emit('inviteGame', {
-				sender: user.nickname,
-				target: target.nickname,
-				// game type aussi
-			});
-		} 
-		// Already received invite -> start game
-		else {
-			// create room	
-			const room = new Room(listName, user, target);
+        // if target is offline
+        if (!targetSocket) {
+            client.emit('error', {
+                message: 'This user is not online'
+            });
+        }
+        // if target is ingame
+        if (target.status === 'ingame') {
+            client.emit('error', {
+                message: 'This user is currently in-game'
+            });
+        }
 
-            await client.join(listName);
-            await targetSocket.join(listName);
+        var listName;
+        if (user.id < target.id)
+            listName = user.id + '-' + target.id;
+        else
+            listName = target.id + '-' + user.id;
+        // if first invite -> create waiting list for private game
+        if (!this.friendWaitingList.has(listName)) {
+            console.log("here")
+            this.friendWaitingList.set(listName, [user.id, target.id]);
+            // renvoyer l'invite a target
+            targetSocket.emit('inviteGame', {
+                sender: user.nickname,
+                target: target.nickname,
+                // game type aussi
+            });
+        }
+        // Already received invite -> start game
+        else {
+            //sacha --> check all waiting lists
+            if (this.defaultWaitingList.has(client.id))
+                this.defaultWaitingList.delete(client.id);
+            if (this.defaultWaitingList.has(targetSocket.id))
+                this.defaultWaitingList.delete(targetSocket.id);
+            if (this.upgradedWaitingList.has(client.id))
+                this.upgradedWaitingList.delete(client.id);
+            if (this.upgradedWaitingList.has(targetSocket.id))
+                this.upgradedWaitingList.delete(targetSocket.id);
+
+            // Send startGame event
+            client.emit('startGame');
+            targetSocket.emit('startGame');
+
+            await this.sleep(300);
+            var socketP1 = this.userToSocket.get(user.id);
+            var socketP2 = this.userToSocket.get(target.id);
+            // wait for new socket connection
+            while (!socketP1 || !socketP2 || socketP1.id === client.id || socketP2.id === targetSocket.id) {
+                socketP1 = this.userToSocket.get(user.id);
+                socketP2 = this.userToSocket.get(target.id);
+            }
+
+            // create room	
+            const room = new Room(listName, user, target);
+
+            // const socketP1 = this.userToSocket.get(user.id);
+            // const socketP2 = this.userToSocket.get(target.id)
+
+            await socketP1.join(listName);
+            await socketP2.join(listName);
             // send room initial info to front
-            client.emit('Room', { name: listName, role: ROLE.Left, leftNickname: room.getLeftNickname(), rightNickname: room.getRightNickname() });
-            targetSocket.emit('Room', { name: listName, role: ROLE.Right, leftNickname: room.getLeftNickname(), rightNickname: room.getRightNickname() });
+            socketP1.emit('Room', { name: listName, role: ROLE.Left, leftNickname: room.getLeftNickname(), rightNickname: room.getRightNickname() });
+            socketP2.emit('Room', { name: listName, role: ROLE.Right, leftNickname: room.getLeftNickname(), rightNickname: room.getRightNickname() });
             this.roomsList.set(listName, room);
-            
-            this.roomsParticipants.set(client.id, room);
-            this.roomsParticipants.set(targetSocket.id, room);
+
+            this.roomsParticipants.set(socketP1.id, room);
+            this.roomsParticipants.set(socketP2.id, room);
             this.server.to(listName).emit('AreYouReady');
             this.friendWaitingList.delete(listName);
 
-			//sacha --> check all waiting lists
-			if (this.defaultWaitingList.has(client.id))
-				this.defaultWaitingList.delete(client.id);
-			if (this.defaultWaitingList.has(targetSocket.id))
-				this.defaultWaitingList.delete(targetSocket.id);
-			if (this.upgradedWaitingList.has(client.id))
-				this.upgradedWaitingList.delete(client.id);
-			if (this.upgradedWaitingList.has(targetSocket.id))
-				this.upgradedWaitingList.delete(targetSocket.id);
 
-
-			// Send startGame event
-			client.emit('startGame');
-			targetSocket.emit('startGame');
-		}
-	}
+        }
+    }
 
     /******************************************************************************
     *                                KEYS HANDLING                                *
     ******************************************************************************/
 
-	@SubscribeMessage('keys')
+    @SubscribeMessage('keys')
     async onKeys(@ConnectedSocket() client: Socket, @MessageBody('action') action: string,
-    @MessageBody('roomName') roomName: string, @MessageBody('role') role: ROLE) {
+        @MessageBody('roomName') roomName: string, @MessageBody('role') role: ROLE) {
 
-        const room = this.roomsList.get(roomName);      
+        const room = this.roomsList.get(roomName);
 
-        if (role == ROLE.Left)
-        {
+        if (role == ROLE.Left) {
             if (action === 'upPressed') {
                 room.getLeftPaddle().move(-10);
             } else if (action === 'downPressed') {
@@ -246,8 +266,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
             room.getLeftPaddle().update();
         }
-        if (role == ROLE.Right)
-        {
+        if (role == ROLE.Right) {
             if (action === 'upPressed') {
                 room.getRightPaddle().move(-10);
             } else if (action === 'downPressed') {
@@ -263,12 +282,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     *                                   MATCHMAKING                               *
     ******************************************************************************/
 
-    async matchmaking(option:OPTION) // add upgraded features
+    async matchmaking(option: OPTION) // add upgraded features
     {
-        if (option == OPTION.Default)
-        {
-            if (this.defaultWaitingList.size >= 2)
-            {
+        if (option == OPTION.Default) {
+            if (this.defaultWaitingList.size >= 2) {
                 const iteratorId = this.defaultWaitingList.keys();
                 const iteratorPlayer = this.defaultWaitingList.values();
 
@@ -295,7 +312,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 secondClient.emit('Room', { name: roomName, role: ROLE.Right, leftNickname: room.getLeftNickname(), rightNickname: room.getRightNickname() });
 
                 this.roomsList.set(roomName, room);
-                
+
                 this.roomsParticipants.set(firstId.value, room);
                 this.roomsParticipants.set(secondId.value, room);
 
@@ -304,12 +321,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 this.defaultWaitingList.delete(firstId.value);
                 this.defaultWaitingList.delete(secondId.value);
 
-           }
+            }
         }
 
-    /******************************************************************************
-    *                                   ROBOT                                     *
-    ******************************************************************************/
+        /******************************************************************************
+        *                                   ROBOT                                     *
+        ******************************************************************************/
 
         // //ROBOT ROOM CREATION
         // else if (option == OPTION.Robot)
@@ -334,7 +351,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     *                                  GAME LOOP                                  *
     ******************************************************************************/
 
-	async sleep(ms: number) {
+    async sleep(ms: number) {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
@@ -342,79 +359,80 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     async onReady(@ConnectedSocket() client: Socket, @MessageBody('roomName') roomName: string) {
 
         const room = this.roomsList.get(roomName);
-        
-        room.isReady();
 
+        room.isReady();
+        console.log('set room ready')
         //both players are ready --> start game loop
-        if (room.getReady() >= 2)
-        {
+        if (room.getReady() >= 2) {
+            console.log('both ready');
             await this.gameService.statusIngame(room.getLeftUser().id);
             await this.gameService.statusIngame(room.getRightUser().id);
 
-        if (this.defaultWaitingList.has(client.id))
-            this.defaultWaitingList.delete(client.id);
+            if (this.defaultWaitingList.has(client.id))
+                this.defaultWaitingList.delete(client.id);
 
-        if (this.upgradedWaitingList.has(client.id))
-            this.upgradedWaitingList.delete(client.id);
+            if (this.upgradedWaitingList.has(client.id))
+                this.upgradedWaitingList.delete(client.id);
 
             //set count down
-            
+
             isPlaying = true; // change for setGameStart() for code consistency
 
             const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
             const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
             this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
-    
+
             while (isPlaying === true && !room.getGameEnd()) {
                 //const updatePuckInterval = setInterval(() => {
-                    room.getPuck().update();
-                    //if (this.puck.checkPaddleRight(this.right) || this.puck.checkPaddleLeft(this.left) || this.puck.checkEdges()) {
-                        room.getPuck().checkPaddleRight(room.getRightPaddle());
-                        room.getPuck().checkPaddleLeft(room.getLeftPaddle());
-                        const point = room.getPuck().checkEdges();
-                        if (point == POINT.Left)
-                        {
-                            room.leftPoint();
-                            this.server.to(roomName).emit('Score', { left: room.getLeftScore(), right: room.getRightScore() });
-                        }
-                        if (point == POINT.Right)
-                        {
-                            room.rightPoint();
-                            this.server.to(roomName).emit('Score', { left: room.getLeftScore(), right: room.getRightScore() });
-                        }
-                        const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
-                        const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
-                        this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
-                    //}
+                room.getPuck().update();
+                //if (this.puck.checkPaddleRight(this.right) || this.puck.checkPaddleLeft(this.left) || this.puck.checkEdges()) {
+                room.getPuck().checkPaddleRight(room.getRightPaddle());
+                room.getPuck().checkPaddleLeft(room.getLeftPaddle());
+                const point = room.getPuck().checkEdges();
+                if (point == POINT.Left) {
+                    room.leftPoint();
+                    this.server.to(roomName).emit('Score', { left: room.getLeftScore(), right: room.getRightScore() });
+                }
+                if (point == POINT.Right) {
+                    room.rightPoint();
+                    this.server.to(roomName).emit('Score', { left: room.getLeftScore(), right: room.getRightScore() });
+                }
+                const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
+                const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
+                this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
+                //}
                 //}, 1000 / 60);
                 this.server.to(roomName).emit('Paddle', { leftPos: room.getLeftPaddle().getY(), rightPos: room.getRightPaddle().getY() });
-                await this.sleep(1000/60);
+                await this.sleep(1000 / 60);
             }
 
             //if end of game due to deconnection (find method to identify deconnected socket) --> set the one who deconnected as loser
 
-            if (this.userToSocket.has(room.getLeftUser().id))
+            if (!this.userToSocket.has(room.getLeftUser().id)) {
                 room.setLeftAsWinner();
-            
-            if (this.userToSocket.has(room.getRightUser().id))
+                console.log("left as winner bc disconnect")
+
+            }
+
+            if (!this.userToSocket.has(room.getRightUser().id))
                 room.setRightAsWinner();
-            
+
             // send results of match & status to db for profiles
             await this.gameService.createMatch(room.getLeftUser().id, room.getRightUser().id, room.getLeftScore(), room.getRightScore(), "ranked");
             await this.gameService.statusOnline(room.getLeftUser().id);
             await this.gameService.statusOnline(room.getRightUser().id);
-			// update achievements
-			this.gameService.updateAchievements(room.getLeftUser().id);
-			this.gameService.updateAchievements(room.getRightUser().id);
+            // update achievements
+            this.gameService.updateAchievements(room.getLeftUser().id);
+            this.gameService.updateAchievements(room.getRightUser().id);
         }
     }
 
     // clean end of game
     @SubscribeMessage('clean')
     async onLeave(@ConnectedSocket() client: Socket, @MessageBody('roomName') roomName: string) {
-        
+
         client.leave(roomName);
-        
+
         if (this.roomsList.has(roomName))
             this.roomsList.delete(roomName);
 
