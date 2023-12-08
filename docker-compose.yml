@@ -6,9 +6,9 @@ services:
     ports:
       - 5434:5432
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
-      POSTGRES_DB: nest
+      POSTGRES_USER: postgres   # ENV
+      POSTGRES_PASSWORD: 123    # ENV
+      POSTGRES_DB: nest         # ENV
     networks:
       - transcendence
   monorepo:
@@ -19,6 +19,7 @@ services:
       - ./monorepo:/app/monorepo
     ports:
       - "3000:3000"
+      - "5555:5555"  # for prisma studio
     # env_file: .env
     depends_on:
       - postgres-db

@@ -146,7 +146,7 @@ const Game: React.FC = () => {
                     role,
                     leftNickname,
                     rightNickname,
-                }: Room) => {
+                }: any) => {
                     setRoomName(name);
                     setRole(role);
                     setNickname({ left: leftNickname, right: rightNickname });
