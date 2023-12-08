@@ -513,6 +513,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                     room.setRightAsWinner();    
             }
             
+            this.server.to(roomName).emit('GameEnd');
+
             // send results of match & status to db for profiles
             await this.gameService.createMatch(room.getLeftUser().id, room.getRightUser().id, room.getLeftScore(), room.getRightScore(), "ranked");
             await this.gameService.statusOnline(room.getLeftUser().id);

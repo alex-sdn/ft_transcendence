@@ -78,6 +78,8 @@ const Game: React.FC = () => {
 
     const [Countdown, setCountdown] = useState(false);
 
+    const [GameEnd, setGameEnd] = useState(false);
+
     const [Count, setCount] = useState<number>(0);
 
     const [LogOut, setLogOut] = useState(false);
@@ -219,6 +221,22 @@ const Game: React.FC = () => {
         };
     }, [roomName]);
 
+    useEffect(() => {
+        if (socket)
+        {
+            socket.on(
+                "GameEnd",
+                () => {
+                    setGameEnd(true);
+                }
+            );
+        }
+        return () => {
+            if (socket)
+                socket.off("GameEnd");
+        };
+    }, [roomName]);
+
     /******************************************************************************
     *                              KEYS HANDLING                                  *
     ******************************************************************************/
@@ -288,8 +306,6 @@ const Game: React.FC = () => {
 
     const NewGame = () => {
 
-        console.log('****NEW GAME****');
-
         // clean all in back
         socket?.emit('clean', { roomName: roomName });
 
@@ -308,6 +324,7 @@ const Game: React.FC = () => {
         setScreenIssue(false);
         setCountdown(false);
         setCount(0);
+        setGameEnd(false);
     };
 
     /******************************************************************************
@@ -419,6 +436,7 @@ const Game: React.FC = () => {
                 {AskReady &&
                     (<button onClick={IAmReady}>Ready</button>)
                 }
+
                 {Countdown && 
                     (<div> 
                         {Count}
@@ -440,6 +458,10 @@ const Game: React.FC = () => {
                 }
 
                 {LogOut &&
+                    (<button onClick={NewGame}>New Game</button>)
+                }
+
+                {GameEnd &&
                     (<button onClick={NewGame}>New Game</button>)
                 }
 
