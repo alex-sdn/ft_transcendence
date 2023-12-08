@@ -5,7 +5,7 @@ import { AuthService } from "src/auth/auth.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { ChatService } from "../chat.service";
 
-@WebSocketGateway({ namespace: 'chat1' })
+@WebSocketGateway()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
 		private chatService: ChatService,
@@ -32,19 +32,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		else {
 			console.log('Connection accepted for', user.nickname);
 			// status Online
-			this.chatService.statusOnline(user.id);
+			await this.chatService.statusOnline(user.id);
 			// add to maps
 			this.userToSocket.set(user.id, client);
 			this.idToUser.set(client.id, user);
 		}
 	}
 
-	handleDisconnect(client: any) {
+	async handleDisconnect(client: any) {
 		console.log(client.id, "disconnected");
 
 		if (this.idToUser.has(client.id)) {
 			// status Offline
-			this.chatService.statusOffline(this.idToUser.get(client.id).id);
+			await this.chatService.statusOffline(this.idToUser.get(client.id).id);
 			// rm from maps
 			this.userToSocket.delete(this.idToUser.get(client.id).id);
 			this.idToUser.delete(client.id);
