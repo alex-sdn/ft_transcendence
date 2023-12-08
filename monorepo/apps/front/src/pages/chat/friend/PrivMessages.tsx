@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom";
 interface PrivMessage {
 	sender: string;
 	message: string;
+	isCommand: boolean;
 }
 
 interface PrivMessageProps {
@@ -63,6 +64,7 @@ const PrivMessages: React.FC<PrivMessageProps> = ({ sender }) => {
 					const previousmessages: PrivMessage[] = response.data.map((msg: any) => ({
 						sender: msg.sender.nickname,
 						message: msg.message,
+						isCommand: msg.isCommand,
 					}));
 					setPrivmessages(previousmessages);
 				}
@@ -84,7 +86,7 @@ const PrivMessages: React.FC<PrivMessageProps> = ({ sender }) => {
 		<div className="privmessages-container">
 			<div className="privmessages-list">
 				{privmessages.map((msg, index) => (
-					<div key={index} className={"privregular-message"}>
+					<div key={index} className={msg.isCommand ? "privcommand-message" : "privregular-message"}>
 						<strong>{msg.sender}</strong>{":"} <span>{msg.message}</span>
 					</div>
 				))}
