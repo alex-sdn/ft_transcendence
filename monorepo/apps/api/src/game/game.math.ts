@@ -1,5 +1,8 @@
-export const width: number = 600;
-export const height: number = 400;
+export const PRECISION: number = 4;
+export const VELOCITY: number = 4;
+export const PUCK: number = 5 * PRECISION;
+export const width: number = 600 * PRECISION;
+export const height: number = 400 * PRECISION;
 
 export enum POINT {
     Left,
@@ -21,14 +24,14 @@ export class Paddle {
 
     constructor(isLeft: boolean) {
         this.y = height / 2;
-        this.w = 10;
-        this.h = 100;
+        this.w = 10 * PRECISION;
+        this.h = 100 * PRECISION;
         this.ychange = 0;
 
         if (isLeft) {
-            this.x = 10;
+            this.x = 10 * PRECISION;
         } else {
-            this.x = width - 10;
+            this.x = width - 10 * PRECISION;
         }
     }
 
@@ -84,7 +87,7 @@ export class Puck {
         this.y = height / 2;
         this.xspeed = 0;
         this.yspeed = 0;
-        this.r = 5;
+        this.r = 5 * PRECISION;
 
         this.reset();
     }
@@ -100,8 +103,8 @@ export class Puck {
                 let diff = this.y - (p.getY() - p.getH() / 2);
                 let rad = this.radians(45);
                 let angle = this.map(diff, 0, p.getH(), -rad, rad);
-                this.xspeed = 5 * Math.cos(angle);
-                this.yspeed = 5 * Math.sin(angle);
+                this.xspeed = VELOCITY * Math.cos(angle) * PRECISION;
+                this.yspeed = VELOCITY * Math.sin(angle) * PRECISION;
                 this.x = p.getX() + p.getW() / 2 + this.r;
                 return (true);
             }
@@ -119,8 +122,8 @@ export class Puck {
             if (this.x < p.getX()) {
                 let diff = this.y - (p.getY() - p.getH() / 2);
                 let angle = this.map(diff, 0, p.getH(), this.radians(225), this.radians(135));
-                this.xspeed = 5 * Math.cos(angle);
-                this.yspeed = 5 * Math.sin(angle);
+                this.xspeed = VELOCITY * Math.cos(angle) * PRECISION;
+                this.yspeed = VELOCITY * Math.sin(angle) * PRECISION;
                 this.x = p.getX() - p.getW() / 2 - this.r;
                 return (true);
             }
@@ -137,8 +140,8 @@ export class Puck {
         this.x = width / 2;
         this.y = height / 2;
         let angle = this.random(-Math.PI / 4, Math.PI / 4);
-        this.xspeed = 5 * Math.cos(angle);
-        this.yspeed = 5 * Math.sin(angle);
+        this.xspeed = VELOCITY * Math.cos(angle) * PRECISION;
+        this.yspeed = VELOCITY * Math.sin(angle) * PRECISION;
 
         if (Math.random() < 0.5) {
             this.xspeed *= -1;
@@ -146,17 +149,17 @@ export class Puck {
     }
 
     checkEdges(): POINT {
-        if (this.y < 5 || this.y > height - 5) {
+        if (this.y < PUCK || this.y > height - PUCK) {
             this.yspeed *= -1;
             return (POINT.Nobody);
         }
 
-        if (this.x - this.r - 5 > width) {
+        if (this.x - this.r - PUCK > width) {
             this.reset();
             return (POINT.Left);
         }
 
-        if (this.x + this.r + 5 < 0) {
+        if (this.x + this.r + PUCK < 0) {
             this.reset();
             return (POINT.Right);
         }
