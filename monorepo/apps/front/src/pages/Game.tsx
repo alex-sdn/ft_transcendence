@@ -413,12 +413,12 @@ const Game: React.FC = () => {
                 ctxt.fillText(score.right, canvas.width * 0.75, 20);
 
                 // nicknames
-                ctxt.font = "20px 'Orbitron', bold";
+                ctxt.font = "100px 'Orbitron', bold";
                 ctxt.fillStyle = "white";
                 ctxt.textAlign = "center";
                 ctxt.textBaseline = "bottom";
-                ctxt.fillText(nickname.left, canvas.width * 0.25, 20);
-                ctxt.fillText(nickname.right, canvas.width * 0.75, 20);
+                ctxt.fillText(nickname.left, canvas.width * 0.25, canvas.height - 30);
+                ctxt.fillText(nickname.right, canvas.width * 0.75, canvas.height - 30);
             }
         }
     }, [paddle, puckPos, puckDir, score, AskReady, LogOut]);
