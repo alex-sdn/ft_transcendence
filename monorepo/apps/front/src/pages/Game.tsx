@@ -5,13 +5,15 @@ import SocketContext from "../Socket.js";
 *                         INTERFACES & CONSTANTS                              *
 ******************************************************************************/
 
+const PRECISION = 4;
+
 export const gameConst = {
-    PLAYGROUND_WIDTH: 600,
-    PLAYGROUND_HEIGHT: 400,
-    PADDLE_MOVE_SPEED: 10,
-    PADDLE_HEIGHT: 100,
-    PADDLE_WIDTH: 10,
-    PADDLE_OFFSET: 10,
+    PLAYGROUND_WIDTH: 600 * PRECISION,
+    PLAYGROUND_HEIGHT: 400 * PRECISION,
+    PADDLE_MOVE_SPEED: 10 * PRECISION,
+    PADDLE_HEIGHT: 100 * PRECISION,
+    PADDLE_WIDTH: 10 * PRECISION,
+    PADDLE_OFFSET: 10 * PRECISION,
 };
 
 export interface PuckPos {
@@ -364,18 +366,18 @@ const Game: React.FC = () => {
                 canvas.width = gameConst.PLAYGROUND_WIDTH;
                 canvas.height = gameConst.PLAYGROUND_HEIGHT;
 
-                // background canvas white
-                ctxt.fillStyle = "white";
+                // background canvas black
+                ctxt.fillStyle = "black";
                 ctxt.fillRect(0, 0, canvas.width, canvas.height);
 
-                // black border
-                ctxt.strokeStyle = "black";
-                ctxt.lineWidth = 3;
+                // white border
+                ctxt.strokeStyle = "white";
+                ctxt.lineWidth = 3 * PRECISION;
                 ctxt.setLineDash([]);
                 ctxt.strokeRect(0, 0, canvas.width, canvas.height);
 
                 // dashed divider line
-                ctxt.setLineDash([23, 14.7]);
+                ctxt.setLineDash([23 * PRECISION, 14.7 * PRECISION]);
                 ctxt.beginPath();
                 ctxt.moveTo(canvas.width / 2, 0);
                 ctxt.lineTo(canvas.width / 2, canvas.height);
@@ -383,8 +385,8 @@ const Game: React.FC = () => {
 
                 // both paddles
                 // ctxt.fillStyle = "#262f69"; --> color for bonus
-                ctxt.fillStyle = "black";
-                ctxt.fillRect(10, paddle.leftPos - gameConst.PADDLE_HEIGHT / 2, gameConst.PADDLE_WIDTH, gameConst.PADDLE_HEIGHT);
+                ctxt.fillStyle = "white";
+                ctxt.fillRect(gameConst.PADDLE_OFFSET, paddle.leftPos - gameConst.PADDLE_HEIGHT / 2, gameConst.PADDLE_WIDTH, gameConst.PADDLE_HEIGHT);
                 // ctxt.fillStyle = "#482669"; --> color for bonus
                 ctxt.fillRect(
                     canvas.width - gameConst.PADDLE_WIDTH - gameConst.PADDLE_OFFSET,
@@ -394,7 +396,7 @@ const Game: React.FC = () => {
                 );
 
                 // puck
-                ctxt.fillStyle = "black";
+                ctxt.fillStyle = "white";
                 ctxt.fillRect(
                     puckPos.x - gameConst.PADDLE_WIDTH / 2,
                     puckPos.y - gameConst.PADDLE_WIDTH / 2,
@@ -403,8 +405,8 @@ const Game: React.FC = () => {
                 );
 
                 // scores
-                ctxt.font = "50px 'Orbitron', bold";
-                ctxt.fillStyle = "black";
+                ctxt.font = "200px 'Orbitron', bold";
+                ctxt.fillStyle = "white";
                 ctxt.textAlign = "center";
                 ctxt.textBaseline = "top";
                 ctxt.fillText(score.left, canvas.width * 0.25, 20);
@@ -412,7 +414,7 @@ const Game: React.FC = () => {
 
                 // nicknames
                 ctxt.font = "20px 'Orbitron', bold";
-                ctxt.fillStyle = "black";
+                ctxt.fillStyle = "white";
                 ctxt.textAlign = "center";
                 ctxt.textBaseline = "bottom";
                 ctxt.fillText(nickname.left, canvas.width * 0.25, 20);
@@ -518,7 +520,7 @@ const Game: React.FC = () => {
                 }
 
                 {!AskOption && !AskReady && !ScreenIssue && !Countdown && (Count >= 4) &&
-                    (<div>
+                    (<div id="retro">
                         <canvas id="responsive-canvas" ref={canvasRef}></canvas>
                     </div>)
                 }
@@ -539,14 +541,13 @@ const Game: React.FC = () => {
                     (<button onClick={NewGame}>New Game</button>)
                 }
 
-                {
+                {true &&
                     (<div id="crowdContainer">
                         <canvas id="leftEyeCanvas" width="200" height="200" ref={leftEyeCanvasRef}>
                         </canvas>
                         <canvas id="rightEyeCanvas" width="200" height="200" ref={rightEyeCanvasRef}>
                         </canvas>
                     </div>)
-
                 }
 
             </div>

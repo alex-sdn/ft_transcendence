@@ -5,7 +5,7 @@ import { AuthService } from "src/auth/auth.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { GameService } from "../game.service";
 import { instrument } from "@socket.io/admin-ui";
-import { width, height, Puck, Paddle, POINT } from '../game.math';
+import { width, height, Puck, Paddle, POINT, PRECISION } from '../game.math';
 import { Room } from '../game.room';
 
 export enum OPTION {
@@ -296,9 +296,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         if (role == ROLE.Left) {
             if (action === 'upPressed') {
-                room.getLeftPaddle().move(-10);
+                room.getLeftPaddle().move(-10 * PRECISION);
             } else if (action === 'downPressed') {
-                room.getLeftPaddle().move(10);
+                room.getLeftPaddle().move(10 * PRECISION);
             } else if (action === 'released') {
                 room.getLeftPaddle().move(0);
             }
@@ -306,9 +306,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
         if (role == ROLE.Right) {
             if (action === 'upPressed') {
-                room.getRightPaddle().move(-10);
+                room.getRightPaddle().move(-10 * PRECISION);
             } else if (action === 'downPressed') {
-                room.getRightPaddle().move(10);
+                room.getRightPaddle().move(10 * PRECISION);
             } else if (action === 'released') {
                 room.getRightPaddle().move(0);
             }
@@ -410,20 +410,20 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ******************************************************************************/
 
     async robotLoop(room: Room) {
-        let error = Math.random() * 5 - 5; // error margin between -2.5 and 2.5
-        let delta = Math.random() * 50; // reaction delay 0 up to 50ms
-        let speed = Math.random() * 4 + 4; // speed between 4 and 8
+        let error = (Math.random() * 5 - 5) * PRECISION; // error margin between -5 and 5
+        let delta = Math.random() * 100; // reaction delay 0 up to 50ms
+        let speed = (Math.random() * 4 + 4) * 2; // speed between 4 and 8
 
         await new Promise(resolve => setTimeout(resolve, delta)); // --> would be better if only on ball dir change 
 
         // add anticipation of ball move when ball goes toward other player
 
         // move down
-        if (room.getPuck().getY() + 7.5 + error < room.getRightPaddle().getY()) {
+        if (room.getPuck().getY() + 7.5 * PRECISION + error < room.getRightPaddle().getY()) {
             room.getRightPaddle().move(-speed);
         }
         // move up
-        else if (room.getPuck().getY() - 7.5 + error > room.getRightPaddle().getY()) {
+        else if (room.getPuck().getY() - 7.5 * PRECISION + error > room.getRightPaddle().getY()) {
             room.getRightPaddle().move(speed);
         }
         // don't move
