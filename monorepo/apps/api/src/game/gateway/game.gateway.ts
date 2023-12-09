@@ -412,23 +412,29 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     *                                   ROBOT                                     *
     ******************************************************************************/
 
-    // speed 0.8 * human + weakness --> top ?
     async robotLoop(room: Room) {
-        // add check direction of ball ? (human would move by anticipation anyway)
+        let error = Math.random() * 5 - 5; // error margin between -2.5 and 2.5
+        let delta = Math.random() * 50; // reaction delay 0 up to 50ms
+        let speed = Math.random() * 4 + 4; // speed between 4 and 8
+    
+        await new Promise(resolve => setTimeout(resolve, delta)); // --> would be better if only on ball dir change 
+    
+        // add anticipation of ball move when ball goes toward other player
 
-            // move down
-            if (room.getPuck().getY() + 7.5 < room.getRightPaddle().getY()) {
-                room.getRightPaddle().move(-7);
-            }
-            // move up
-            else if (room.getPuck().getY() - 7.5 > room.getRightPaddle().getY()) {
-                room.getRightPaddle().move(7);
-            }
-            // don't move --> add modulo so that human like ? --> randomization of lag + usleep when ball changes direction
-            else {
-                room.getRightPaddle().move(0);
-            }
-            room.getRightPaddle().update();
+        // move down
+        if (room.getPuck().getY() + 7.5 + error < room.getRightPaddle().getY()) {
+            room.getRightPaddle().move(-speed);
+        }
+        // move up
+        else if (room.getPuck().getY() - 7.5 + error > room.getRightPaddle().getY()) {
+            room.getRightPaddle().move(speed);
+        }
+        // don't move
+        else {
+            room.getRightPaddle().move(0);
+        }
+    
+        room.getRightPaddle().update();
     }
 
     /******************************************************************************
