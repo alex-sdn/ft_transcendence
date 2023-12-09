@@ -294,11 +294,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         const room = this.roomsList.get(roomName);
 
+        let steps;
+        if (room.getOption() == OPTION.CoolCat)
+            steps = 3;
+        else
+            steps = 10;
+
         if (role == ROLE.Left) {
             if (action === 'upPressed') {
-                room.getLeftPaddle().move(-10 * PRECISION);
+                room.getLeftPaddle().move(-1 * steps * PRECISION);
             } else if (action === 'downPressed') {
-                room.getLeftPaddle().move(10 * PRECISION);
+                room.getLeftPaddle().move(steps * PRECISION);
             } else if (action === 'released') {
                 room.getLeftPaddle().move(0);
             }
@@ -306,14 +312,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
         if (role == ROLE.Right) {
             if (action === 'upPressed') {
-                room.getRightPaddle().move(-10 * PRECISION);
+                room.getRightPaddle().move(-1 * steps * PRECISION);
             } else if (action === 'downPressed') {
-                room.getRightPaddle().move(10 * PRECISION);
+                room.getRightPaddle().move(steps * PRECISION);
             } else if (action === 'released') {
                 room.getRightPaddle().move(0);
             }
             room.getRightPaddle().update();
         }
+        if (room.getOption() == OPTION.CoolCat)
+            this.server.to(roomName).emit('Paddle', { leftPos: room.getLeftPaddle().getY(), rightPos: room.getRightPaddle().getY() });
     }
 
     /******************************************************************************
@@ -412,7 +420,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     async robotLoop(room: Room) {
         let error = (Math.random() * 5 - 5) * PRECISION; // error margin between -5 and 5
         let delta = Math.random() * 100; // reaction delay 0 up to 50ms
-        let speed = (Math.random() * 4 + 4) * 2; // speed between 4 and 8
+        let speed = (Math.random() * 4 + 4) * PRECISION / 2; // speed between 4 and 8
 
         await new Promise(resolve => setTimeout(resolve, delta)); // --> would be better if only on ball dir change 
 
@@ -460,8 +468,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.withdrawFromAllWaitingLists(client.id);
 
             // set count down
-            for (let i = 1; i <= 4; i++) {
-                await this.sleep(1000);
+            for (let i = 3; i >= -1; i--) {
+                if (i != 3)
+                    await this.sleep(1000);
                 this.server.to(roomName).emit('Countdown', i);
             }
 
@@ -476,6 +485,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 if (!this.robotInterval.has(roomName))
                     this.robotInterval.set(roomName, setInterval(this.robotLoop, 30, room));
             }
+
+            await this.sleep(300);
 
             while (!room.getGameEnd()) {
                 //const updatePuckInterval = setInterval(() => {
@@ -498,7 +509,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 //}
                 //}, 1000 / 60);
 
-                this.server.to(roomName).emit('Paddle', { leftPos: room.getLeftPaddle().getY(), rightPos: room.getRightPaddle().getY() });
+                if (room.getOption() != OPTION.CoolCat)
+                    this.server.to(roomName).emit('Paddle', { leftPos: room.getLeftPaddle().getY(), rightPos: room.getRightPaddle().getY() });
 
                 await this.sleep(1000 / 60);
             }

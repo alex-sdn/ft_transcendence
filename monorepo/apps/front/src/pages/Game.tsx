@@ -82,7 +82,7 @@ const Game: React.FC = () => {
 
     const [GameEnd, setGameEnd] = useState(false);
 
-    const [Count, setCount] = useState<number>(0);
+    const [Count, setCount] = useState<number>(4);
 
     const [LogOut, setLogOut] = useState(false);
 
@@ -211,7 +211,7 @@ const Game: React.FC = () => {
             socket.on(
                 "Countdown",
                 (nbr: number) => {
-                    if (nbr === 4)
+                    if (nbr === -1)
                         setCountdown(false);
                     else
                         setCountdown(true);
@@ -326,7 +326,7 @@ const Game: React.FC = () => {
         setAskOption(true);
         setScreenIssue(false);
         setCountdown(false);
-        setCount(0);
+        setCount(4);
         setGameEnd(false);
     };
 
@@ -482,19 +482,21 @@ const Game: React.FC = () => {
         context.fill();
     }
 
-    useEffect(() => {
+    if (false) {
+        useEffect(() => {
 
-        const leftCanvas = leftEyeCanvasRef.current;
-        const rightCanvas = rightEyeCanvasRef.current;
+            const leftCanvas = leftEyeCanvasRef.current;
+            const rightCanvas = rightEyeCanvasRef.current;
 
-        //initialize ?
-        //eyeball(leftCanvas, { x: 100, y: 100, x2: 100, y2: 100 });
-        //eyeball(rightCanvas, { x: 400, y: 100, x2: 400, y2: 100 });
+            //initialize ?
+            //eyeball(leftCanvas, { x: 100, y: 100, x2: 100, y2: 100 });
+            //eyeball(rightCanvas, { x: 400, y: 100, x2: 400, y2: 100 });
 
-        eyeball(leftCanvas, getPupil(leftCanvas, puckPos.x, puckPos.y));
-        eyeball(rightCanvas, getPupil(rightCanvas, puckPos.x, puckPos.y));
+            eyeball(leftCanvas, getPupil(leftCanvas, puckPos.x, puckPos.y));
+            eyeball(rightCanvas, getPupil(rightCanvas, puckPos.x, puckPos.y));
 
-    }, [puckPos]);
+        }, [puckPos]);
+    }
 
     return (
         <div>
@@ -513,13 +515,19 @@ const Game: React.FC = () => {
                     (<button onClick={IAmReady}>Ready</button>)
                 }
 
-                {Countdown &&
-                    (<div>
+                {Countdown && (Count != 0) &&
+                    (<div id="countdown">
                         {Count}
                     </div>)
                 }
 
-                {!AskOption && !AskReady && !ScreenIssue && !Countdown && (Count >= 4) &&
+                {Countdown && (Count == 0) &&
+                    (<div id="countdown">
+                        FIGHT !
+                    </div>)
+                }
+
+                {!AskOption && !AskReady && !ScreenIssue && !Countdown && (Count <= 0) &&
                     (<div id="retro">
                         <canvas id="responsive-canvas" ref={canvasRef}></canvas>
                     </div>)
@@ -541,7 +549,7 @@ const Game: React.FC = () => {
                     (<button onClick={NewGame}>New Game</button>)
                 }
 
-                {true &&
+                {false &&
                     (<div id="crowdContainer">
                         <canvas id="leftEyeCanvas" width="200" height="200" ref={leftEyeCanvasRef}>
                         </canvas>
