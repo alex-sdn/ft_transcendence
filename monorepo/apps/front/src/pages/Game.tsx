@@ -88,6 +88,9 @@ const Game: React.FC = () => {
 
     const canvasRef = useRef<any>(null);
 
+    const leftEyeCanvasRef = useRef<any>(null);
+    const rightEyeCanvasRef = useRef<any>(null);
+
     const socket = useContext(SocketContext);
 
     useEffect(() => {
@@ -154,7 +157,7 @@ const Game: React.FC = () => {
                     name,
                     role,
                     leftNickname,
-                    rightNickname, 
+                    rightNickname,
                 }: any) => {
                     setRoomName(name);
                     setRole(role);
@@ -202,16 +205,15 @@ const Game: React.FC = () => {
     }, [roomName]);
 
     useEffect(() => {
-        if (socket)
-        {
+        if (socket) {
             socket.on(
                 "Countdown",
                 (nbr: number) => {
-                    if(nbr === 4)
-                        setCountdown(false);                    
+                    if (nbr === 4)
+                        setCountdown(false);
                     else
                         setCountdown(true);
-                    setCount(nbr);                
+                    setCount(nbr);
                 }
             );
         }
@@ -222,8 +224,7 @@ const Game: React.FC = () => {
     }, [roomName]);
 
     useEffect(() => {
-        if (socket)
-        {
+        if (socket) {
             socket.on(
                 "GameEnd",
                 () => {
@@ -274,13 +275,13 @@ const Game: React.FC = () => {
         setGameOption(OPTION.Robot);
         setAskOption(false);
     };
-    
+
     const playRetro = () => {
         socket?.emit('retro', { action: 'retro' });
         setGameOption(OPTION.Retro);
         setAskOption(false);
     };
-    
+
     const playCoolCat = () => {
         socket?.emit('coolCat', { action: 'coolCat' });
         setGameOption(OPTION.CoolCat);
@@ -336,7 +337,7 @@ const Game: React.FC = () => {
         const handleResize = () => {
             const viewportWidth = window.innerWidth;
             const viewportHeight = window.innerHeight;
-                    
+
             if (viewportWidth < 600 || viewportHeight < 400) {
                 setScreenIssue(true);
             }
@@ -358,98 +359,171 @@ const Game: React.FC = () => {
     useEffect(() => {
         const canvas = canvasRef.current;
         if (canvas) {
-          const ctxt = canvas.getContext("2d");
-          if (ctxt) {
-            canvas.width = gameConst.PLAYGROUND_WIDTH;
-            canvas.height = gameConst.PLAYGROUND_HEIGHT;
-    
-            // background canvas white
-            ctxt.fillStyle = "white";
-            ctxt.fillRect(0, 0, canvas.width, canvas.height);
-    
-            // black border
-            ctxt.strokeStyle = "black";
-            ctxt.lineWidth = 3;
-            ctxt.setLineDash([]);
-            ctxt.strokeRect(0, 0, canvas.width, canvas.height);
-    
-            // dashed divider line
-            ctxt.setLineDash([23, 14.7]);
-            ctxt.beginPath();
-            ctxt.moveTo(canvas.width / 2, 0);
-            ctxt.lineTo(canvas.width / 2, canvas.height);
-            ctxt.stroke();
-    
-            // both paddles
-            // ctxt.fillStyle = "#262f69"; --> color for bonus
-            ctxt.fillStyle = "black";
-            ctxt.fillRect(10, paddle.leftPos - gameConst.PADDLE_HEIGHT / 2, gameConst.PADDLE_WIDTH, gameConst.PADDLE_HEIGHT);
-            // ctxt.fillStyle = "#482669"; --> color for bonus
-            ctxt.fillRect(
-              canvas.width - gameConst.PADDLE_WIDTH - gameConst.PADDLE_OFFSET,
-              paddle.rightPos - gameConst.PADDLE_HEIGHT / 2,
-              gameConst.PADDLE_WIDTH,
-              gameConst.PADDLE_HEIGHT,
-            );
-    
-            // puck
-            ctxt.fillStyle = "black";
-            ctxt.fillRect(
-              puckPos.x - gameConst.PADDLE_WIDTH / 2,
-              puckPos.y - gameConst.PADDLE_WIDTH / 2,
-              gameConst.PADDLE_WIDTH,
-              gameConst.PADDLE_WIDTH,
-            );
+            const ctxt = canvas.getContext("2d");
+            if (ctxt) {
+                canvas.width = gameConst.PLAYGROUND_WIDTH;
+                canvas.height = gameConst.PLAYGROUND_HEIGHT;
 
-            // scores
-            ctxt.font = "50px 'Orbitron', bold";
-            ctxt.fillStyle = "black";
-            ctxt.textAlign = "center";
-            ctxt.textBaseline = "top";
-            ctxt.fillText(score.left, canvas.width * 0.25, 20);
-            ctxt.fillText(score.right, canvas.width * 0.75, 20);
+                // background canvas white
+                ctxt.fillStyle = "white";
+                ctxt.fillRect(0, 0, canvas.width, canvas.height);
 
-            // nicknames
-            ctxt.font = "20px 'Orbitron', bold";
-            ctxt.fillStyle = "black";
-            ctxt.textAlign = "center";
-            ctxt.textBaseline = "bottom";
-            ctxt.fillText(nickname.left, canvas.width * 0.25, 20);
-            ctxt.fillText(nickname.right, canvas.width * 0.75, 20);
-          }
+                // black border
+                ctxt.strokeStyle = "black";
+                ctxt.lineWidth = 3;
+                ctxt.setLineDash([]);
+                ctxt.strokeRect(0, 0, canvas.width, canvas.height);
+
+                // dashed divider line
+                ctxt.setLineDash([23, 14.7]);
+                ctxt.beginPath();
+                ctxt.moveTo(canvas.width / 2, 0);
+                ctxt.lineTo(canvas.width / 2, canvas.height);
+                ctxt.stroke();
+
+                // both paddles
+                // ctxt.fillStyle = "#262f69"; --> color for bonus
+                ctxt.fillStyle = "black";
+                ctxt.fillRect(10, paddle.leftPos - gameConst.PADDLE_HEIGHT / 2, gameConst.PADDLE_WIDTH, gameConst.PADDLE_HEIGHT);
+                // ctxt.fillStyle = "#482669"; --> color for bonus
+                ctxt.fillRect(
+                    canvas.width - gameConst.PADDLE_WIDTH - gameConst.PADDLE_OFFSET,
+                    paddle.rightPos - gameConst.PADDLE_HEIGHT / 2,
+                    gameConst.PADDLE_WIDTH,
+                    gameConst.PADDLE_HEIGHT,
+                );
+
+                // puck
+                ctxt.fillStyle = "black";
+                ctxt.fillRect(
+                    puckPos.x - gameConst.PADDLE_WIDTH / 2,
+                    puckPos.y - gameConst.PADDLE_WIDTH / 2,
+                    gameConst.PADDLE_WIDTH,
+                    gameConst.PADDLE_WIDTH,
+                );
+
+                // scores
+                ctxt.font = "50px 'Orbitron', bold";
+                ctxt.fillStyle = "black";
+                ctxt.textAlign = "center";
+                ctxt.textBaseline = "top";
+                ctxt.fillText(score.left, canvas.width * 0.25, 20);
+                ctxt.fillText(score.right, canvas.width * 0.75, 20);
+
+                // nicknames
+                ctxt.font = "20px 'Orbitron', bold";
+                ctxt.fillStyle = "black";
+                ctxt.textAlign = "center";
+                ctxt.textBaseline = "bottom";
+                ctxt.fillText(nickname.left, canvas.width * 0.25, 20);
+                ctxt.fillText(nickname.right, canvas.width * 0.75, 20);
+            }
         }
     }, [paddle, puckPos, puckDir, score, AskReady, LogOut]);
+
+    /******************************************************************************
+    *                                CROWD CANVA                                   *
+    ******************************************************************************/
+
+    function getPupil(canvas: any, puckX: number, puckY: number) {
+
+        var rect = canvas.getBoundingClientRect();
+
+        var X = puckX - (rect.left + rect.width / 2);
+        var Y = puckY - (rect.top + rect.height / 2);
+        var XYs = Math.abs(X) + Math.abs(Y);
+        var Xr = (XYs == 0) ? 0 : X / (XYs);
+        var Yr = (XYs == 0) ? 0 : Y / (XYs);
+
+        var Zm = Math.pow(
+            Math.pow(rect.width, 2) +
+            Math.pow(rect.height, 2)
+            , 0.5);
+
+        var eyelimit = Zm * 2 / Math.PI
+        var Z = Zm * 12 / 100 * Math.atan(Math.pow(Math.pow(X, 2) + Math.pow(Y, 2), 0.5) / eyelimit);
+
+        return {
+            x: (rect.left + rect.width / 2) +
+                0.7 * Math.pow(Math.pow(Z, 2) * Math.abs(Xr), 0.5) *
+                ((Xr < 0) ? -1 : 1),
+            y: (rect.top + rect.height / 2) +
+                0.7 * Math.pow(Math.pow(Z, 2) * Math.abs(Yr), 0.5) *
+                ((Yr < 0) ? -1 : 1),
+            x2: (rect.left + rect.width / 2) +
+                Math.pow(Math.pow(Z, 2) * Math.abs(Xr), 0.5) *
+                ((Xr < 0) ? -1 : 1),
+            y2: (rect.top + rect.height / 2) +
+                Math.pow(Math.pow(Z, 2) * Math.abs(Yr), 0.5) *
+                ((Yr < 0) ? -1 : 1)
+        };
+    }
+
+    function eyeball(canvas: any, coord: any) {
+
+        var rect = canvas.getBoundingClientRect();
+        var context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        var grd = context.createRadialGradient(
+            coord.x - rect.left, coord.y - rect.top, 40,
+            coord.x2 - rect.left, coord.y2 - rect.top, 15);
+
+        grd.addColorStop(0.95, "black");
+        grd.addColorStop(0.94, "blue");
+        grd.addColorStop(0.41, "blue");
+        grd.addColorStop(0.40, "white");
+
+        context.fillStyle = grd;
+        context.beginPath();
+        context.arc(100, 100, 50, 0, 2 * Math.PI);
+        context.fill();
+    }
+
+    useEffect(() => {
+
+        const leftCanvas = leftEyeCanvasRef.current;
+        const rightCanvas = rightEyeCanvasRef.current;
+
+        //initialize ?
+        //eyeball(leftCanvas, { x: 100, y: 100, x2: 100, y2: 100 });
+        //eyeball(rightCanvas, { x: 400, y: 100, x2: 400, y2: 100 });
+
+        eyeball(leftCanvas, getPupil(leftCanvas, puckPos.x, puckPos.y));
+        eyeball(rightCanvas, getPupil(rightCanvas, puckPos.x, puckPos.y));
+
+    }, [puckPos]);
 
     return (
         <div>
             <div>
 
                 {AskOption && (
-                <div>
-                    <button onClick={playWithRobot}>Human vs Machine</button>
-                    <button onClick={playRetro}>Retro Pong Game</button>
-                    <button onClick={playCoolCat}>Cool Cat Version</button>
-                    <button onClick={playWeirdCrowd}>Weird Crowd Edition</button>
-                </div>)
+                    <div>
+                        <button onClick={playWithRobot}>Human vs Machine</button>
+                        <button onClick={playRetro}>Retro Pong Game</button>
+                        <button onClick={playCoolCat}>Cool Cat Version</button>
+                        <button onClick={playWeirdCrowd}>Weird Crowd Edition</button>
+                    </div>)
                 }
 
                 {AskReady &&
                     (<button onClick={IAmReady}>Ready</button>)
                 }
 
-                {Countdown && 
-                    (<div> 
+                {Countdown &&
+                    (<div>
                         {Count}
                     </div>)
                 }
 
-                {!AskOption && !AskReady && !ScreenIssue && !Countdown && (Count >=4 ) &&
-                (<div>            
-                    <canvas id="responsive-canvas" ref={canvasRef}></canvas>
-                </div>)
+                {!AskOption && !AskReady && !ScreenIssue && !Countdown && (Count >= 4) &&
+                    (<div>
+                        <canvas id="responsive-canvas" ref={canvasRef}></canvas>
+                    </div>)
                 }
-                
-                {ScreenIssue && 
+
+                {ScreenIssue &&
                     (<div>Please increase the size of your screen. The minimum required is: 600 * 400. Thank you!</div>)
                 }
 
@@ -463,6 +537,16 @@ const Game: React.FC = () => {
 
                 {GameEnd &&
                     (<button onClick={NewGame}>New Game</button>)
+                }
+
+                {
+                    (<div id="crowdContainer">
+                        <canvas id="leftEyeCanvas" width="200" height="200" ref={leftEyeCanvasRef}>
+                        </canvas>
+                        <canvas id="rightEyeCanvas" width="200" height="200" ref={rightEyeCanvasRef}>
+                        </canvas>
+                    </div>)
+
                 }
 
             </div>
