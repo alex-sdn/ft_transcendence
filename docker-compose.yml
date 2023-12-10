@@ -2,18 +2,13 @@ version: '3.8'
 
 services:
   postgres-db:
-    # image: postgres:13
-    # ports:
-    #   - 5434:5432
-    # environment:
-    #   POSTGRES_USER: postgres   # ENV
-    #   POSTGRES_PASSWORD: 123    # ENV
-    #   POSTGRES_DB: nest         # ENV
     build:
       context: ./db
       dockerfile: Dockerfile
     env_file:
       - .env
+    # volumes:
+    #   - ./db/data:/var/lib/postgresql/data
     networks:
       - transcendence
   monorepo:
