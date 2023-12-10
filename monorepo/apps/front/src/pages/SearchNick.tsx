@@ -7,6 +7,7 @@ const SearchNick: React.FC = () => {
     const [inputNick, setInputCode] = useState<string>('');
     const [user, setUser] = useState<any[]>([]);
     const [myid, setMyId] = useState<number>();
+    const [showPopup, setShowPopup] = useState(false);
     const jwtToken = Cookies.get('jwt-token');
     var ID : string;
 
@@ -48,9 +49,17 @@ const SearchNick: React.FC = () => {
         await getProfileData();
         if (ID === myid?.toString())
           { return window.location.assign('/profile');}
+        else if ( ID === undefined)
+          { setShowPopup(true);
+            return;}
         else 
          {return window.location.assign(`/profileUser/${ID}`);}
       }
+
+
+      setTimeout(() => {
+        setShowPopup(false);
+    }, 4000);
 
     const getuser = async (value: string) => {
       await axios.get('/api/user/all', {
@@ -72,11 +81,13 @@ const SearchNick: React.FC = () => {
         <div>
         <input type='text' name='code' id='code' value={inputNick} onChange={(e) => {setInputCode(e.target.value); getuser(e.target.value)}} placeholder='Research'/>
         <button className='button-29' onClick={handleValidation}>ok</button>
+        {showPopup && 
+                                ( <span className='popup'> &nbsp;User Not Found</span> )
+                                }
         <ul className="searchResultsUser">
                 {user && user.map((element, index) => <li 
                 onClick={() => {
                     setInputCode(element.nickname);
-                    // setErrorName("");
                 }} 
                 key={index}>{element.nickname}</li>)}
             </ul>
