@@ -101,23 +101,22 @@
     z-index: 999; /* Assurez-vous que z-index est supérieur à ceux des autres éléments de la page */
   }
 
-  /* .container {
-    display: flex;
-  }
-  
-  .left-section {
-    flex: 1;
-    background-color: #f0f0f0;
-    padding: 20px;
-  }
-  
-  .right-section {
-    flex: 1;
-    background-color: #e0e0e0;
-    padding: 20px;
-  } */
   .wrapper {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
   }
   
+  button, input[type="submit"], input[type="reset"] {
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
+
+    &:hover {
+        color: white;
+          text-shadow: 0 0 10px #fff, 0 0 20px #ffffffc0;
+    }
+  }
