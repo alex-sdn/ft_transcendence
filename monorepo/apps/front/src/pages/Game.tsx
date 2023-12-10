@@ -93,6 +93,11 @@ const Game: React.FC = () => {
 
     const [ThereIsCrowd, setThereIsCrowd] = useState(false);
 
+    const [showTextRobot, setShowTextRobot] = useState(false);
+    const [showTextRetro, setShowTextRetro] = useState(false);
+    const [showTextWeirdCrowd, setShowTextWeirdCrowd] = useState(false);
+    const [showTextCoolCat, setShowTextCoolCat] = useState(false);
+
     const canvasRef = useRef<any>(null);
 
     const leftEyeCanvasRef = useRef<any>(null);
@@ -484,7 +489,7 @@ const Game: React.FC = () => {
             grd.addColorStop(0.41, "blue");
             grd.addColorStop(0.40, "white");
         }
-            
+
         context.fillStyle = grd;
         context.beginPath();
         context.arc(100, 100, 50, 0, 2 * Math.PI);
@@ -510,12 +515,28 @@ const Game: React.FC = () => {
             <div>
 
                 {AskOption && (
-                    <div>
-                        <button onClick={playWithRobot}>Human vs Machine</button>
-                        <button onClick={playRetro}>Retro Pong Game</button>
-                        <button onClick={playCoolCat}>Cool Cat Version</button>
-                        <button onClick={playWeirdCrowd}>Weird Crowd Edition</button>
-                    </div>)
+                    <div className="button-container">
+                    <div className="button-wrapper" onClick={playWithRobot} onMouseEnter={() => setShowTextRobot(true)} onMouseLeave={() => setShowTextRobot(false)}>
+                        <button className="robot-button"></button>
+                        {AskOption && showTextRobot && <div className="info-text">• HUMAN VS MACHINE •<br /> All alone? <br /> Our robot will always be here for you!</div>}
+                    </div>
+                
+                    <div className="button-wrapper" onClick={playRetro} onMouseEnter={() => setShowTextRetro(true)} onMouseLeave={() => setShowTextRetro(false)}>
+                        <button className="retro-button"></button>
+                        {AskOption && showTextRetro && <div className="info-text">• RETRO MODE •<br /> Try our original version of pong <br /> as it was played in the 70s <br /> by Allan Alcorn himself!</div>}
+                    </div>
+                
+                    <div className="button-wrapper" onClick={playCoolCat} onMouseEnter={() => setShowTextCoolCat(true)} onMouseLeave={() => setShowTextCoolCat(false)}>
+                        <button className="coolcat-button"></button>
+                        {AskOption && showTextCoolCat && <div className="info-text">• COOL CAT EDITION •<br /> Play a smoother version of pong <br /> with some little surprises along the way...</div>}
+                    </div>
+                
+                    <div className="button-wrapper" onClick={playWeirdCrowd} onMouseEnter={() => setShowTextWeirdCrowd(true)} onMouseLeave={() => setShowTextWeirdCrowd(false)}>
+                        <button className="weirdcrowd-button"></button>
+                        {AskOption && showTextWeirdCrowd && <div className="info-text">• WEIRD CROWD VERSION •<br /> What would be a tennis match <br /> without its weird headshaking crowd?</div>}
+                    </div>
+                </div>)
+
                 }
 
                 {AskReady &&
@@ -556,7 +577,7 @@ const Game: React.FC = () => {
                     (<button onClick={NewGame}>New Game</button>)
                 }
 
-                { true && 
+                {true &&
                     (<div id="crowdContainer">
                         <canvas id="leftEyeCanvas" width="200" height="200" ref={leftEyeCanvasRef}>
                         </canvas>
@@ -567,7 +588,7 @@ const Game: React.FC = () => {
 
             </div>
 
-        </div>
+        </div >
     );
 };
 
