@@ -170,9 +170,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     async onWeirdCrowd(@ConnectedSocket() client: Socket) {
 
         const user = this.idToUser.get(client.id);
-        this.weirdCrowdWaitingList.set(client.id, user);
+        this.retroWaitingList.set(client.id, user);
 
-        await this.matchmaking(OPTION.WeirdCrowd);
+        await this.matchmaking(OPTION.Retro);
 
     }
 
@@ -329,7 +329,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ******************************************************************************/
 
     async matchmaking(option: OPTION) {
-        if (option == OPTION.Retro) {
+        if (option == OPTION.Retro || option == OPTION.WeirdCrowd) {
             if (this.retroWaitingList.size >= 2) {
                 const iteratorId = this.retroWaitingList.keys();
                 const iteratorPlayer = this.retroWaitingList.values();
@@ -376,7 +376,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             const firstPlayer = iteratorPlayer.next();
 
             const robot = await this.prisma.user.findUnique({
-                where: { nickname: 'ROBOT' }
+                where: { nickname: 'robot' }
             });
 
             const roomName = `robot-${firstId.value}-robot`;
@@ -405,10 +405,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
 
         else if (option == OPTION.CoolCat) {
-
-        }
-
-        else if (option == OPTION.WeirdCrowd) {
 
         }
     }

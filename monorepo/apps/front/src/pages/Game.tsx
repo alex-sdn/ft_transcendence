@@ -7,6 +7,9 @@ import SocketContext from "../Socket.js";
 
 const PRECISION = 4;
 
+const DELTAX = 0; //-430
+const DELTAY = 0; //-200
+
 export const gameConst = {
     PLAYGROUND_WIDTH: 600 * PRECISION,
     PLAYGROUND_HEIGHT: 400 * PRECISION,
@@ -87,6 +90,8 @@ const Game: React.FC = () => {
     const [LogOut, setLogOut] = useState(false);
 
     const [ScreenIssue, setScreenIssue] = useState(false);
+
+    const [ThereIsCrowd, setThereIsCrowd] = useState(false);
 
     const canvasRef = useRef<any>(null);
 
@@ -294,6 +299,7 @@ const Game: React.FC = () => {
         socket?.emit('weirdCrowd', { action: 'weirdCrowd' });
         setGameOption(OPTION.WeirdCrowd);
         setAskOption(false);
+        setThereIsCrowd(true);
     };
 
     const IAmReady = () => {
@@ -328,6 +334,7 @@ const Game: React.FC = () => {
         setCountdown(false);
         setCount(4);
         setGameEnd(false);
+        setThereIsCrowd(false);
     };
 
     /******************************************************************************
@@ -471,32 +478,32 @@ const Game: React.FC = () => {
             coord.x - rect.left, coord.y - rect.top, 40,
             coord.x2 - rect.left, coord.y2 - rect.top, 15);
 
-        grd.addColorStop(0.95, "black");
-        grd.addColorStop(0.94, "blue");
-        grd.addColorStop(0.41, "blue");
-        grd.addColorStop(0.40, "white");
-
+        if (ThereIsCrowd && !AskOption && !AskReady && !ScreenIssue && !Countdown && (Count <= 0)) {
+            grd.addColorStop(0.95, "black");
+            grd.addColorStop(0.94, "blue");
+            grd.addColorStop(0.41, "blue");
+            grd.addColorStop(0.40, "white");
+        }
+            
         context.fillStyle = grd;
         context.beginPath();
         context.arc(100, 100, 50, 0, 2 * Math.PI);
         context.fill();
     }
 
-    if (false) {
-        useEffect(() => {
+    useEffect(() => {
 
-            const leftCanvas = leftEyeCanvasRef.current;
-            const rightCanvas = rightEyeCanvasRef.current;
+        const leftCanvas = leftEyeCanvasRef.current;
+        const rightCanvas = rightEyeCanvasRef.current;
 
-            //initialize ?
-            //eyeball(leftCanvas, { x: 100, y: 100, x2: 100, y2: 100 });
-            //eyeball(rightCanvas, { x: 400, y: 100, x2: 400, y2: 100 });
+        //initialize ?
+        //eyeball(leftCanvas, { x: 100, y: 100, x2: 100, y2: 100 });
+        //eyeball(rightCanvas, { x: 400, y: 100, x2: 400, y2: 100 });
 
-            eyeball(leftCanvas, getPupil(leftCanvas, puckPos.x, puckPos.y));
-            eyeball(rightCanvas, getPupil(rightCanvas, puckPos.x, puckPos.y));
+        eyeball(leftCanvas, getPupil(leftCanvas, puckPos.x + DELTAX, puckPos.y + DELTAY));
+        eyeball(rightCanvas, getPupil(rightCanvas, puckPos.x + DELTAX, puckPos.y + DELTAY));
 
-        }, [puckPos]);
-    }
+    }, [puckPos]);
 
     return (
         <div>
@@ -549,7 +556,7 @@ const Game: React.FC = () => {
                     (<button onClick={NewGame}>New Game</button>)
                 }
 
-                {false &&
+                { true && 
                     (<div id="crowdContainer">
                         <canvas id="leftEyeCanvas" width="200" height="200" ref={leftEyeCanvasRef}>
                         </canvas>

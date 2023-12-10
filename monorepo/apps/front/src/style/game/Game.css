@@ -8,19 +8,25 @@
 }
 
 #crowdContainer {
-    margin: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%; /* Utilisez top plutôt que bottom */
+    left: 50%;
+    transform: translate(-50%, -50%); /* Pour le centrer horizontalement et verticalement */
     height: 300px;
     width: 500px;
-    background-color: #888;
+    background-color: rgba(136, 136, 136, 0);
 }
 
 #leftEyeCanvas {
-    background-color: #888;
+    background-color: rgba(136, 136, 136, 0);
     white-space: pre;
 }
 
 #rightEyeCanvas {
-    background-color: #888;
+    background-color: rgba(136, 136, 136, 0);
     white-space: pre;
     float: right;
 }

@@ -40,9 +40,17 @@ export class Room {
         this.leftPlayer = left;
         this.rightPlayer = right;
 
-        this.leftNickname = left.nickname;
-        this.rightNickname = right.nickname;
+        if (left.nickname)
+            this.leftNickname = left.nickname;
+        else
+            this.leftNickname = "no name";
+        
+        if (right.nickname)
+            this.rightNickname = right.nickname;
+        else
+            this.rightNickname = "no name";
 
+        
         this.puck = new Puck();
         
         this.leftPaddle = new Paddle(true);

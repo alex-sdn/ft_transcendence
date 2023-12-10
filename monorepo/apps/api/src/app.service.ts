@@ -17,7 +17,7 @@ export class AppService implements OnModuleInit {
 			await this.prisma.user.create({
 				data: {
 					login42: 'R',
-					nickname: 'ROBOT',
+					nickname: 'robot',
 					// custom avatar ?
 				}
 			});
