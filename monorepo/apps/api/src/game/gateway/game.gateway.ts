@@ -156,8 +156,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     }
 
-    @SubscribeMessage('coolCat')
-    async onCoolCat(@ConnectedSocket() client: Socket) {
+    @SubscribeMessage('coolcatopt')
+    async onCoolcatopt(@ConnectedSocket() client: Socket) {
 
         const user = this.idToUser.get(client.id);
         this.coolCatWaitingList.set(client.id, user);
@@ -295,10 +295,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const room = this.roomsList.get(roomName);
 
         let steps;
-        if (room.getOption() == OPTION.CoolCat)
-            steps = 3;
-        else
-            steps = 10;
+        //if (room.getOption() == OPTION.CoolCat)
+        //    steps = 3;
+        //else
+        steps = 10;
 
         if (role == ROLE.Left) {
             if (action === 'upPressed') {
@@ -320,9 +320,45 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
             room.getRightPaddle().update();
         }
-        if (room.getOption() == OPTION.CoolCat)
-            this.server.to(roomName).emit('Paddle', { leftPos: room.getLeftPaddle().getY(), rightPos: room.getRightPaddle().getY() });
     }
+
+    /******************************************************************************
+    *                                   COOL CAT                                  *
+    ******************************************************************************/
+
+    @SubscribeMessage('coolcat')
+    async onCoolcat(@ConnectedSocket() client: Socket, @MessageBody('action') action: string,
+        @MessageBody('roomName') roomName: string, @MessageBody('role') role: ROLE) {
+
+        const room = this.roomsList.get(roomName);
+
+        let steps;
+        //if (room.getOption() == OPTION.CoolCat)
+        //    steps = 3;
+        //else
+        steps = 2;
+
+        if (role == ROLE.Left) {
+            if (action === 'upPressed') {
+                room.getLeftPaddle().move(-1 * steps * PRECISION);
+            } else if (action === 'downPressed') {
+                room.getLeftPaddle().move(steps * PRECISION);
+            }
+            room.getLeftPaddle().update();
+        }
+        if (role == ROLE.Right) {
+            if (action === 'upPressed') {
+                room.getRightPaddle().move(-1 * steps * PRECISION);
+            } else if (action === 'downPressed') {
+                room.getRightPaddle().move(steps * PRECISION);
+            }
+            room.getRightPaddle().update();
+        }
+        this.server.to(roomName).emit('Paddle', { leftPos: room.getLeftPaddle().getY(), rightPos: room.getRightPaddle().getY() });
+        console.log(room.getLeftPaddle().getY());
+
+    }
+
 
     /******************************************************************************
     *                                MATCHMAKING                                  *
@@ -406,6 +442,43 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         else if (option == OPTION.CoolCat) {
 
+            if (this.coolCatWaitingList.size >= 2) {
+                const iteratorId = this.coolCatWaitingList.keys();
+                const iteratorPlayer = this.coolCatWaitingList.values();
+
+                const firstId = iteratorId.next();
+                const firstPlayer = iteratorPlayer.next();
+
+                const secondId = iteratorId.next();
+                const secondPlayer = iteratorPlayer.next();
+
+                // generate unique room name --> uuid ?
+                const roomName = `coolcat-${firstId.value}-${secondId.value}`;
+
+                const firstClient = this.userToSocket.get(firstPlayer.value.id);
+                const secondClient = this.userToSocket.get(secondPlayer.value.id);
+
+                // create room
+                const room = new Room(roomName, firstPlayer.value, secondPlayer.value, OPTION.CoolCat);
+
+                await firstClient.join(roomName);
+                await secondClient.join(roomName);
+
+                // send room initial info to front
+                firstClient.emit('Room', { name: roomName, role: ROLE.Left, leftNickname: room.getLeftNickname(), rightNickname: room.getRightNickname() });
+                secondClient.emit('Room', { name: roomName, role: ROLE.Right, leftNickname: room.getLeftNickname(), rightNickname: room.getRightNickname() });
+
+                this.roomsList.set(roomName, room);
+
+                this.roomsParticipants.set(firstId.value, room);
+                this.roomsParticipants.set(secondId.value, room);
+
+                this.server.to(roomName).emit('AreYouReady');
+
+                this.retroWaitingList.delete(firstId.value);
+                this.retroWaitingList.delete(secondId.value);
+            }
+
         }
     }
 
@@ -487,7 +560,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             while (!room.getGameEnd()) {
                 //const updatePuckInterval = setInterval(() => {
                 room.getPuck().update();
-                //if (this.puck.checkPaddleRight(this.right) || this.puck.checkPaddleLeft(this.left) || this.puck.checkEdges()) {
+                //if (room.getPuck().checkPaddleRight(room.getRightPaddle()) || room.getPuck().checkPaddleLeft(room.getLeftPaddle()) || room.getPuck().checkEdges() == POINT.Left || room.getPuck().checkEdges() == POINT.Right) {
                 room.getPuck().checkPaddleRight(room.getRightPaddle());
                 room.getPuck().checkPaddleLeft(room.getLeftPaddle());
                 const point = room.getPuck().checkEdges();
@@ -508,6 +581,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 if (room.getOption() != OPTION.CoolCat)
                     this.server.to(roomName).emit('Paddle', { leftPos: room.getLeftPaddle().getY(), rightPos: room.getRightPaddle().getY() });
 
+                //}
                 await this.sleep(1000 / 60);
             }
 
