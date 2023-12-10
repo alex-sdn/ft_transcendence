@@ -24,50 +24,55 @@ const Profile: React.FC = () => {
 
   useEffect(() => {
     const getProfileData = async () => {
-      console.log('token = ', jwtToken);
-      const response = await axios.get('/api/user/me', {
-        headers: {
-          'Authorization': 'Bearer ' + jwtToken,
-        },
-      },);
-      if (response.status === 200) {
-        const resp_profile = response.data;
-        setNickname(resp_profile.nickname);
-        setLoss(resp_profile.loss);
-        setWin(resp_profile.win);
-        setLp(resp_profile.LP);
-        setGameNb(resp_profile.loss + resp_profile.win);
-        setTwofa(resp_profile.has2fa);
-        console.log(resp_profile);
-      }
+        try {
+            const response = await axios.get('/api/user/me', {
+                headers: {
+                  'Authorization': 'Bearer ' + jwtToken,
+                },
+            },);
+            if (response.status === 200) {
+                const resp_profile = response.data;
+                setNickname(resp_profile.nickname);
+                setLoss(resp_profile.loss);
+                setWin(resp_profile.win);
+                setLp(resp_profile.LP);
+                setGameNb(resp_profile.loss + resp_profile.win);
+                setTwofa(resp_profile.has2fa);
+            }
+        }
+        catch (error)
+            {console.log(error);}
     }
     getProfileData();
   },);
 
   //REQUETE AVATAR
   useEffect(() => {
-    const fetchDefaultAvatar = async () => {
-      let response = await axios.get('/api/user/me', {
-        headers: {
-          'Authorization': 'Bearer ' + jwtToken,
-        },
-      },);
-      const fileName = response.data.avatar;
-      console.log("response.data PROFILE = " + response.data);
-      response = await axios.get('/api/user/avatar/' + fileName, {
-        headers: {
-          'Authorization': 'Bearer ' + jwtToken,
-        },
-        responseType: 'arraybuffer',
-      });
-      console.log('RESP PROFILE  ==> '+ response.data);
-      if (response.status === 200) {
-        const blob = new Blob([response.data]);
-        const file = new File([blob], fileName);
-        setImage(file);
-      }
-    };
-    fetchDefaultAvatar();
+      const fetchDefaultAvatar = async () => {
+          try{
+              let response = await axios.get('/api/user/me', {
+                  headers: {
+                    'Authorization': 'Bearer ' + jwtToken,
+                  },
+              },);
+              const fileName = response.data.avatar;
+              response = await axios.get('/api/user/avatar/' + fileName, {
+                  headers: {
+                    'Authorization': 'Bearer ' + jwtToken,
+                  },
+                  responseType: 'arraybuffer',
+              });
+              if (response.status === 200) 
+              {
+                  const blob = new Blob([response.data]);
+                  const file = new File([blob], fileName);
+                  setImage(file);
+              }
+          }
+          catch (error)
+              {console.log(error);}
+      };
+      fetchDefaultAvatar();
   }, []);
 
   //SCORING
@@ -77,12 +82,12 @@ const Profile: React.FC = () => {
   const [isOpenpic, setIsOpenpic] = useState(false);
 
   const openModalpic = () => {
-    setIsOpenpic(true);
+      setIsOpenpic(true);
   };
 
   const closeModalpic = () => {
-    window.location.reload();
-    setIsOpenpic(false);
+      window.location.reload();
+      setIsOpenpic(false);
   };
 
   //  MODALE NICKNAME
@@ -90,12 +95,12 @@ const Profile: React.FC = () => {
   const [isOpennic, setIsOpennic] = useState(false);
 
   const openModalnic = () => {
-    setIsOpennic(true);
+      setIsOpennic(true);
   };
 
   const closeModalnic = () => {
-    window.location.reload();
-    setIsOpennic(false);
+      window.location.reload();
+      setIsOpennic(false);
   };
 
   //2FA activation Modale
@@ -103,12 +108,12 @@ const Profile: React.FC = () => {
   const [isOpenfa, setIsOpenfa] = useState(false);
 
   const openModalfa = () => {
-    setIsOpenfa(true);
+      setIsOpenfa(true);
   };
 
   const closeModalfa = () => {
-    window.location.reload();
-    setIsOpenfa(false);
+      window.location.reload();
+      setIsOpenfa(false);
   };
 
   //2FA deactivation Modale
@@ -116,60 +121,59 @@ const Profile: React.FC = () => {
   const [isOpenNofa, setIsOpenNofa] = useState(false);
 
   const openModalNofa = () => {
-    setIsOpenNofa(true);
+      setIsOpenNofa(true);
   };
 
   const closeModalNofa = () => {
-    window.location.reload();
-    setIsOpenNofa(false);
+      window.location.reload();
+      setIsOpenNofa(false);
   };
 
   const handleClic = () => {
-    deac2fabutton();
+      deac2fabutton();
   }
 
   const deac2fabutton = async () => {
     try {
-      console.log('token = ', jwtToken);
-      const response = await axios.delete('/api/user/me/edit2fa', {
-        headers: {
-          'Authorization': 'Bearer ' + jwtToken,
-        },
-      },);
-      if (response.status === 200) {
-        console.log('2FA successfully deactivated');
-        window.location.reload();
-      }
+        const response = await axios.delete('/api/user/me/edit2fa', {
+          headers: {
+            'Authorization': 'Bearer ' + jwtToken,
+          },
+        },);
+        if (response.status === 200) {
+          console.log('2FA successfully deactivated');
+          window.location.reload();
+        }
     }
-    catch (error) { console.log('Error encountered when deactivating 2FA'); }
+    catch (error) 
+        { console.log('Error encountered when deactivating 2FA'); }
   }
   
   //MODALE FRIENDS REQUEST
   const [isOpenfnd, setIsOpenfnd] = useState(false);
 
   const openModalfnd = () => {
-    setIsOpenfnd(true);
+      setIsOpenfnd(true);
   };
 
   const closeModalfnd = () => {
-    window.location.reload();
-    setIsOpenfnd(false);
+      window.location.reload();
+      setIsOpenfnd(false);
   };
 
   //STYLE
-  console.log('token = ', jwtToken);
   const customStyles = {
-    content: {
-      top: '50%',
-      left: '50%',
-      right: 'auto',
-      bottom: 'auto',
-      transform: 'translate(-50%, -50%)',
-      width: 'auto',
-      height: 'auto',
-      background: 'black',
-      margin: '50px',
-    },
+      content: {
+          top: '50%',
+          left: '50%',
+          right: 'auto',
+          bottom: 'auto',
+          transform: 'translate(-50%, -50%)',
+          width: 'auto',
+          height: 'auto',
+          background: 'black',
+          margin: '50px',
+      },
   };
 
   return (
@@ -250,7 +254,9 @@ const Profile: React.FC = () => {
                     </div>
                 </p>
             </div>
-            <div><ProfileList/></div>
+            <div className='_scoreTab'>
+              <ProfileList/>
+            </div>
         </div>
         <div className='_scoreTab'>
             <span className='_h1'>Recent Games</span>
