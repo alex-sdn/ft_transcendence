@@ -600,20 +600,6 @@ const Game: React.FC = () => {
         }
     }
 
-    useEffect(() => {
-        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-            if (AskOption) {
-                event.preventDefault();
-            }
-        };
-        window.addEventListener('beforeunload', handleBeforeUnload);
-
-        return () => {
-            window.removeEventListener('beforeunload', handleBeforeUnload);
-        };
-
-    }, []);
-
     return (
         <div>
             <div>
@@ -725,7 +711,7 @@ const Game: React.FC = () => {
                 }
 
                 {LogOut &&
-                    (<div id="countdown">
+                    (<div className='you-won' id="countdown">
                         You won !
                     </div>)
                 }
@@ -733,7 +719,7 @@ const Game: React.FC = () => {
                 {GameEnd &&
                     (((score.left > score.right) && role == ROLE.Left) ||
                         ((score.right > score.left) && role == ROLE.Right)) &&
-                    (<div id="countdown">
+                    (<div className='you-won' id="countdown">
                         You won !
                     </div>)
                 }
@@ -741,7 +727,7 @@ const Game: React.FC = () => {
                 {GameEnd &&
                     (((score.left < score.right) && role == ROLE.Left) ||
                         ((score.right < score.left) && role == ROLE.Right)) &&
-                    (<div id="countdown">
+                    (<div className='you-lost' id="countdown">
                         You lost !
                     </div>)
                 }
