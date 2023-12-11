@@ -383,7 +383,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// Notify target if connected AND sender
 			// Get target socket
 			const targetSocket = this.userToSocket.get(target.id);
-			if (targetSocket) {
+			if (targetSocket && !(await this.chatService.isIngame(target.id))) {
 				targetSocket.emit('invite', {
 					sender: user.nickname,
 					target: target.nickname,
