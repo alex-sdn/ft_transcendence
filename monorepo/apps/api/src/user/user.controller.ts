@@ -45,8 +45,8 @@ export class UserController {
 
 	@UseInterceptors(FileInterceptor('avatar', {
 		dest: 'uploads/custom/',
-		limits: {fileSize: 100000},       // UPDATE LATER
-		fileFilter(req, file, callback) {  // MOVE ?
+		limits: {fileSize: 1000000},
+		fileFilter(req, file, callback) {
 			const allowedFileTypes = ['.png', '.jpg', '.jpeg'];
 			const extension = path.extname(file.originalname).toLowerCase();
 

@@ -71,8 +71,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // <client.id, User>
     private weirdCrowdWaitingList = new Map<string, User>();
 
-    // < 'id1-id2', [id1, id2] >
-    private friendWaitingList = new Map<string, number[]>;
+    // < 'id1-id2', [id invitor] >
+    private friendWaitingList = new Map<string, number>;
 
     /******************************************************************************
     *                         CONNECTION & DISCONNECTION                          *
@@ -197,7 +197,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     *                             FRIEND INVITATION                               *
     ******************************************************************************/
 
-    // INVITE TEST
+    // INVITE TO GAME
     @SubscribeMessage('inviteGame')
     async handleInviteGame(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
         console.log("invite game", message)
@@ -233,15 +233,23 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			return;
         }
 
-        var listName;
+		var listName;
         if (user.id < target.id)
             listName = user.id + '-' + target.id;
         else
             listName = target.id + '-' + user.id;
+
+		// if already sent invite
+		if (this.friendWaitingList.has(listName) && this.friendWaitingList.get(listName) === user.id) {
+			client.emit('error', {
+                message: 'User already invited'
+            });
+			return;
+		}
         // if first invite -> create waiting list for private game
         if (!this.friendWaitingList.has(listName)) {
             console.log("-creating friendWaitingList")
-            this.friendWaitingList.set(listName, [user.id, target.id]);
+            this.friendWaitingList.set(listName, user.id);
             // renvoyer l'invite a target
             targetSocket.emit('inviteGame', {
                 sender: user.nickname,
@@ -249,7 +257,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 // game type aussi
             });
         }
-        // Already received invite -> start game
+        // Accepted invite -> start game
         else {
             //remove from all waiting lists
             this.withdrawFromAllWaitingLists(client.id);
@@ -271,9 +279,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             // create room	
             const room = new Room(listName, user, target, OPTION.Retro);
 
-            // const socketP1 = this.userToSocket.get(user.id);
-            // const socketP2 = this.userToSocket.get(target.id)
-
             await socketP1.join(listName);
             await socketP2.join(listName);
 
@@ -288,6 +293,30 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.friendWaitingList.delete(listName);
         }
     }
+
+	// REFUSE INVITE
+	@SubscribeMessage('refuseInvite')
+    async handleRefuseInvite(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
+		console.log('refuse invite', message);
+
+		const user = await this.prisma.user.findUnique({
+            where: { id: this.idToUser.get(client.id).id }
+        });
+
+        const target = await this.prisma.user.findUnique({
+            where: { nickname: message.target }
+        });
+
+		var listName;
+        if (user.id < target.id)
+            listName = user.id + '-' + target.id;
+        else
+            listName = target.id + '-' + user.id;
+
+		if (this.friendWaitingList.has(listName)) {
+			this.friendWaitingList.delete(listName);
+		}
+	}
 
     /******************************************************************************
     *                                KEYS HANDLING                                *
