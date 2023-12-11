@@ -39,13 +39,13 @@
 
 .searchResultsUser {
   position: absolute;
-  top: 255px;
+  top: 210px;
   background: white;
   width: 236px;
   background-color: white;
   max-height: 250px;
   /* overflow-y: auto; */
-  left: 48.4%;
+  left: 48.8%;
   transform: translate(-48.4%);
   z-index: 1;
   padding: 0;
