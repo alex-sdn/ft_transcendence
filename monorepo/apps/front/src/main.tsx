@@ -9,7 +9,10 @@ import './style/NotFound.css';
 import './style/Login.css';
 import './style/ProfilePicture.css';
 import './style/Profile.css';
+import './style/ProfileMatch.css';
+import './style/ProfileList.css';
 import './style/FirstLog.css'
+
 //chat
 import './style/chat/Chat.css';
 import './style/chat/Channel.css'
@@ -23,6 +26,7 @@ import './style/game/Game.css'
 
 import './style/chat/Messages.css'
 import './style/chat/PrivMessages.css'
+
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 
