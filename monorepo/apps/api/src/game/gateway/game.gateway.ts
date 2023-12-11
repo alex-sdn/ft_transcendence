@@ -232,18 +232,20 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             });
 			return;
         }
+
+		var listName;
+        if (user.id < target.id)
+            listName = user.id + '-' + target.id;
+        else
+            listName = target.id + '-' + user.id;
+
+		// if already sent invite
 		if (this.friendWaitingList.has(listName) && this.friendWaitingList.get(listName) === user.id) {
 			client.emit('error', {
                 message: 'User already invited'
             });
 			return;
 		}
-
-        var listName;
-        if (user.id < target.id)
-            listName = user.id + '-' + target.id;
-        else
-            listName = target.id + '-' + user.id;
         // if first invite -> create waiting list for private game
         if (!this.friendWaitingList.has(listName)) {
             console.log("-creating friendWaitingList")
@@ -255,7 +257,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 // game type aussi
             });
         }
-        // Already received invite -> start game
+        // Accepted invite -> start game
         else {
             //remove from all waiting lists
             this.withdrawFromAllWaitingLists(client.id);
