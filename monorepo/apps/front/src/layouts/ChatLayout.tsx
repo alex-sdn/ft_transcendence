@@ -1,7 +1,18 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { NavLink, Outlet } from "react-router-dom";
+import SocketContext from "../Socket";
 
 const ChatLayout: React.FC = () => {
+    const socket = useContext(SocketContext);
+
+    useEffect(() => {
+        const disconnectSocket = () => {
+            socket?.disconnect();
+            socket?.connect();
+        }
+        disconnectSocket();
+    }, []);
+
     return (
         <div className="sidebar">
             <div>
