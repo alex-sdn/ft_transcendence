@@ -9,7 +9,7 @@ URGENT:
 - [X] : handle deconnection + clean end of game / init + what if switch page during game --> raise the question of socket subspace
 - [X] : responsive screen
 - [X] : extra features (upgraded option)
-- [ ] : check if front send good room name + protection socket
+- [X] : check if front send good room name + protection socket
 - [X] : handle end of game
 - [X] : when game starts --> withdraw user from all waiting lists
 
@@ -37,10 +37,13 @@ WITH SOLENE :
 - [X] : .css
 
 IMPROVEMENTS : 
+- [ ] : finish front of cool cat + finish features
 - [ ] : better robot algorithm
 - [ ] : multiple eyes in crowd
-- [ ] : picture in waiting room
-- [ ] : add music
-- [ ] : finish front of cool cat + add features
+- [ ] : add picture in waiting room
+- [ ] : add music + sounds when events
+- [ ] : add achievements
 - [ ] : improve responsiveness
+- [ ] : do tests (protection sockets, deconnection, waiting lists...)
+- [ ] : clean code (organization of constants, refactoring, front in different files, check data sent to profiles, check invitation from chat...)
 
