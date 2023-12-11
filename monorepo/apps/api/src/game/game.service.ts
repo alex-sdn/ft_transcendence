@@ -195,22 +195,94 @@ export class GameService {
 	
 		// Win 5 matches
 		if (user.achievements.win5 === false) {
-			// 
-		}
+			const matches = await this.prisma.match.findMany({
+				where: {user1Id: user.id}
+			});
+			// iterate through matches
+			let nbr = 0;
+			for (var i = 0; i < matches.length; i++) {
+				if (matches[i].p1score === maxScore) {
+						nbr++;
+						if (nbr == 5)
+						{	
+							// add achievement
+							await this.prisma.achievements.update({
+								where: {userId: user.id},
+								data: {win5: true}
+							});
+							break;
+						}
+					}
+				}
+			}
 	
 		// Win 10 matches
-		if (user.achievements.win5 === false) {
-			// 
+		if (user.achievements.win10 === false) {
+			const matches = await this.prisma.match.findMany({
+				where: {user1Id: user.id}
+			});
+			// iterate through matches
+			let nbr = 0;
+			for (var i = 0; i < matches.length; i++) {
+				if (matches[i].p1score === maxScore) {
+					nbr++;
+					if (nbr == 10)
+					{
+						// add achievement
+						await this.prisma.achievements.update({
+							where: {userId: user.id},
+							data: {win10: true}
+						});
+						break;
+					}
+				}
+			}
 		}
 	
 		// Win 20 matches
-		if (user.achievements.win5 === false) {
-			// 
+		if (user.achievements.win20 === false) {
+			const matches = await this.prisma.match.findMany({
+				where: {user1Id: user.id}
+			});
+			// iterate through matches
+			let nbr = 0;
+			for (var i = 0; i < matches.length; i++) {
+				if (matches[i].p1score === maxScore) {
+					nbr++;
+					if (nbr == 20)
+					{	
+						// add achievement
+						await this.prisma.achievements.update({
+							where: {userId: user.id},
+							data: {win20: true}
+						});
+						break;
+					}
+				}
+			}
 		}
 	
 		// Win 50 matches
-		if (user.achievements.win5 === false) {
-			// 
+		if (user.achievements.win50 === false) {
+			const matches = await this.prisma.match.findMany({
+				where: {user1Id: user.id}
+			});
+			// iterate through matches
+			let nbr = 0;
+			for (var i = 0; i < matches.length; i++) {
+				if (matches[i].p1score === maxScore) {
+					nbr++;
+					if (nbr == 50)
+					{	
+						// add achievement
+						await this.prisma.achievements.update({
+							where: {userId: user.id},
+							data: {win50: true}
+						});
+						break;
+					}
+				}
+			}
 		}
 	}
 }
