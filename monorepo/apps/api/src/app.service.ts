@@ -12,15 +12,18 @@ export class AppService implements OnModuleInit {
 	// Create Robot
 	async createRobotUser() {
 		try {
-			await this.prisma.user.create({
+			const robot = await this.prisma.user.create({
 				data: {
 					login42: 'R',
-					nickname: 'ROBOT',
+					nickname: 'robot',
 					// custom avatar ?
 				}
 			});
+			await this.prisma.achievements.create({
+				data: {userId: robot.id}
+			});
 		} catch (error) {
-			console.log('Failed to create Robot user');
+			console.log('Failed to create Robot user');  // remove?
 		}
 	}
 }

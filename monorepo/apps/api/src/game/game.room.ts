@@ -1,12 +1,9 @@
 import { User } from "@prisma/client";
 import { width, height, Puck, Paddle } from './game.math';
+import { OPTION } from './gateway/game.gateway';
 
 let isPlaying: boolean = false;
-
-// export interface Score {
-//     left: number;
-//     right: number;
-// }
+const MAX_SCORE: number = 7;
 
 /******************************************************************************
 *                               SOCKET ROOMS                                  *
@@ -34,16 +31,26 @@ export class Room {
 
     private gameEnd: boolean;
 
-    constructor(name: string, left: User, right: User) {
+    private gameOption: OPTION;
+
+    constructor(name: string, left: User, right: User, option: OPTION) {
 
         this.name = name;
 
         this.leftPlayer = left;
         this.rightPlayer = right;
 
-        this.leftNickname = left.nickname;
-        this.rightNickname = right.nickname;
+        if (left.nickname)
+            this.leftNickname = left.nickname;
+        else
+            this.leftNickname = "no name";
+        
+        if (right.nickname)
+            this.rightNickname = right.nickname;
+        else
+            this.rightNickname = "no name";
 
+        
         this.puck = new Puck();
         
         this.leftPaddle = new Paddle(true);
@@ -55,6 +62,8 @@ export class Room {
         this.ready = 0;
 
         this.gameEnd = false;
+
+        this.gameOption = option;
 
     }
 
@@ -103,7 +112,7 @@ export class Room {
     }
 
     getGameEnd(): boolean {
-        if (this.leftScore >= 7 || this.rightScore >= 7)
+        if (this.leftScore >= MAX_SCORE || this.rightScore >= MAX_SCORE)
             this.gameEnd = true;
         return this.gameEnd;
     }
@@ -124,6 +133,10 @@ export class Room {
         return this.rightPlayer;
     }
 
+    getOption(): OPTION {
+        return this.gameOption;
+    }
+
     //setters
 
     setGameEnd(): void {
@@ -135,12 +148,11 @@ export class Room {
     }
 
     setLeftAsWinner(): void {
-        this.leftScore = 7;
+        this.leftScore = MAX_SCORE;
     }
 
     setRightAsWinner(): void {
-        this.rightScore = 7;
+        this.rightScore = MAX_SCORE;
     }
-
 
 }
