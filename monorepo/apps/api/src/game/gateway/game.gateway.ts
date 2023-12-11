@@ -110,10 +110,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             //check if client was in a room if so set Game.End and send info to front of other player
             if (this.roomsParticipants.has(client.id)) {
                 const roomName = this.roomsParticipants.get(client.id).getName();
-				if (!this.roomsParticipants.get(client.id).getGameEnd()) {
-					this.server.to(roomName).emit("LogOut");
-					this.roomsParticipants.get(client.id).setGameEnd();
-				}
+                if (!this.roomsParticipants.get(client.id).getGameEnd()) {
+                    this.server.to(roomName).emit("LogOut");
+                    this.roomsParticipants.get(client.id).setGameEnd();
+                }
                 console.log('set game end bc deco')
             }
 
@@ -214,42 +214,42 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             client.emit('error', {
                 message: 'This user does not exist'
             });
-			return;
+            return;
         }
         const targetSocket = this.userToSocket.get(target.id);
 
-		var listName;
-		if (user.id < target.id)
-			listName = user.id + '-' + target.id;
-		else
-			listName = target.id + '-' + user.id;
+        var listName;
+        if (user.id < target.id)
+            listName = user.id + '-' + target.id;
+        else
+            listName = target.id + '-' + user.id;
 
         // if target is offline
         if (!targetSocket) {
             client.emit('error', {
                 message: 'This user is not online'
             });
-			if (this.friendWaitingList.has(listName))
-				this.friendWaitingList.delete(listName);
-			return;
+            if (this.friendWaitingList.has(listName))
+                this.friendWaitingList.delete(listName);
+            return;
         }
         // if target is ingame
         if (target.status === 'ingame') {
             client.emit('error', {
                 message: 'This user is currently in-game'
             });
-			if (this.friendWaitingList.has(listName))
-				this.friendWaitingList.delete(listName);
-			return;
+            if (this.friendWaitingList.has(listName))
+                this.friendWaitingList.delete(listName);
+            return;
         }
 
-		// if already sent invite
-		if (this.friendWaitingList.has(listName) && this.friendWaitingList.get(listName) === user.id) {
-			client.emit('error', {
+        // if already sent invite
+        if (this.friendWaitingList.has(listName) && this.friendWaitingList.get(listName) === user.id) {
+            client.emit('error', {
                 message: 'User already invited'
             });
-			return;
-		}
+            return;
+        }
         // if first invite -> create waiting list for private game
         if (!this.friendWaitingList.has(listName)) {
             console.log("-creating friendWaitingList")
@@ -298,12 +298,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
-	// REFUSE INVITE
-	@SubscribeMessage('refuseInvite')
+    // REFUSE INVITE
+    @SubscribeMessage('refuseInvite')
     async handleRefuseInvite(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
-		console.log('refuse invite', message);
+        console.log('refuse invite', message);
 
-		const user = await this.prisma.user.findUnique({
+        const user = await this.prisma.user.findUnique({
             where: { id: this.idToUser.get(client.id).id }
         });
 
@@ -311,16 +311,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             where: { nickname: message.target }
         });
 
-		var listName;
+        var listName;
         if (user.id < target.id)
             listName = user.id + '-' + target.id;
         else
             listName = target.id + '-' + user.id;
 
-		if (this.friendWaitingList.has(listName)) {
-			this.friendWaitingList.delete(listName);
-		}
-	}
+        if (this.friendWaitingList.has(listName)) {
+            this.friendWaitingList.delete(listName);
+        }
+    }
 
     /******************************************************************************
     *                                KEYS HANDLING                                *
@@ -625,16 +625,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
             // if end of game due to deconnection, set the one who disconnected as loser (ignore robot)
             if (room.getLeftScore() < 7 && room.getRightScore() < 7) { // MAX_SCORE 
-				if (!this.userToSocket.has(room.getLeftUser().id) || (room.getOption() !== OPTION.Robot && !this.userToSocket.has(room.getRightUser().id))) {
-					if (!this.userToSocket.has(room.getLeftUser().id))
-						room.setRightAsWinner();
-	
-					if (!this.userToSocket.has(room.getRightUser().id) && room.getOption() !== OPTION.Robot)
-						room.setLeftAsWinner();
-				}
-			}
+                if (!this.userToSocket.has(room.getLeftUser().id) || (room.getOption() !== OPTION.Robot && !this.userToSocket.has(room.getRightUser().id))) {
+                    if (!this.userToSocket.has(room.getLeftUser().id))
+                        room.setRightAsWinner();
+
+                    if (!this.userToSocket.has(room.getRightUser().id) && room.getOption() !== OPTION.Robot)
+                        room.setLeftAsWinner();
+                }
+            }
 
             this.server.to(roomName).emit('GameEnd');
+
+            // clean and leave
+            client.leave(roomName);
+            if (this.roomsList.has(roomName))
+                this.roomsList.delete(roomName);
+
+            if (this.roomsParticipants.has(client.id))
+                this.roomsParticipants.delete(client.id);
 
             // send results of match & status to db for profiles
             await this.gameService.createMatch(room.getLeftUser().id, room.getRightUser().id, room.getLeftScore(), room.getRightScore(), "Robot");
@@ -650,18 +658,5 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 this.robotInterval.delete(roomName);
             }
         }
-    }
-
-    // clean end of game --> new game
-    @SubscribeMessage('clean')
-    async onLeave(@ConnectedSocket() client: Socket, @MessageBody('roomName') roomName: string) {
-
-        client.leave(roomName);
-
-        if (this.roomsList.has(roomName))
-            this.roomsList.delete(roomName);
-
-        if (this.roomsParticipants.has(client.id))
-            this.roomsParticipants.delete(client.id);
     }
 }  
