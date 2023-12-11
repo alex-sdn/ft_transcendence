@@ -110,8 +110,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             //check if client was in a room if so set Game.End and send info to front of other player
             if (this.roomsParticipants.has(client.id)) {
                 const roomName = this.roomsParticipants.get(client.id).getName();
-                this.server.to(roomName).emit("LogOut");
-                this.roomsParticipants.get(client.id).setGameEnd();
+				if (!this.roomsParticipants.get(client.id).getGameEnd()) {
+					this.server.to(roomName).emit("LogOut");
+					this.roomsParticipants.get(client.id).setGameEnd();
+				}
                 console.log('set game end bc deco')
             }
 
@@ -586,13 +588,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
 
             // if end of game due to deconnection, set the one who disconnected as loser (ignore robot)
-            if (!this.userToSocket.has(room.getLeftUser().id) || (room.getOption() !== OPTION.Robot && !this.userToSocket.has(room.getRightUser().id))) {
-                if (!this.userToSocket.has(room.getLeftUser().id))
-                    room.setRightAsWinner();
-
-                if (!this.userToSocket.has(room.getRightUser().id) && room.getOption() !== OPTION.Robot)
-                    room.setLeftAsWinner();
-            }
+            if (room.getLeftScore() < 7 && room.getRightScore() < 7) { // MAX_SCORE 
+				if (!this.userToSocket.has(room.getLeftUser().id) || (room.getOption() !== OPTION.Robot && !this.userToSocket.has(room.getRightUser().id))) {
+					if (!this.userToSocket.has(room.getLeftUser().id))
+						room.setRightAsWinner();
+	
+					if (!this.userToSocket.has(room.getRightUser().id) && room.getOption() !== OPTION.Robot)
+						room.setLeftAsWinner();
+				}
+			}
 
             this.server.to(roomName).emit('GameEnd');
 
