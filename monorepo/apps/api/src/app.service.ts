@@ -10,12 +10,14 @@ export class AppService implements OnModuleInit {
 	}
 
 	// Create Robot
+
+	// + check if already exist before
 	async createRobotUser() {
 		try {
 			await this.prisma.user.create({
 				data: {
 					login42: 'R',
-					nickname: 'ROBOT',
+					nickname: 'robot',
 					// custom avatar ?
 				}
 			});
