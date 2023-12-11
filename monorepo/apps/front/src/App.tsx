@@ -16,7 +16,6 @@ import ChannelsLayout from './layouts/ChannelsLayout'
 import MeLayout from './layouts/FriendsLayout'
 
 //pages
-import Home from './pages/Home'
 import Game from './pages/Game'
 import Profile from './pages/Profile'
 import NotFound from './pages/NotFound'
@@ -39,8 +38,7 @@ const jwt2faToken = Cookies.get('jwt-2fa-token');
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<RootLayout />}>
-      <Route index element={jwtToken ? <Home /> : <Navigate to='/login' />} />
-      <Route path="game" element={jwtToken ? <Game /> : <Navigate to='/login' />} />
+      <Route index element={jwtToken ? <Game /> : <Navigate to='/login' />} />
       <Route path="chat" element={jwtToken ? <ChatLayout /> : <Navigate to='/login' />}>
         <Route path='channels' element={jwtToken ? <ChannelsLayout /> : <Navigate to='/login' />}>
           <Route path=":channelName" element={jwtToken ? <Channel /> : <Navigate to='/login' />} />
