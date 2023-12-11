@@ -587,11 +587,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
             // if end of game due to deconnection, set the one who disconnected as loser (ignore robot)
             if (!this.userToSocket.has(room.getLeftUser().id) || (room.getOption() !== OPTION.Robot && !this.userToSocket.has(room.getRightUser().id))) {
-                if (this.userToSocket.has(room.getLeftUser().id))
-                    room.setLeftAsWinner();
-
-                if (this.userToSocket.has(room.getRightUser().id))
+                if (!this.userToSocket.has(room.getLeftUser().id))
                     room.setRightAsWinner();
+
+                if (!this.userToSocket.has(room.getRightUser().id) && room.getOption() !== OPTION.Robot)
+                    room.setLeftAsWinner();
             }
 
             this.server.to(roomName).emit('GameEnd');
