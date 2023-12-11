@@ -55,7 +55,16 @@ const SearchNick: React.FC = () => {
         else 
          {return window.location.assign(`/profileUser/${ID}`);}
       }
+    }
+    catch (error) {
+      console.log(error);
+    }
+  }
+  const handleValidation = async () => {
 
+    await getProfileData();
+    return navigate(`/profileUser/${ID}`);
+  }
 
       setTimeout(() => {
         setShowPopup(false);

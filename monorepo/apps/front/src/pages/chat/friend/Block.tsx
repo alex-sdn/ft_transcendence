@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
 
 interface blockProps {
+    id: string,
     nickname: string,
     isBlocked: boolean,
     isChannel: boolean,
@@ -12,6 +13,7 @@ interface blockProps {
 }
 
 const Block: React.FC<blockProps> = ({
+    id,
     nickname,
     isBlocked,
     isChannel,
@@ -24,32 +26,42 @@ const Block: React.FC<blockProps> = ({
     const blockUser = async () => {
         let response;
         if (!isBlocked) {
-            response = await axios.post(`/api/user/block/${nickname}`, { nickname: nickname }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + jwtToken,
-                },
-            });
-            if (response.status === 201) {
-                setError("");
-                onClose();
-                if (!isChannel)
-                    window.location.assign('/chat/@me');
+            try {
+                response = await axios.post(`/api/user/block/${id}`, { nickname: nickname }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + jwtToken,
+                    },
+                });
+                if (response.status === 201) {
+                    setError("");
+                    onClose();
+                    if (!isChannel)
+                        window.location.assign('/chat/@me');
+                }
+            }
+            catch (error) {
+                console.log(error);
             }
         }
         else {
-            response = await axios.delete(`/api/user/block/${nickname}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + jwtToken,
-                },
-                data: {
-                    nickname: nickname,
-                },
-            });
-            if (response.status === 200) {
-                setError("");
-                onClose();
+            try {
+                response = await axios.delete(`/api/user/block/${id}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + jwtToken,
+                    },
+                    data: {
+                        nickname: nickname,
+                    },
+                });
+                if (response.status === 200) {
+                    setError("");
+                    onClose();
+                }
+            }
+            catch (error) {
+                console.log(error);
             }
         }
     }
@@ -75,7 +87,7 @@ const Block: React.FC<blockProps> = ({
                 </ModalHeader>
                 <ModalBody>
                     {!isBlocked &&
-                        <p>You wont be abble to see this user's messages anymore</p>
+                        <p>You won't be able to see this user's messages anymore</p>
                     }
                     {isBlocked &&
                         <p>You will see this user's messages again</p>

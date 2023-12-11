@@ -182,7 +182,6 @@ const dltFriend = async () => {
         {console.log(error);}
 }
 
-
   return (
   <div>
 
@@ -203,12 +202,10 @@ const dltFriend = async () => {
                                         onClose={() => setBlockModal(false)}
                                     />
                                 }
-
                             <span> {isFriend === true ?
                                 <button className="button-29" onClick={dltClic}> 👤➖ </button> 
                                 :
                                 <button className="button-29" onClick={postClic}> 👤➕ </button>}
-
                                 {showPopup && 
                                 ( <div className='popup'> <p>Request already sent</p></div> )
                                 } 
@@ -245,8 +242,7 @@ const dltFriend = async () => {
             <div> No matches done yet ! 🤺 </div>
         }
     </div>
-</div>
-      )
+  )
 }
 
 export default ProfileUser;

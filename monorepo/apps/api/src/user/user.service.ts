@@ -427,6 +427,8 @@ export class UserService {
 				blockedId: target.id
 			}
 		});
+		// Send socket event to warn of block
+		this.chatGateway.blockEvent(user, target);
 	}
 
 	async deleteBlock(userId: number, user) {
@@ -484,5 +486,24 @@ export class UserService {
 		}
 
 		return (await this.myMatches(user));
+	}
+
+	async myAchievements(user) {
+		const achievements = await this.prisma.achievements.findUnique({
+			where: {userId: user.id}
+		});
+
+		return achievements;
+	}
+
+	async getAchievements(userId: number) {
+		const user = await this.prisma.user.findUnique({
+			where: {id: userId}
+		});
+		if (!user) {
+			throw new HttpException('USER DOES NOT EXIST', HttpStatus.BAD_REQUEST);
+		}
+
+		return (await this.myAchievements(user));
 	}
 }
