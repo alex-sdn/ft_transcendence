@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Cookies from "js-cookie";
 import axios from 'axios'
 import ProfilePicture from './ProfilePicture';
@@ -6,6 +6,7 @@ import Modal from 'react-modal';
 import Nickname from './Nickname';
 import Twofa from './2fa';
 import SearchNick from './SearchNick';
+import SocketContext from '../Socket';
 
 const Profile: React.FC = () => {
 
@@ -17,12 +18,20 @@ const Profile: React.FC = () => {
   const [twofa, setTwofa] = useState<boolean>();
   const [gameNb, setGameNb] = useState<number>();
 
+  const socket = useContext(SocketContext);
 
   const jwtToken = Cookies.get('jwt-token');
 
   useEffect(() => {
+    const disconnectSocket = () => {
+        socket?.disconnect();
+        socket?.connect();
+    }
+    disconnectSocket();
+}, []);
+
+  useEffect(() => {
     const getProfileData = async () => {
-      console.log('token = ', jwtToken);
       try {
         const response = await axios.get('/api/user/me', {
           headers: {
@@ -37,7 +46,6 @@ const Profile: React.FC = () => {
           setLp(resp_profile.LP);
           setGameNb(resp_profile.loss + resp_profile.win);
           setTwofa(resp_profile.has2fa);
-          console.log(resp_profile);
         }
       }
       catch (error) {
@@ -57,7 +65,6 @@ const Profile: React.FC = () => {
           },
         },);
         const fileName = response.data.avatar;
-        console.log("response.data PROFILE = " + response.data);
         try {
           response = await axios.get('/api/user/avatar/' + fileName, {
             headers: {
@@ -65,7 +72,6 @@ const Profile: React.FC = () => {
             },
             responseType: 'arraybuffer',
           });
-          console.log('RESP PROFILE  ==> ' + response.data);
           if (response.status === 200) {
             const blob = new Blob([response.data]);
             const file = new File([blob], fileName);
@@ -141,20 +147,17 @@ const Profile: React.FC = () => {
 
   const deac2fabutton = async () => {
     try {
-      console.log('token = ', jwtToken);
       const response = await axios.delete('/api/user/me/edit2fa', {
         headers: {
           'Authorization': 'Bearer ' + jwtToken,
         },
       },);
       if (response.status === 200) {
-        console.log('2FA successfully deactivated');
         window.location.reload();
       }
     }
     catch (error) { console.log('Error encountered when deactivating 2FA'); }
   }
-  console.log('token = ', jwtToken);
   const customStyles = {
     content: {
       top: '50%',
