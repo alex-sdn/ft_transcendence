@@ -12,8 +12,6 @@ export class GameService {
 
 	async	createMatch(user1Id: number, user2Id: number, user1score: number, user2score: number, gameType) {
 		try {
-			console.log('GAMETYPE: ' + gameType);
-			console.log('Typetype: ' + typeof(gameType));
 
 			const user1 = await this.prisma.user.findUnique({
 				where: {id: user1Id}
