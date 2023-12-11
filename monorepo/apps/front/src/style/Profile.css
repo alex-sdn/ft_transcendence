@@ -4,46 +4,56 @@
 }*/
 
 
-h1 {
-    padding : 2px;
-    text-align: center;
-    font-size: 3em;
-    margin: 10px
+._h1 {
+    /* padding : 1.5; */
+    /* text-align: center; */
+    font-size: 1.6em;
+    /* margin: 10px */
 }
 ._profile {
-    /* font-size: 3em; */
     margin : 30px;
     padding: 30px;
     color: black;
     text-align: center;
     border: 3px #4b134f double;
     border-radius: 10px;
-    background: rgba(233, 232, 238, 0.918);
+    background: rgba(207, 207, 212, 0.918);
     background-attachment: fixed;
     background-size: cover;
-    /* box-shadow: rgba(57, 57, 61, 0.911) 0px 60px 30px -12px inset, rgba(0, 0, 0, 0.3) 0px 90px 100px -18px inset; */
     box-shadow: rgba(17, 17, 53, 0.9) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.6) 0px 18px 36px -18px inset;
 }
 
     ._info {
-    font-size: 1.5em;
+    font-size: 1.3em;
     margin: 20px;
-    padding: 60px;
+    padding: 30px;
+    padding-left: 45px;
     color: rgb(226, 224, 224);
-    /* text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff; */
     text-align: left;
     border-radius: 15px;
-    /* background: rgba(253, 254, 255, 0.726); */
     box-shadow: rgba(0, 0, 0, 0.3) 0px 30px 38px, rgba(0, 0, 0, 0.22) 0px 20px 12px;
-    /* box-shadow: rgba(0, 0, 0, 0.1) 0px -10px 25px 0px inset, rgba(0, 0, 0, 0) 0px -20px 30px 0px inset, rgba(0, 0, 0, 0) 0px -30px 20px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px;
-    box-shadow: rgb(255, 255, 255) 0px 10px 25px 0px inset; */
-    background: linear-gradient(172deg, rgb(36, 36, 36), rgb(10, 10, 10, 1));
-  /* box-shadow: 0 8px 32px 0 rgba(255, 255, 255, 0.1); */
-    border: 1px solid rgba(0, 0, 0, 0.5);
+    background: black;
+    border: solid white;
+}
+
+._scoreTab {
+  font-size: 1.3em;
+  /* margin: 30px;
+  padding: 30px;
+  text-align: center; */
+  margin: 40px;
+  padding: 60px;
+  text-align: left;
+  color: black;
+  border-radius: 5px;
+  box-shadow: rgba(12, 12, 12, 0.3) 0px 30px 38px, rgba(10, 10, 10, 0.22) 0px 20px 12px;
+  background: white;
+  border-style: solid ;
 }
 
 ._score {
-    text-shadow: 0 0 10px #fff, 0 0 20px #ffffff6e;
+  color: white;
+    text-shadow: 0 0 10px #fff, 0 0 20px #ffffffc0;
 }
 
 ._avatar-img {
@@ -55,29 +65,58 @@ h1 {
 
 
 .button-29 {
-  font-size: 0.8em;
+  width: 40px; 
+  height: 30px;
+  color: rgba(0, 0, 0, 0.767);
+  font-size: 0.6em;
   /* align-items: center; */
-  border-radius: 6px;
-  background: rgb(54, 54, 54);
+  background: rgb(255, 255, 255);
   box-shadow: rgba(45, 35, 66, .4) 0 2px 4px,rgba(45, 35, 66, .3) 0 7px 13px -3px,rgba(58, 65, 111, .5) 0 -3px 0 inset;
   box-sizing: border-box;
   cursor: pointer;
   justify-content: center;
   padding-left: 1px;
   padding-right: 1px;
-  will-change: box-shadow,transform;
+  will-change: box-shadow, transform;
 }
 
-.button-29:focus {
-    box-shadow: #ffffff86 0 0 0 1.5px inset, rgba(45, 35, 66, .4) 0 2px 4px, rgba(45, 35, 66, .3) 0 7px 13px -3px, #ffffff6c 0 -3px 0 inset;
-  }
   
   .button-29:hover {
+    color: rgb(122, 122, 122);
     box-shadow: rgba(255, 255, 255, 0.4) 0 4px 8px, rgba(45, 35, 66, .3) 0 7px 13px -3px, #ffffff3b 0 -3px 0 inset;
     transform: translateY(-2px);
   }
   
   .button-29:active {
+    color: rgba(255, 255, 255, 0.849);
     box-shadow: #ffffff73 0 3px 7px inset;
     transform: translateY(2px);
+  }
+
+  .popup {
+    position: absolute;
+    /* top: 50%; */
+    /* right: 0; */
+    /* transform: translate(0, -50%); */
+    z-index: 999; /* Assurez-vous que z-index est supérieur à ceux des autres éléments de la page */
+  }
+
+  .wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  button, input[type="submit"], input[type="reset"] {
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
+
+    &:hover {
+        color: white;
+          text-shadow: 0 0 10px #fff, 0 0 20px #ffffffc0;
+    }
   }

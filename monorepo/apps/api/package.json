@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "db:up": "docker-compose up dev-db --build -d",
+    "db:up": "docker-compose up --build -d dev-db",
     "db:stop": "docker-compose stop",
     "db:down": "docker-compose down",
     "build": "npx prisma generate && nest build",
