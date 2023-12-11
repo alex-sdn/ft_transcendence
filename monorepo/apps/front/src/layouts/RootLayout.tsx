@@ -45,50 +45,6 @@ const RootLayout: React.FC = () => {
     getMe();
   }, [jwtToken, socket]);
 
-
-  // useEffect(() => {
-  //   if (socket) {
-  //     socket.on("inviteGame", (data) => {
-  //       console.log("invite received")
-  //       if (me == data.target && status != "ingame") {
-  //         setInviteGameModale(true);
-  //         setUser(data.sender);
-  //       }
-  //     })
-  //   }
-
-  //   return () => {
-  //     if (socket) {
-
-  //       socket.off("inviteGame");
-
-  //     }
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   if (socket) {
-
-  //     socket.on("invite", (data) => {
-  //       if (me == data.target && status != "ingame") {
-  //         setInviteChannelModale(true);
-  //         setUser(data.sender);
-  //         setChannel(data.channel);
-  //       }
-
-  //     });
-
-  //     //invite game
-  //   }
-
-  //   return () => {
-  //     if (socket) {
-  //       socket.off("invite");
-
-  //     }
-  //   }
-  // }, []);
-
   useEffect(() => {
     if (socket) {
       socket.on("inviteGame", (data) => {
@@ -107,12 +63,11 @@ const RootLayout: React.FC = () => {
         }
       })
 
-
       socket.on("startGame", () => {
         console.log("start game front")
-        window.location.assign('/game');
+        window.location.assign('/');
       })
-      //invite game
+    
     }
 
     return () => {
@@ -149,8 +104,14 @@ const RootLayout: React.FC = () => {
 
   const handlePlayGame = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (socket)
+    if (socket) {
       socket.emit("inviteGame", { sender: me, target: user });
+      console.log("invite game");
+      // socket.on("error", (data) => {
+      //   setError(data.message);
+      // })
+    }
+
   }
 
   return (
@@ -158,13 +119,13 @@ const RootLayout: React.FC = () => {
       <header>
         <h1>Pong Game</h1>
         <nav className="navbar links">
-          <NavLink to="/">Home</NavLink>
-          <NavLink to="game">Game</NavLink>
+          <NavLink to="/">Game</NavLink>
           <NavLink to="chat">Chat</NavLink>
           <NavLink to="profile">Profile</NavLink>
           <button className='button-59' onClick={disconnect}>Logout</button>
         </nav>
       </header>
+
       <Modal show={inviteChannelModale}
         onHide={() => setInviteChannelModale(false)}
         style={{ color: "black" }}
@@ -193,6 +154,7 @@ const RootLayout: React.FC = () => {
           </p>
         </ModalBody>
       </Modal>
+
       <Modal show={inviteGameModale}
         onHide={() => setInviteGameModale(false)}
         style={{ color: "black" }}
