@@ -34,7 +34,6 @@ const ProfileList: React.FC = () => {
 
   return (
       <div>
-          <div className='_h1' style={{ textAlign: 'center' }}>Friends</div>
           <div className='_info'>
               {lists.length > 0 ?
                 <ul>

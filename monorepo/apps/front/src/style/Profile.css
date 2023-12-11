@@ -41,8 +41,9 @@
   /* margin: 30px;
   padding: 30px;
   text-align: center; */
-  margin: 40px;
-  padding: 60px;
+  margin: 20px;
+  padding: 30px;
+  padding-right: auto;
   text-align: left;
   color: black;
   border-radius: 5px;
@@ -53,7 +54,7 @@
 
 ._score {
   color: white;
-    text-shadow: 0 0 10px #fff, 0 0 20px #ffffffc0;
+  text-shadow: 0 0 10px #fff, 0 0 20px #ffffffc0;
 }
 
 ._avatar-img {

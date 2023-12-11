@@ -31,7 +31,6 @@ const ProfileBadges: React.FC = () => {
 
   return (
       <div>
-          <div className='_h1' style={{ textAlign: 'center' }}>Achievements</div>
           <div className='_info' style={{ textAlign: 'center' }}>
               {/* {Badges.length > 0 ?
                 <ul>

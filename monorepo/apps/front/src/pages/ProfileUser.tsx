@@ -7,7 +7,7 @@ import Block from "./chat/friend/Block";
 
 
 const ProfileUser: React.FC = () => {
-    const { ID } = useParams<{ ID?: string }>();
+  const { ID } = useParams<{ ID?: string }>();
 
   const [nickname, setNickname] = useState<string>('');
   const [image, setImage] = useState<File>();
@@ -21,6 +21,7 @@ const ProfileUser: React.FC = () => {
   const [isBlocked, setIsBlocked] = useState<boolean>(false);
   const [blockModal, setBlockModal] = useState<boolean>(false);
   const [showPopup, setShowPopup] = useState(false);
+  const [Badges, setBadges] = useState<any[]>([]);
   const jwtToken = Cookies.get('jwt-token');
 
   // REQUETE INFOS
@@ -182,6 +183,26 @@ const dltFriend = async () => {
         {console.log(error);}
 }
 
+//ACHIEVEMENTS
+useEffect(() => {
+  const getBadges = async () => {
+    try {
+        const response = await axios.get(`/api/user/achievements/${ID}`, {
+        headers: {
+          'Authorization': 'Bearer ' + jwtToken,
+        },
+    },);
+    if (response.status === 200) {
+        const resp_Badges= response.data;
+        setBadges(resp_Badges);
+        console.log(resp_Badges);
+        }}
+     catch (error)
+        {console.log(error);}
+  }
+  getBadges();
+}, []);
+
 
   return (
   <div>
@@ -221,6 +242,10 @@ const dltFriend = async () => {
                   <p>Victory : <span className='_score'>{win} </span></p>
                   <p>Loss : <span className='_score'>{loss}</span></p>
                   <p>Ladder Points : <span className='_score'>{lp}</span> </p>
+              </div>
+              <div className='_scoreTab'>
+                  <div className='_h1' style={{ textAlign: 'center' }}>Achievements</div>
+                  <div className='_info'>***********BADGES HERE**************</div>
               </div>
           </div>
     </div>

@@ -8,8 +8,10 @@ import Twofa from './2fa';
 import ProfileMatch from './ProfileMatch';
 import SearchNick from './SearchNick';
 import Profilefriends from './Profilefriends';
+import Tabs from './Tabs';
 import ProfileList from './ProfileList';
 import ProfileBadges from './ProfileBadges';
+import ProfileTabs from './Tabs';
 
 const Profile: React.FC = () => {
 
@@ -256,9 +258,12 @@ const Profile: React.FC = () => {
                 </p>
             </div>
             <div className='_scoreTab'>
-              {/* <ProfileList/> */}
-              <ProfileBadges/>
+              <ProfileTabs/>
+              {/* <ProfileBadges/> */}
+
             </div>
+ 
+ 
         </div>
         <div className='_scoreTab'>
             <span className='_h1'>Recent Games</span>
