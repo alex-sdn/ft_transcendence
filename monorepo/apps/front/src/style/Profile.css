@@ -115,3 +115,7 @@ button, input[type="submit"], input[type="reset"] {
         text-shadow: 0 0 10px #fff, 0 0 20px #ffffffc0;
   }
 }
+
+.robot-button {
+  background-image: url("/robot.png");
+}
