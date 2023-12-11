@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Cookies from "js-cookie";
 import axios from 'axios'
-import ProfileFriends from './Profilefriends';
-import ProfileUser from './ProfileUser';
+// import ProfileFriends from './Profilefriends';
+// import ProfileUser from './ProfileUser';
 
 const ProfileList: React.FC = () => {
 

@@ -9,6 +9,7 @@ import ProfileMatch from './ProfileMatch';
 import SearchNick from './SearchNick';
 import Profilefriends from './Profilefriends';
 import ProfileList from './ProfileList';
+import ProfileBadges from './ProfileBadges';
 
 const Profile: React.FC = () => {
 
@@ -255,7 +256,8 @@ const Profile: React.FC = () => {
                 </p>
             </div>
             <div className='_scoreTab'>
-              <ProfileList/>
+              {/* <ProfileList/> */}
+              <ProfileBadges/>
             </div>
         </div>
         <div className='_scoreTab'>
