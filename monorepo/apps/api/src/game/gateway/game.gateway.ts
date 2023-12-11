@@ -214,6 +214,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             client.emit('error', {
                 message: 'This user does not exist'
             });
+			return;
         }
         const targetSocket = this.userToSocket.get(target.id);
 
@@ -222,12 +223,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             client.emit('error', {
                 message: 'This user is not online'
             });
+			return;
         }
         // if target is ingame
         if (target.status === 'ingame') {
             client.emit('error', {
                 message: 'This user is currently in-game'
             });
+			return;
         }
 
         var listName;
@@ -237,7 +240,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             listName = target.id + '-' + user.id;
         // if first invite -> create waiting list for private game
         if (!this.friendWaitingList.has(listName)) {
-            console.log("here")
+            console.log("-creating friendWaitingList")
             this.friendWaitingList.set(listName, [user.id, target.id]);
             // renvoyer l'invite a target
             targetSocket.emit('inviteGame', {
