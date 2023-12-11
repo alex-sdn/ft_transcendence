@@ -122,5 +122,44 @@
     align-items: center;
     justify-content: center;
     height: 100vh;
-  }
-  
+}
+
+.ready-button {
+    background-color: #581109;
+    color: #fff;
+    border: none;
+    padding: 15px 30px;
+    font-size: 32px;
+    cursor: pointer;
+    border-radius: 8px;
+
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.ready-button:hover {
+    color: #000000;
+    background-color: #ffffff;
+}
+
+.newgame-button {
+    background-color: #581109;
+    color: #fff;
+    border: none;
+    padding: 15px 30px;
+    font-size: 32px;
+    cursor: pointer;
+    border-radius: 8px;
+
+    position: fixed;
+    top: 90%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.newgame-button:hover {
+    color: #000000;
+    background-color: #ffffff;
+}

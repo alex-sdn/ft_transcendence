@@ -97,6 +97,8 @@ const Game: React.FC = () => {
 
     const [Coolcat, setCoolcat] = useState(false);
 
+    const [WaitingRoom, setWaitingRoom] = useState(false);
+
     const [showTextRobot, setShowTextRobot] = useState(false);
     const [showTextRetro, setShowTextRetro] = useState(false);
     const [showTextWeirdCrowd, setShowTextWeirdCrowd] = useState(false);
@@ -199,6 +201,7 @@ const Game: React.FC = () => {
                     console.log("Are you ready ?");
                     setAskReady(true);
                     setAskOption(false);
+                    setWaitingRoom(false);
                 }
             );
         }
@@ -294,12 +297,14 @@ const Game: React.FC = () => {
         socket?.emit('robot', { action: 'robot' });
         setGameOption(OPTION.Robot);
         setAskOption(false);
+        setWaitingRoom(true);
     };
 
     const playRetro = () => {
         socket?.emit('retro', { action: 'retro' });
         setGameOption(OPTION.Retro);
         setAskOption(false);
+        setWaitingRoom(true);
     };
 
     const playCoolCat = () => {
@@ -307,6 +312,7 @@ const Game: React.FC = () => {
         setGameOption(OPTION.CoolCat);
         setAskOption(false);
         setCoolcat(true);
+        setWaitingRoom(true);
     };
 
     const playWeirdCrowd = () => {
@@ -314,6 +320,7 @@ const Game: React.FC = () => {
         setGameOption(OPTION.WeirdCrowd);
         setAskOption(false);
         setThereIsCrowd(true);
+        setWaitingRoom(true);
     };
 
     const IAmReady = () => {
@@ -349,6 +356,7 @@ const Game: React.FC = () => {
         setCount(4);
         setGameEnd(false);
         setCoolcat(false);
+        setWaitingRoom(false);
         setThereIsCrowd(false);
     };
 
@@ -623,7 +631,9 @@ const Game: React.FC = () => {
                 }
 
                 {AskReady &&
-                    (<button onClick={IAmReady}>Ready</button>)
+
+                    <button className="ready-button" onClick={IAmReady}>Ready</button>
+
                 }
 
                 {Countdown && (Count != 0) &&
@@ -644,20 +654,44 @@ const Game: React.FC = () => {
                     </div>)
                 }
 
+                {
+                    WaitingRoom &&
+                    (<div >WAITING ROOM</div>)
+                }
+
                 {ScreenIssue &&
-                    (<div>Please increase the size of your screen. The minimum required is: 600 * 400. Thank you!</div>)
+                    (<div style={{ textAlign: 'center' }}>Please increase the size of your screen. The minimum required is: 600 * 400. Thank you!</div>)
                 }
 
                 {LogOut &&
-                    (<div>Oops, your competitor has just logged out... So you've just won!</div>)
+                    (<div style={{ textAlign: 'center' }}>Oops, your competitor has just logged out... So you've just won!</div>)
                 }
 
                 {LogOut &&
-                    (<button onClick={NewGame}>New Game</button>)
+                    (<div id="countdown">
+                        You won !
+                    </div>)
                 }
 
                 {GameEnd &&
-                    (<button onClick={NewGame}>New Game</button>)
+                    (((score.left > score.right) && role == ROLE.Left) ||
+                    ((score.right > score.left) && role == ROLE.Right)) &&
+                    (<div id="countdown">
+                        You won !
+                    </div>)
+                }
+
+                {GameEnd &&
+                    (((score.left < score.right) && role == ROLE.Left) ||
+                    ((score.right < score.left) && role == ROLE.Right)) &&
+                    (<div id="countdown">
+                        You lost !
+                    </div>)
+                }
+
+
+                {(LogOut || GameEnd) &&
+                    (<button className="newgame-button" onClick={NewGame}>New Game</button>)
                 }
 
                 {true &&
