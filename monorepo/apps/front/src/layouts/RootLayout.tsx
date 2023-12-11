@@ -45,50 +45,6 @@ const RootLayout: React.FC = () => {
     getMe();
   }, [jwtToken, socket]);
 
-
-  // useEffect(() => {
-  //   if (socket) {
-  //     socket.on("inviteGame", (data) => {
-  //       console.log("invite received")
-  //       if (me == data.target && status != "ingame") {
-  //         setInviteGameModale(true);
-  //         setUser(data.sender);
-  //       }
-  //     })
-  //   }
-
-  //   return () => {
-  //     if (socket) {
-
-  //       socket.off("inviteGame");
-
-  //     }
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   if (socket) {
-
-  //     socket.on("invite", (data) => {
-  //       if (me == data.target && status != "ingame") {
-  //         setInviteChannelModale(true);
-  //         setUser(data.sender);
-  //         setChannel(data.channel);
-  //       }
-
-  //     });
-
-  //     //invite game
-  //   }
-
-  //   return () => {
-  //     if (socket) {
-  //       socket.off("invite");
-
-  //     }
-  //   }
-  // }, []);
-
   useEffect(() => {
     if (socket) {
       socket.on("inviteGame", (data) => {
@@ -107,12 +63,11 @@ const RootLayout: React.FC = () => {
         }
       })
 
-
       socket.on("startGame", () => {
         console.log("start game front")
-        window.location.assign('/game');
+        window.location.assign('/');
       })
-      //invite game
+
     }
 
     return () => {
@@ -149,84 +104,95 @@ const RootLayout: React.FC = () => {
 
   const handlePlayGame = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (socket)
+    if (socket) {
       socket.emit("inviteGame", { sender: me, target: user });
+      socket.on("error", (data) => {
+        setError(data.message);
+      })
+    }
   }
 
-  return (
-    <div className='root-layout'>
-      <header>
-        <h1>Pong Game</h1>
-        <nav className="navbar links">
-          <NavLink to="/">Home</NavLink>
-          <NavLink to="game">Game</NavLink>
-          <NavLink to="chat">Chat</NavLink>
-          <NavLink to="profile">Profile</NavLink>
-          <button className='button-59' onClick={disconnect}>Logout</button>
-        </nav>
-      </header>
-      <Modal show={inviteChannelModale}
-        onHide={() => setInviteChannelModale(false)}
-        style={{ color: "black" }}
-        className="text-center"
-      >
-        <ModalHeader>
-          <ModalTitle>
-            <strong>{user}</strong> invited you to join <strong>{channel}</strong>
-          </ModalTitle>
-        </ModalHeader>
-        <ModalBody>
-          Do you want to join <strong>{channel}</strong>?
-          <p className="action-buttons">
-            <button className="button-59"
-              onClick={(e) => handleJoinChannel(e)}
-            >
-              Yes
-            </button>
-            <button className="button-59"
-              onClick={() => {
-                setError("");
-                setInviteChannelModale(false);
-              }}>
-              No
-            </button>
-          </p>
-        </ModalBody>
-      </Modal>
-      <Modal show={inviteGameModale}
-        onHide={() => setInviteGameModale(false)}
-        style={{ color: "black" }}
-        className="text-center"
-      >
-        <ModalHeader>
-          <ModalTitle>
-            <strong>{user}</strong> invited you to play
-          </ModalTitle>
-        </ModalHeader>
-        <ModalBody>
-          Do you want to play with <strong>{user}</strong>?
-          <p className="action-buttons">
-            <button className="button-59"
-              onClick={(e) => handlePlayGame(e)}
-            >
-              Yes
-            </button>
-            <button className="button-59"
-              onClick={() => {
-                setError("");
-                setInviteGameModale(false);
-                // event pour refuser
-              }}>
-              No
-            </button>
-          </p>
-        </ModalBody>
-      </Modal>
-      <main>
-        <Outlet />
-      </main>
-    </div>
-  );
-};
+  const handleRefuse = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (socket) {
+      socket.emit("refuseInvite", { sender: me, target: user });
+      setError("");
+      setInviteGameModale(false);
+    }
+  }
 
-export default RootLayout;
+    return (
+      <div className='root-layout'>
+        <header>
+          <h1>Pong Game</h1>
+          <nav className="navbar links">
+            <NavLink to="/">Game</NavLink>
+            <NavLink to="chat">Chat</NavLink>
+            <NavLink to="profile">Profile</NavLink>
+            <button className='button-59' onClick={disconnect}>Logout</button>
+          </nav>
+        </header>
+
+        <Modal show={inviteChannelModale}
+          onHide={() => setInviteChannelModale(false)}
+          style={{ color: "black" }}
+          className="text-center"
+        >
+          <ModalHeader>
+            <ModalTitle>
+              <strong>{user}</strong> invited you to join <strong>{channel}</strong>
+            </ModalTitle>
+          </ModalHeader>
+          <ModalBody>
+            Do you want to join <strong>{channel}</strong>?
+            <p className="action-buttons">
+              <button className="button-59"
+                onClick={(e) => handleJoinChannel(e)}
+              >
+                Yes
+              </button>
+              <button className="button-59"
+                onClick={() => {
+                  setError("");
+                  setInviteChannelModale(false);
+                }}>
+                No
+              </button>
+            </p>
+          </ModalBody>
+        </Modal>
+
+        <Modal show={inviteGameModale}
+          onHide={() => setInviteGameModale(false)}
+          style={{ color: "black" }}
+          className="text-center"
+        >
+          <ModalHeader>
+            <ModalTitle>
+              <strong>{user}</strong> invited you to play
+            </ModalTitle>
+          </ModalHeader>
+          <ModalBody>
+            Do you want to play with <strong>{user}</strong>?
+            <p className="action-buttons">
+              <button className="button-59"
+                onClick={(e) => handlePlayGame(e)}
+              >
+                Yes
+              </button>
+              <button className="button-59"
+                onClick={(e) => handleRefuse(e)}>
+                No
+              </button>
+            </p>
+            {error && <div className="text-danger">{error}</div>}
+          </ModalBody>
+        </Modal>
+        <main>
+          <Outlet />
+        </main>
+      </div>
+    );
+  };
+
+  export default RootLayout;

@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState, useRef } from 'react';
 import SocketContext from "../Socket.js";
 import Sketch from "react-p5";
 import p5Types from "p5";
+import { useLocation, redirect } from 'react-router-dom';
 
 /******************************************************************************
 *                         INTERFACES & CONSTANTS                              *
@@ -607,33 +608,75 @@ const Game: React.FC = () => {
                 }
                 {AskOption && (
                     <div className="button-container">
-                        <div className="button-wrapper" onClick={playWithRobot} onMouseEnter={() => setShowTextRobot(true)} onMouseLeave={() => setShowTextRobot(false)}>
-                            <button className="robot-button"></button>
-                            {AskOption && showTextRobot && <div className="info-text">• HUMAN VS MACHINE •<br /> All alone? <br /> Our robot will always be here for you!</div>}
+                        <div className="button-wrapper"
+                            onClick={playWithRobot}
+                            onMouseEnter={() => setShowTextRobot(true)}
+                            onMouseLeave={() => setShowTextRobot(false)}
+                        >
+                            <button className="robot-button" />
+                            {AskOption && showTextRobot &&
+                                <div className="info-text">
+                                    <p>• HUMAN VS MACHINE •</p>
+                                    <p>All alone?</p>
+                                    <p>Our robot will always be here for you!</p>
+                                </div>
+                            }
                         </div>
 
-                        <div className="button-wrapper" onClick={playRetro} onMouseEnter={() => setShowTextRetro(true)} onMouseLeave={() => setShowTextRetro(false)}>
-                            <button className="retro-button"></button>
-                            {AskOption && showTextRetro && <div className="info-text">• RETRO MODE •<br /> Try our original version of pong <br /> as it was played in the 70s <br /> by Allan Alcorn himself!</div>}
+                        <div className="button-wrapper"
+                            onClick={playRetro}
+                            onMouseEnter={() => setShowTextRetro(true)}
+                            onMouseLeave={() => setShowTextRetro(false)}
+                        >
+                            <button className="retro-button" />
+                            {AskOption && showTextRetro &&
+                                <div className="info-text">
+                                    <p>• RETRO MODE •</p>
+                                    <p>Try our original version of pong</p>
+                                    <p>as it was played in the 70s</p>
+                                    <p>by Allan Alcorn himself!</p>
+                                </div>
+                            }
                         </div>
 
-                        <div className="button-wrapper" onClick={playCoolCat} onMouseEnter={() => setShowTextCoolCat(true)} onMouseLeave={() => setShowTextCoolCat(false)}>
-                            <button className="coolcat-button"></button>
-                            {AskOption && showTextCoolCat && <div className="info-text">• COOL CAT EDITION •<br /> Play a smoother version of pong <br /> with some little surprises along the way...</div>}
+                        <div className="button-wrapper"
+                            onClick={playCoolCat}
+                            onMouseEnter={() => setShowTextCoolCat(true)}
+                            onMouseLeave={() => setShowTextCoolCat(false)}
+                        >
+                            <button className="coolcat-button" />
+                            {AskOption && showTextCoolCat &&
+                                <div className="info-text">
+                                    <p>• COOL CAT EDITION •</p>
+                                    <p>Play a smoother version of pong</p>
+                                    <p>with some little surprises along the way...</p>
+                                </div>
+                            }
                         </div>
 
-                        <div className="button-wrapper" onClick={playWeirdCrowd} onMouseEnter={() => setShowTextWeirdCrowd(true)} onMouseLeave={() => setShowTextWeirdCrowd(false)}>
-                            <button className="weirdcrowd-button"></button>
-                            {AskOption && showTextWeirdCrowd && <div className="info-text">• WEIRD CROWD VERSION •<br /> What would be a tennis match <br /> without its weird headshaking crowd?</div>}
+                        <div className="button-wrapper"
+                            onClick={playWeirdCrowd}
+                            onMouseEnter={() => setShowTextWeirdCrowd(true)}
+                            onMouseLeave={() => setShowTextWeirdCrowd(false)}
+                        >
+                            <button className="weirdcrowd-button" />
+                            {AskOption && showTextWeirdCrowd &&
+                                <div className="info-text">
+                                    <p>• WEIRD CROWD VERSION •</p>
+                                    <p>What would be a tennis match</p>
+                                    <p>without its weird headshaking crowd?</p>
+                                </div>
+                            }
                         </div>
                     </div>)
-
                 }
 
                 {AskReady &&
-
-                    <button className="ready-button" onClick={IAmReady}>Ready</button>
-
+                    <button className="ready-button"
+                        onClick={IAmReady}
+                    >
+                        Ready
+                    </button>
                 }
 
                 {Countdown && (Count != 0) &&
@@ -668,23 +711,23 @@ const Game: React.FC = () => {
                 }
 
                 {LogOut &&
-                    (<div id="countdown">
+                    (<div className='you-won' id="countdown">
                         You won !
                     </div>)
                 }
 
                 {GameEnd &&
                     (((score.left > score.right) && role == ROLE.Left) ||
-                    ((score.right > score.left) && role == ROLE.Right)) &&
-                    (<div id="countdown">
+                        ((score.right > score.left) && role == ROLE.Right)) &&
+                    (<div className='you-won' id="countdown">
                         You won !
                     </div>)
                 }
 
                 {GameEnd &&
                     (((score.left < score.right) && role == ROLE.Left) ||
-                    ((score.right < score.left) && role == ROLE.Right)) &&
-                    (<div id="countdown">
+                        ((score.right < score.left) && role == ROLE.Right)) &&
+                    (<div className='you-lost' id="countdown">
                         You lost !
                     </div>)
                 }

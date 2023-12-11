@@ -218,11 +218,19 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
         const targetSocket = this.userToSocket.get(target.id);
 
+		var listName;
+		if (user.id < target.id)
+			listName = user.id + '-' + target.id;
+		else
+			listName = target.id + '-' + user.id;
+
         // if target is offline
         if (!targetSocket) {
             client.emit('error', {
                 message: 'This user is not online'
             });
+			if (this.friendWaitingList.has(listName))
+				this.friendWaitingList.delete(listName);
 			return;
         }
         // if target is ingame
@@ -230,14 +238,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             client.emit('error', {
                 message: 'This user is currently in-game'
             });
+			if (this.friendWaitingList.has(listName))
+				this.friendWaitingList.delete(listName);
 			return;
         }
-
-		var listName;
-        if (user.id < target.id)
-            listName = user.id + '-' + target.id;
-        else
-            listName = target.id + '-' + user.id;
 
 		// if already sent invite
 		if (this.friendWaitingList.has(listName) && this.friendWaitingList.get(listName) === user.id) {
