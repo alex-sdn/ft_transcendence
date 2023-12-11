@@ -3,6 +3,7 @@ import { width, height, Puck, Paddle } from './game.math';
 import { OPTION } from './gateway/game.gateway';
 
 let isPlaying: boolean = false;
+const MAX_SCORE: number = 7;
 
 /******************************************************************************
 *                               SOCKET ROOMS                                  *
@@ -39,9 +40,17 @@ export class Room {
         this.leftPlayer = left;
         this.rightPlayer = right;
 
-        this.leftNickname = left.nickname;
-        this.rightNickname = right.nickname;
+        if (left.nickname)
+            this.leftNickname = left.nickname;
+        else
+            this.leftNickname = "no name";
+        
+        if (right.nickname)
+            this.rightNickname = right.nickname;
+        else
+            this.rightNickname = "no name";
 
+        
         this.puck = new Puck();
         
         this.leftPaddle = new Paddle(true);
@@ -103,7 +112,7 @@ export class Room {
     }
 
     getGameEnd(): boolean {
-        if (this.leftScore >= 7 || this.rightScore >= 7)
+        if (this.leftScore >= MAX_SCORE || this.rightScore >= MAX_SCORE)
             this.gameEnd = true;
         return this.gameEnd;
     }
@@ -139,11 +148,11 @@ export class Room {
     }
 
     setLeftAsWinner(): void {
-        this.leftScore = 7;
+        this.leftScore = MAX_SCORE;
     }
 
     setRightAsWinner(): void {
-        this.rightScore = 7;
+        this.rightScore = MAX_SCORE;
     }
 
 }
