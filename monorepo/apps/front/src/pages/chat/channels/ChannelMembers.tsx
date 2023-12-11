@@ -30,6 +30,7 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
     const [banModal, setBanModal] = useState<boolean>(false);
     const [adminModal, setAdminModal] = useState<boolean>(false);
     const [blockModal, setBlockModal] = useState<boolean>(false);
+    const [error, setError] = useState<string>("");
     const socket = useContext(SocketContext);
 
     useEffect(() => {
@@ -56,38 +57,23 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
     const inviteGame = async (event: React.FormEvent) => {
         event.preventDefault();
         console.log("button pressed")
-        // const createPromise = new Promise<{
-        //     sender: string;
-        //     target: string;
-        //     channel: string;
-        // }>((resolve, reject) => {
-            if (socket && selectedMember) {
-                socket.emit("inviteGame", { sender: me.name, target: selectedMember.name });
-
-                console.log("me " + me.name)
-                console.log("selected member " + selectedMember.name)
-                console.log("emit")
-            }
-
-        //         socket.on("invite", (data) => {
-        //             resolve(data);
-        //         });
-        //         socket.on("error", (data) => {
-        //             reject(data);
-        //         });
-        //     }
-        // });
-
-        // createPromise
-        //     .then(() => {
-        //         setError("");
-        //         setUserSelected("");
-        //         onClose();
-        //     })
-        //     .catch((error) => {
-        //         setError(error.message);
-        //     })
+        if (socket && selectedMember) {
+            socket.emit("inviteGame", { sender: me.name, target: selectedMember.name });
+            socket.on("error", (data) => {
+                setError(data.message);
+            })
+        }
     }
+
+    useEffect(() => {
+        if (error) {
+            const timeoutId = setTimeout(() => {
+                setError('');
+            }, 3000); // Durée d'affichage en millisecondes (ici, 3 secondes)
+
+            return () => clearTimeout(timeoutId);
+        }
+    }, [error]);
 
     return (
         <div>
@@ -180,6 +166,7 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
                                 Let's play!
                             </button>
                         </p>
+                        {error && <div className="text-danger">{error}</div>}
                         {!isBlocked &&
                             <p>
                                 <button onClick={() => {
