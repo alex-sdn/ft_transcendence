@@ -112,14 +112,16 @@ export class ChatService {
 			where: { chanId: chan.id },
 			include: { sender: true }
 		});
+		// remove messages from blocked users
+		const filteredMessages = await this.filterBlockedMessages(user, messages);
 		// delete info
-		for (var i in messages) {
-			delete messages[i].sender.has2fa;
-			delete messages[i].sender.secret2fa;
-			delete messages[i].sender.status;
+		for (var i in filteredMessages) {
+			delete filteredMessages[i].sender.has2fa;
+			delete filteredMessages[i].sender.secret2fa;
+			delete filteredMessages[i].sender.status;
 		}
 
-		return messages;
+		return filteredMessages;
 	}
 
 	async getPrivmessages(nickname: string, user) {
@@ -248,7 +250,8 @@ export class ChatService {
 				friend1Id: id1,
 				friend2Id: id2,
 				userId: sender.id,
-				message: message
+				message: message,
+				isCommand: false
 			}
 		});
 	}
@@ -266,9 +269,11 @@ export class ChatService {
 		if (checkTaken) {
 			throw new Error('channel name already taken');
 		}
-		// IF MISSING PASSWORD
-		if (message.access === 'protected' && !message.password) {
-			throw new Error('missing password for protected access');
+		// IF MISSING PASSWORD OR WRONG FORMAT
+		if (message.access === 'protected') {
+			if (!message.password)
+				throw new Error('missing password for protected access');
+			this.validatePassword(message.password);
 		}
 		// IF WRONG ACCESS TYPE
 		if (!['public', 'private', 'protected'].includes(message.access)) {
@@ -278,7 +283,7 @@ export class ChatService {
 		try {
 			// Hash password
 			let pwHash;
-			if (message.password) // && access==protected ?
+			if (message.access === 'protected')
 				pwHash = await argon.hash(message.password);
 			else
 				pwHash = null;
@@ -290,7 +295,7 @@ export class ChatService {
 					password: pwHash
 				}
 			});
-			// Add user  (+set as owner! +admin)
+			// Add user  (+set as owner +admin)
 			await this.prisma.member.create({
 				data: {
 					chanId: channel.id,
@@ -402,9 +407,11 @@ export class ChatService {
 			});
 		}
 		else if (access === 'protected') {
-			//check password format ?
 			if (!password)
 				throw new Error('Missing password for protected access');
+			// Check password format
+			this.validatePassword(password);
+			// Hash and update channel
 			const pwHash = await argon.hash(password);
 			await this.prisma.channel.update({
 				where: { id: channel.id },
@@ -604,7 +611,41 @@ export class ChatService {
 			}
 		});
 
-		// + ADD TO PRIVMSG HISTORY
+		// + Add to privmsg history
+		const friendship1 = await this.prisma.friendship.findUnique({
+			where: {
+				user1Id_user2Id: {
+					user1Id: user.id,
+					user2Id: target.id
+				}
+			}
+		});
+		const friendship2 = await this.prisma.friendship.findUnique({
+			where: {
+				user1Id_user2Id: {
+					user1Id: target.id,
+					user2Id: user.id
+				}
+			}
+		});
+		var id1: number;
+		var id2: number;
+		if (friendship1.id < friendship2.id) {
+			id1 = friendship1.id;
+			id2 = friendship2.id;
+		} else {
+			id1 = friendship2.id;
+			id2 = friendship1.id;
+		}
+		await this.prisma.privmsg.create({
+			data: {
+				friend1Id: id1,
+				friend2Id: id2,
+				userId: user.id,
+				message: `invited ${target.nickname} to ${channel.name}`,
+				isCommand: true
+			}
+		});
 	}
 
 	async addAdmin(user: User, target: User, channel) {
@@ -670,7 +711,7 @@ export class ChatService {
 		}
 	}
 
-
+	
 	/*           *\
 	**   UTILS   **
 	\*           */
@@ -799,6 +840,15 @@ export class ChatService {
 			throw new Error('Forbidden characters in channel name');
 	}
 
+	validatePassword(pw: string) {
+		if (pw.length < 8 || pw.length > 20)
+			throw new Error('Password must be 8-20 characters');
+		
+		const pattern =  /^[a-zA-Z0-9_-]*$/;
+		if (!pattern.test(pw))
+			throw new Error('Forbidden characters in password');
+	}
+
 	async deleteChannel(chanId: number) {
 		// delete invited
 		await this.prisma.invited.deleteMany({
@@ -831,5 +881,16 @@ export class ChatService {
 				isCommand: isCmd
 			}
 		});
+	}
+
+	async filterBlockedMessages(user: User, messages) {
+		const filteredMessages = await Promise.all(
+			messages.map(async (message) => {
+				if (!(await this.isBlocked(user.id, message.userId))) {
+					return message;
+				}
+			})
+		);
+		return filteredMessages.filter((message) => message !== undefined);
 	}
 }

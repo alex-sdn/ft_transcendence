@@ -5,6 +5,7 @@ import axios from "axios";
 
 const Nickname: React.FC = () => {
     const [newNickname, setnewNickname] = useState({ nickname: '' });
+    const [error, setError] = useState<string>("");
     const jwtToken = Cookies.get('jwt-token');
 
     const handleNicknameSubmit = async (event: React.FormEvent) => {
@@ -17,14 +18,11 @@ const Nickname: React.FC = () => {
                     'Authorization': 'Bearer ' + jwtToken,
                 },
             });
-            console.log(response);
             if (response.status === 200) {
                 return window.location.reload();
-            } else {
-                return { error: 'Nickname already taken' };
             }
         } catch (error) {
-            console.error('Error during request:', error);
+            setError((error as any).response.data.message);
         }
     };
 
@@ -46,10 +44,20 @@ const Nickname: React.FC = () => {
                         <input type="text"
                             name="nickname"
                             value={newNickname.nickname}
-                            onChange={handleNicknameChange}
+                            pattern="[a-zA-Z0-9_\-]{4,20}"
+                            title="Nickname can only contain letters, numbers, hyphens, and underscores, and a length between 4 and 20 characters"
+                            onChange={(e) => {
+                                handleNicknameChange(e);
+                                setError("")
+                            }}
                             required />
                     </p>
                 </label>
+                {error &&
+                    <p className="text-danger">
+                        {error}
+                    </p>
+                }
                 <p>
                     <button type="submit">Submit</button>
                 </p>

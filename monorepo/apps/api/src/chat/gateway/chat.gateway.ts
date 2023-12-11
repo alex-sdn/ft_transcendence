@@ -5,12 +5,12 @@ import { AuthService } from "src/auth/auth.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { ChatService } from "../chat.service";
 
-@WebSocketGateway({namespace: 'chat1'})
+@WebSocketGateway()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
 		private chatService: ChatService,
 		private authService: AuthService,
-		private prisma: PrismaService) {}
+		private prisma: PrismaService) { }
 
 	@WebSocketServer()
 	server: Server;
@@ -22,7 +22,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	// Add user to maps if jwt OK, disconnect if not
 	async handleConnection(client: any, ...args: any[]) {
-		console.log("New chat WS connection attempted ("+client.id+")");
+		console.log("New chat WS connection attempted (" + client.id + ")");
 
 		const user = await this.authService.validateToken(client.handshake.headers.authorization);
 		if (!user) {
@@ -32,19 +32,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		else {
 			console.log('Connection accepted for', user.nickname);
 			// status Online
-			this.chatService.statusOnline(user.id);
+			await this.chatService.statusOnline(user.id);
 			// add to maps
 			this.userToSocket.set(user.id, client);
 			this.idToUser.set(client.id, user);
 		}
 	}
 
-	handleDisconnect(client: any) {
+	async handleDisconnect(client: any) {
 		console.log(client.id, "disconnected");
-		// rm from maps (if in)
+
 		if (this.idToUser.has(client.id)) {
 			// status Offline
-			this.chatService.statusOffline(this.idToUser.get(client.id).id);
+			await this.chatService.statusOffline(this.idToUser.get(client.id).id);
+			// rm from maps
 			this.userToSocket.delete(this.idToUser.get(client.id).id);
 			this.idToUser.delete(client.id);
 		}
@@ -55,14 +56,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('message')  // ==channel
 	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
 		// console.log("[msg] ", this.idToUser.get(client.id).nickname + ":", message);
-	
+
 		const user = await this.prisma.user.findUnique({
 			where: { id: this.idToUser.get(client.id).id }
 		});
 
 		const channel = await this.prisma.channel.findUnique({
-			where: {name: message.target},
-			include: {members: true}
+			where: { name: message.target },
+			include: { members: true }
 		});
 
 		try {
@@ -79,7 +80,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					});
 				}
 			}
-		} catch(error) {  // maybe verify error type
+		} catch (error) {  // maybe verify error type
 			this.emitError(client, error.message);
 		}
 	}
@@ -98,7 +99,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		try {
 			await this.chatService.privMessage(sender, target, message.message);
-			
+
 			// Get target socket
 			const targetSocket = this.userToSocket.get(target.id);
 			if (targetSocket) {
@@ -112,11 +113,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				sender: sender.nickname,
 				message: message.message
 			});
-		} catch(error) {  // maybe verify error type
+		} catch (error) {  // maybe verify error type
 			this.emitError(client, error.message);
 		}
 	}
-	
+
 	@SubscribeMessage('create')
 	async handleCreate(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
 		console.log("create", message);
@@ -124,7 +125,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const user = await this.prisma.user.findUnique({
 			where: { id: this.idToUser.get(client.id).id }
 		});
-	
+
 		try {
 			await this.chatService.createChannel(user, message);
 
@@ -133,7 +134,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				target: message.target,
 				message: 'has created the channel'
 			});
-		} catch(error) {  // maybe verify error type
+		} catch (error) {  // maybe verify error type
 			this.emitError(client, error.message);
 		}
 	}
@@ -147,8 +148,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 
 		const channel = await this.prisma.channel.findUnique({
-			where: {name: message.target},
-			include: {members: true}
+			where: { name: message.target },
+			include: { members: true }
 		});
 
 		try {
@@ -171,7 +172,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					});
 				}
 			}
-		} catch(error) {  // maybe verify error type
+		} catch (error) {  // maybe verify error type
 			this.emitError(client, error.message);
 		}
 	}
@@ -185,8 +186,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 
 		const channel = await this.prisma.channel.findUnique({
-			where: {name: message.target},
-			include: {members: true}
+			where: { name: message.target },
+			include: { members: true }
 		});
 
 		try {
@@ -209,7 +210,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					});
 				}
 			}
-		} catch(error) {  // maybe verify error type
+		} catch (error) {  // maybe verify error type
 			this.emitError(client, error.message);
 		}
 	}
@@ -223,8 +224,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 
 		const channel = await this.prisma.channel.findUnique({
-			where: {name: message.target},
-			include: {members: true}
+			where: { name: message.target },
+			include: { members: true }
 		});
 
 		try {
@@ -242,7 +243,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					});
 				}
 			}
-		} catch(error) {  // maybe verify error type
+		} catch (error) {  // maybe verify error type
 			this.emitError(client, error.message);
 		}
 	}
@@ -279,7 +280,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					});
 				}
 			}
-		} catch(error) {  // maybe verify error type
+		} catch (error) {  // maybe verify error type
 			this.emitError(client, error.message);
 		}
 	}
@@ -316,7 +317,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					});
 				}
 			}
-		} catch(error) {  // maybe verify error type
+		} catch (error) {  // maybe verify error type
 			this.emitError(client, error.message);
 		}
 	}
@@ -354,7 +355,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					});
 				}
 			}
-		} catch(error) {  // maybe verify error type
+		} catch (error) {  // maybe verify error type
 			this.emitError(client, error.message);
 		}
 	}
@@ -394,7 +395,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				target: target.nickname,
 				channel: channel.name
 			});
-		} catch(error) {  // maybe verify error type
+		} catch (error) {  // maybe verify error type
 			this.emitError(client, error.message);
 		}
 	}
@@ -431,7 +432,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					});
 				}
 			}
-		} catch(error) {  // maybe verify error type
+		} catch (error) {  // maybe verify error type
 			this.emitError(client, error.message);
 		}
 	}
@@ -444,11 +445,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	refreshNickname(userId: number) {
 		const sockets = Array.from(this.userToSocket.values());
-		
+
 		// send to all sockets ?
 		for (var i in sockets) {
 			// need json ?
 			sockets[i].emit('refresh');
+		}
+	}
+
+	blockEvent(blocker, blocked) {
+		const blockedSocket = this.userToSocket.get(blocked.id);
+		// if blocked user is online
+		if (blockedSocket) {
+			blockedSocket.emit('block', {
+				sender: blocker.id,
+				target: blocked.nickname
+			});
 		}
 	}
 
