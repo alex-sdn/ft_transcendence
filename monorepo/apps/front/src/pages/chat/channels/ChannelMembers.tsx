@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
+import { Col, Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
 import Cookies from "js-cookie";
 import SocketContext from "../../../Socket";
 
@@ -12,6 +12,7 @@ import Ban from './Ban.tsx';
 import Admin from "./Admin.tsx";
 import axios from "axios";
 import Block from "../friend/Block.tsx";
+import { Color } from "p5";
 
 interface channelUsersProps {
     me: user;
@@ -30,6 +31,7 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
     const [banModal, setBanModal] = useState<boolean>(false);
     const [adminModal, setAdminModal] = useState<boolean>(false);
     const [blockModal, setBlockModal] = useState<boolean>(false);
+    const [error, setError] = useState<string>("");
     const socket = useContext(SocketContext);
 
     useEffect(() => {
@@ -56,37 +58,29 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
     const inviteGame = async (event: React.FormEvent) => {
         event.preventDefault();
         console.log("button pressed")
-        // const createPromise = new Promise<{
-        //     sender: string;
-        //     target: string;
-        //     channel: string;
-        // }>((resolve, reject) => {
-            if (socket && selectedMember) {
-                socket.emit("inviteGame", { sender: me.name, target: selectedMember.name });
+        if (socket && selectedMember) {
+            socket.emit("inviteGame", { sender: me.name, target: selectedMember.name });
+            socket.on("error", (data) => {
+                setError(data.message);
+            })
+        }
+    }
 
-                console.log("me " + me.name)
-                console.log("selected member " + selectedMember.name)
-                console.log("emit")
-            }
+    useEffect(() => {
+        if (error) {
+            const timeoutId = setTimeout(() => {
+                setError('');
+            }, 3000); // Durée d'affichage en millisecondes (ici, 3 secondes)
 
-        //         socket.on("invite", (data) => {
-        //             resolve(data);
-        //         });
-        //         socket.on("error", (data) => {
-        //             reject(data);
-        //         });
-        //     }
-        // });
+            return () => clearTimeout(timeoutId);
+        }
+    }, [error]);
 
-        // createPromise
-        //     .then(() => {
-        //         setError("");
-        //         setUserSelected("");
-        //         onClose();
-        //     })
-        //     .catch((error) => {
-        //         setError(error.message);
-        //     })
+    const handleValidation = async () => {
+        {
+            if (selectedMember)
+                return window.location.assign(`/profileUser/${selectedMember.id}`);
+        }
     }
 
     return (
@@ -157,7 +151,7 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
                 {selectedMember &&
                     <ModalHeader className="justify-content-center">
                         <ModalTitle className="text-center">
-                            {selectedMember.name} {/* remplacer le nom du user par un lien vers son profile */}
+                            <button className="user-title" onClick={handleValidation}>{selectedMember.name}</button> {/* remplacer le nom du user par un lien vers son profile */}
                             {selectedMember.owner &&
                                 <span className="material-symbols-outlined">
                                     family_star
@@ -180,6 +174,7 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
                                 Let's play!
                             </button>
                         </p>
+                        {error && <div className="text-danger">{error}</div>}
                         {!isBlocked &&
                             <p>
                                 <button onClick={() => {
