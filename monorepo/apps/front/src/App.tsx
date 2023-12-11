@@ -24,6 +24,10 @@ import Nickname from './pages/Nickname'
 import Login2fa from './pages/Login2fa'
 import ProfilePicture from './pages/ProfilePicture'
 import ProfileUser from './pages/ProfileUser'
+import ProfileMatch from './pages/ProfileMatch'
+import ProfileBadges from './pages/ProfileBadges'
+import ProfileFriends from './pages/Profilefriends'
+import ProfileList from './pages/ProfileList'
 import Channel from './pages/chat/channels/Channel'
 import Friend from './pages/chat/friend/Friend'
 import FirstLog from './pages/FirstLog';
@@ -49,6 +53,11 @@ const router = createBrowserRouter(
       <Route path="login" element={<Login />} />
       <Route path="nickname" element={jwtToken ? <Nickname /> : <Navigate to='/login' />} />
       <Route path="profile_picture" element={jwtToken ? <ProfilePicture /> : <Navigate to='/login' />} />
+      <Route path="profile_friends" element={jwtToken ? <ProfileFriends /> : <Navigate to='/login' />} />
+      <Route path="profileUser/:ID" element={jwtToken ? <ProfileUser /> : <Navigate to='/login' />} />
+      <Route path="profile_list" element={<ProfileList />} />
+      <Route path="profile_match" element={<ProfileMatch/>} />
+      <Route path="profile_Badges" element={<ProfileBadges/>} />
       <Route path='*' element={jwtToken ? <NotFound /> : <Navigate to='/login' />} />
     </Route>
   )

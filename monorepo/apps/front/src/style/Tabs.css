@@ -1,0 +1,20 @@
+.tab-list {
+    display: flex;
+  }
+  
+  .tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background-color: white;
+    color: black;
+  }
+  
+  .tab.active {
+    background-color: black;
+    color: white; 
+  }
+
+  .tab:hover {
+    text-shadow: 0 0 10px #000000, 0 0 20px #000000c0;
+  }
