@@ -60,7 +60,7 @@ const ProfilePicture: React.FC = () => {
 
     const changeImageHandler = async (event: React.FormEvent) => {
         event.preventDefault();
-        if (image && image.size > 100000)
+        if (image && image.size > 1000000)
             setError("File too large");
         else if (image && newImage) {
             const formData = new FormData();

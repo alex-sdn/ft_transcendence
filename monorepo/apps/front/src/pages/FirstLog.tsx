@@ -25,7 +25,7 @@ const FirstLog: React.FC = () => {
         } catch (error) {
             setErrorNickname((error as any).response.data.message);
         }
-        if (newImage && newImage.size > 100000)
+        if (newImage && newImage.size > 1000000)
             setErrorImage("File too large");
         else {
             try {

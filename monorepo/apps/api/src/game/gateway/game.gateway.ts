@@ -71,8 +71,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // <client.id, User>
     private weirdCrowdWaitingList = new Map<string, User>();
 
-    // < 'id1-id2', [id1, id2] >
-    private friendWaitingList = new Map<string, number[]>;
+    // < 'id1-id2', [id invitor] >
+    private friendWaitingList = new Map<string, number>;
 
     /******************************************************************************
     *                         CONNECTION & DISCONNECTION                          *
@@ -110,8 +110,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             //check if client was in a room if so set Game.End and send info to front of other player
             if (this.roomsParticipants.has(client.id)) {
                 const roomName = this.roomsParticipants.get(client.id).getName();
-                this.server.to(roomName).emit("LogOut");
-                this.roomsParticipants.get(client.id).setGameEnd();
+				if (!this.roomsParticipants.get(client.id).getGameEnd()) {
+					this.server.to(roomName).emit("LogOut");
+					this.roomsParticipants.get(client.id).setGameEnd();
+				}
                 console.log('set game end bc deco')
             }
 
@@ -195,7 +197,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     *                             FRIEND INVITATION                               *
     ******************************************************************************/
 
-    // INVITE TEST
+    // INVITE TO GAME
     @SubscribeMessage('inviteGame')
     async handleInviteGame(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
         console.log("invite game", message)
@@ -212,6 +214,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             client.emit('error', {
                 message: 'This user does not exist'
             });
+			return;
         }
         const targetSocket = this.userToSocket.get(target.id);
 
@@ -220,23 +223,33 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             client.emit('error', {
                 message: 'This user is not online'
             });
+			return;
         }
         // if target is ingame
         if (target.status === 'ingame') {
             client.emit('error', {
                 message: 'This user is currently in-game'
             });
+			return;
         }
 
-        var listName;
+		var listName;
         if (user.id < target.id)
             listName = user.id + '-' + target.id;
         else
             listName = target.id + '-' + user.id;
+
+		// if already sent invite
+		if (this.friendWaitingList.has(listName) && this.friendWaitingList.get(listName) === user.id) {
+			client.emit('error', {
+                message: 'User already invited'
+            });
+			return;
+		}
         // if first invite -> create waiting list for private game
         if (!this.friendWaitingList.has(listName)) {
-            console.log("here")
-            this.friendWaitingList.set(listName, [user.id, target.id]);
+            console.log("-creating friendWaitingList")
+            this.friendWaitingList.set(listName, user.id);
             // renvoyer l'invite a target
             targetSocket.emit('inviteGame', {
                 sender: user.nickname,
@@ -244,7 +257,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 // game type aussi
             });
         }
-        // Already received invite -> start game
+        // Accepted invite -> start game
         else {
             //remove from all waiting lists
             this.withdrawFromAllWaitingLists(client.id);
@@ -266,9 +279,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             // create room	
             const room = new Room(listName, user, target, OPTION.Retro);
 
-            // const socketP1 = this.userToSocket.get(user.id);
-            // const socketP2 = this.userToSocket.get(target.id)
-
             await socketP1.join(listName);
             await socketP2.join(listName);
 
@@ -283,6 +293,30 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.friendWaitingList.delete(listName);
         }
     }
+
+	// REFUSE INVITE
+	@SubscribeMessage('refuseInvite')
+    async handleRefuseInvite(@ConnectedSocket() client: Socket, @MessageBody() message: any) {
+		console.log('refuse invite', message);
+
+		const user = await this.prisma.user.findUnique({
+            where: { id: this.idToUser.get(client.id).id }
+        });
+
+        const target = await this.prisma.user.findUnique({
+            where: { nickname: message.target }
+        });
+
+		var listName;
+        if (user.id < target.id)
+            listName = user.id + '-' + target.id;
+        else
+            listName = target.id + '-' + user.id;
+
+		if (this.friendWaitingList.has(listName)) {
+			this.friendWaitingList.delete(listName);
+		}
+	}
 
     /******************************************************************************
     *                                KEYS HANDLING                                *
@@ -585,19 +619,21 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 await this.sleep(1000 / 60);
             }
 
-            // if end of game due to deconnection, set the one who disconnected as loser
-            if (!this.userToSocket.has(room.getLeftUser().id) || !this.userToSocket.has(room.getRightUser().id)) {
-                if (this.userToSocket.has(room.getLeftUser().id))
-                    room.setLeftAsWinner();
-
-                if (this.userToSocket.has(room.getRightUser().id))
-                    room.setRightAsWinner();
-            }
+            // if end of game due to deconnection, set the one who disconnected as loser (ignore robot)
+            if (room.getLeftScore() < 7 && room.getRightScore() < 7) { // MAX_SCORE 
+				if (!this.userToSocket.has(room.getLeftUser().id) || (room.getOption() !== OPTION.Robot && !this.userToSocket.has(room.getRightUser().id))) {
+					if (!this.userToSocket.has(room.getLeftUser().id))
+						room.setRightAsWinner();
+	
+					if (!this.userToSocket.has(room.getRightUser().id) && room.getOption() !== OPTION.Robot)
+						room.setLeftAsWinner();
+				}
+			}
 
             this.server.to(roomName).emit('GameEnd');
 
             // send results of match & status to db for profiles
-            await this.gameService.createMatch(room.getLeftUser().id, room.getRightUser().id, room.getLeftScore(), room.getRightScore(), "ranked");
+            await this.gameService.createMatch(room.getLeftUser().id, room.getRightUser().id, room.getLeftScore(), room.getRightScore(), "Robot");
             await this.gameService.statusOnline(room.getLeftUser().id);
             await this.gameService.statusOnline(room.getRightUser().id);
 
