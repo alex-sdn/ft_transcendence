@@ -10,6 +10,9 @@ import './style/Login.css';
 import './style/ProfilePicture.css';
 import './style/Profile.css';
 import './style/FirstLog.css'
+import './style/ProfileMatch.css';
+import './style/ProfileList.css';
+import './style/Tabs.css';
 //chat
 import './style/chat/Chat.css';
 import './style/chat/Channel.css'
