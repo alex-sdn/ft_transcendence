@@ -831,9 +831,19 @@ export class ChatService {
 		return false;
 	}
 
+	async isIngame(userId: number): Promise<boolean> {
+		const user = await this.prisma.user.findUnique({
+			where: {id: userId}
+		});
+
+		if (user.status === 'ingame')
+			return true;
+		return false;
+	}
+
 	validateName(name: string) {
-		if (name.length < 2 || name.length > 20)
-			throw new Error('Channel name must be 2-20 characters');
+		if (name.length < 4 || name.length > 20)
+			throw new Error('Channel name must be 4-20 characters');
 		
 		const pattern =  /^[a-zA-Z0-9_-]*$/;
 		if (!pattern.test(name))

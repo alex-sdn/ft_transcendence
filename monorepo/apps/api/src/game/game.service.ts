@@ -12,6 +12,7 @@ export class GameService {
 
 	async	createMatch(user1Id: number, user2Id: number, user1score: number, user2score: number, gameType) {
 		try {
+
 			const user1 = await this.prisma.user.findUnique({
 				where: {id: user1Id}
 			});
@@ -66,7 +67,7 @@ export class GameService {
 				});
 			}
 			// if ranked -> update LP
-			if (gameType === 'ranked') {
+			if (gameType === 'Retro') {
 				if (user1score > user2score) {
 					await this.prisma.user.update({
 						where: {id: user1Id},
