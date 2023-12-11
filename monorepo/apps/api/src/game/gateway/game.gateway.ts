@@ -585,8 +585,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 await this.sleep(1000 / 60);
             }
 
-            // if end of game due to deconnection, set the one who disconnected as loser
-            if (!this.userToSocket.has(room.getLeftUser().id) || !this.userToSocket.has(room.getRightUser().id)) {
+            // if end of game due to deconnection, set the one who disconnected as loser (ignore robot)
+            if (!this.userToSocket.has(room.getLeftUser().id) || (room.getOption() !== OPTION.Robot && !this.userToSocket.has(room.getRightUser().id))) {
                 if (this.userToSocket.has(room.getLeftUser().id))
                     room.setLeftAsWinner();
 
@@ -597,7 +597,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.server.to(roomName).emit('GameEnd');
 
             // send results of match & status to db for profiles
-            await this.gameService.createMatch(room.getLeftUser().id, room.getRightUser().id, room.getLeftScore(), room.getRightScore(), "ranked");
+            await this.gameService.createMatch(room.getLeftUser().id, room.getRightUser().id, room.getLeftScore(), room.getRightScore(), "Robot");
             await this.gameService.statusOnline(room.getLeftUser().id);
             await this.gameService.statusOnline(room.getRightUser().id);
 

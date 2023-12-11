@@ -22,8 +22,9 @@ enum Statuses {
 }
 
 enum GameType {
-	ranked
-	casual
+	Robot
+	Retro
+	CoolCat
 }
 
 enum ChatAccess {
