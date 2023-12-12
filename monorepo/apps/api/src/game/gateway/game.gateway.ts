@@ -602,14 +602,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 room.getPuck().checkPaddleRight(room.getRightPaddle());
                 room.getPuck().checkPaddleLeft(room.getLeftPaddle());
                 const point = room.getPuck().checkEdges();
-                if (point == POINT.Left) {
-                    room.leftPoint();
-                    this.server.to(roomName).emit('Score', { left: room.getLeftScore(), right: room.getRightScore() });
-                }
-                if (point == POINT.Right) {
-                    room.rightPoint();
-                    this.server.to(roomName).emit('Score', { left: room.getLeftScore(), right: room.getRightScore() });
-                }
+				if (point == POINT.Left || point == POINT.Right) {
+					if (point == POINT.Left) {
+						room.leftPoint();
+						this.server.to(roomName).emit('Score', { left: room.getLeftScore(), right: room.getRightScore() });
+					}
+					if (point == POINT.Right) {
+						room.rightPoint();
+						this.server.to(roomName).emit('Score', { left: room.getLeftScore(), right: room.getRightScore() });
+					}
+					room.getLeftPaddle().reset();
+					room.getRightPaddle().reset();
+				}
                 const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
                 const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
                 this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
