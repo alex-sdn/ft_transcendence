@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Cookies from "js-cookie";
-import axios from 'axios'
+import axios from 'axios';
 
 
 const ProfileMatch: React.FC = () => {
