@@ -21,7 +21,6 @@ const ProfileList: React.FC = () => {
         if (response.status === 200) {
             const resp_lists= response.data;
             setLists(resp_lists);
-            console.log(resp_lists);
             }}
          catch (error)
             {console.log(error);}

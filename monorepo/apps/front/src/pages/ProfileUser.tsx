@@ -61,7 +61,6 @@ const ProfileUser: React.FC = () => {
         if (response.status === 200) {
           const resp_match = response.data;
           setMatches(resp_match);
-          console.log(resp_match);
         }
       }
       catch (error) { console.log(error); }
@@ -115,7 +114,6 @@ const ProfileUser: React.FC = () => {
         })
         if (response.status === 200) { 
           setIsBlocked(response.data);
-          console.log(response.data)
         }
       }
       catch (error) {
@@ -202,7 +200,6 @@ const ProfileUser: React.FC = () => {
         if (response.status === 200) {
           const resp_Badges = response.data;
           setBadges(resp_Badges);
-          console.log(resp_Badges);
         }
       }
       catch (error) { console.log(error); }
