@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
+import { Col, Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
 import Cookies from "js-cookie";
 import SocketContext from "../../../Socket";
 
@@ -12,6 +12,7 @@ import Ban from './Ban.tsx';
 import Admin from "./Admin.tsx";
 import axios from "axios";
 import Block from "../friend/Block.tsx";
+import { Color } from "p5";
 
 interface channelUsersProps {
     me: user;
@@ -74,6 +75,13 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
             return () => clearTimeout(timeoutId);
         }
     }, [error]);
+
+    const handleValidation = async () => {
+        {
+            if (selectedMember)
+                return window.location.assign(`/profileUser/${selectedMember.id}`);
+        }
+    }
 
     return (
         <div>
@@ -143,7 +151,7 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
                 {selectedMember &&
                     <ModalHeader className="justify-content-center">
                         <ModalTitle className="text-center">
-                            {selectedMember.name} {/* remplacer le nom du user par un lien vers son profile */}
+                            <button className="user-title" onClick={handleValidation}>{selectedMember.name}</button> {/* remplacer le nom du user par un lien vers son profile */}
                             {selectedMember.owner &&
                                 <span className="material-symbols-outlined">
                                     family_star
