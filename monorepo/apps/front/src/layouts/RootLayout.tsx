@@ -48,7 +48,6 @@ const RootLayout: React.FC = () => {
   useEffect(() => {
     if (socket) {
       socket.on("inviteGame", (data) => {
-        console.log("invite received")
         if (me == data.target && status != "ingame") {
           setInviteGameModale(true);
           setUser(data.sender);
@@ -64,7 +63,6 @@ const RootLayout: React.FC = () => {
       })
 
       socket.on("startGame", () => {
-        console.log("start game front")
         window.location.assign('/');
       })
 

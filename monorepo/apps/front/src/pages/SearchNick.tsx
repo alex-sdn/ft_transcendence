@@ -72,7 +72,6 @@ const SearchNick: React.FC = () => {
                   return (value && user && user.nickname && user.nickname.toLowerCase().includes(value.toLowerCase()));
               })
               setUser(results);
-              console.log(results);
           })
           .catch((error) => console.log(error));
   }

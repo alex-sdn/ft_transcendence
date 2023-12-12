@@ -65,7 +65,6 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 					message: ` has joined the channel`,
 					isCommand: true
 				};
-				console.log("join");
 				setMessages(prevMessages => [...prevMessages, joinMessage]);
 			}
 		})
@@ -77,7 +76,6 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 					message: ` has left the channel`,
 					isCommand: true
 				};
-				console.log("leave");
 				setMessages(prevMessages => [...prevMessages, leaveMessage]);
 			}
 		})
@@ -100,7 +98,6 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 					message: ` kicked ${data.target} from the channel`,
 					isCommand: true
 				};
-				console.log("kick");
 				setMessages(prevMessages => [...prevMessages, kickMessage]);
 			}
 		})
@@ -112,7 +109,6 @@ const Messages: React.FC<MessageProps> = ({ sender, target }) => {
 					message: ` banned ${data.target} from the channel`,
 					isCommand: true
 				};
-				console.log("ban");
 				setMessages(prevMessages => [...prevMessages, banMessage]);
 			}
 		})
