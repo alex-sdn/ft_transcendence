@@ -7,7 +7,7 @@ const Login: React.FC = () => {
     const [searchParams] = useSearchParams();
     const code = searchParams.get('code');
 	const loginFortyTwo: string = import.meta.env.VITE_FORTYTWOLOGIN;
-    const navigate2 = useNavigate(); // FOR FAKELOGIN ONLY
+    // const navigate2 = useNavigate(); // FOR FAKELOGIN ONLY
 
     const authURL = "/api/auth?code=" + code;
     if (code) {
@@ -35,26 +35,26 @@ const Login: React.FC = () => {
     }
 
     /**  FOR TESTING  **/
-    const handleFakeLogin = async () => {
-        try {
-            const response = await axios.get('/api/auth/fakelogin');
-            const data = response.data;
-            // set cookie
-            Cookies.set("jwt-token", data.access_token, { expires: 1 });
-            if (data.newUser) {
-                window.location.assign('/first-log');
-                return;
-                // return navigate2('/nickname')
-            }
-            else {
-                window.location.assign('/');
-                return;
-                // return navigate2('/'); // Use navigate here
-            }
-        } catch (error) {
-            console.error('ERRORFAKE:', error);
-        }
-    }
+    // const handleFakeLogin = async () => {
+    //     try {
+    //         const response = await axios.get('/api/auth/fakelogin');
+    //         const data = response.data;
+    //         // set cookie
+    //         Cookies.set("jwt-token", data.access_token, { expires: 1 });
+    //         if (data.newUser) {
+    //             window.location.assign('/first-log');
+    //             return;
+    //             // return navigate2('/nickname')
+    //         }
+    //         else {
+    //             window.location.assign('/');
+    //             return;
+    //             // return navigate2('/'); // Use navigate here
+    //         }
+    //     } catch (error) {
+    //         console.error('ERRORFAKE:', error);
+    //     }
+    // }
     /*******************/
 
     return (
@@ -62,7 +62,7 @@ const Login: React.FC = () => {
             <h2 className='login'>
                 <a href={loginFortyTwo}>Login with 42</a>
             </h2>
-            <button onClick={handleFakeLogin}>Fake Login</button>
+            {/* <button onClick={handleFakeLogin}>Fake Login</button> */}
         </div>
     );
 }

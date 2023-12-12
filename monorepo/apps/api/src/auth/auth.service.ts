@@ -233,33 +233,33 @@ export class AuthService {
 
 	/*****************************/
 	// FOR TESTING ! returns jwt for given nickname
-	async genToken(nickname: string) {
-		const user = await this.prisma.user.findUnique({
-			where: {nickname}
-		});
-		if (!user)
-			return null;
+	// async genToken(nickname: string) {
+	// 	const user = await this.prisma.user.findUnique({
+	// 		where: {nickname}
+	// 	});
+	// 	if (!user)
+	// 		return null;
 
-		return await this.signToken(user.id, user.nickname);
-	}
+	// 	return await this.signToken(user.id, user.nickname);
+	// }
 
-	async fakelogin(): Promise<{
-		access_token: string | undefined,
-		newUser: boolean,
-		has2fa: boolean
-	}> {
-		let info42 = 'fakeuser';
-		let nickname = 'testuser';
-		let newUser = await this.createUser(info42, nickname, "default-avatar");
-		while (!newUser) {
-			nickname += '_';
-			info42 += '_'
-			newUser = await this.createUser(info42, nickname, "default-avatar");
-		}
-		return {
-			access_token: await this.signToken(newUser.id, newUser.nickname),
-			newUser: true,
-			has2fa: false
-		};
-	}
+	// async fakelogin(): Promise<{
+	// 	access_token: string | undefined,
+	// 	newUser: boolean,
+	// 	has2fa: boolean
+	// }> {
+	// 	let info42 = 'fakeuser';
+	// 	let nickname = 'testuser';
+	// 	let newUser = await this.createUser(info42, nickname, "default-avatar");
+	// 	while (!newUser) {
+	// 		nickname += '_';
+	// 		info42 += '_'
+	// 		newUser = await this.createUser(info42, nickname, "default-avatar");
+	// 	}
+	// 	return {
+	// 		access_token: await this.signToken(newUser.id, newUser.nickname),
+	// 		newUser: true,
+	// 		has2fa: false
+	// 	};
+	// }
 }
