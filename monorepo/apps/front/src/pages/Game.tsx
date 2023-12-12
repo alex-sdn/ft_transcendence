@@ -603,10 +603,10 @@ const Game: React.FC = () => {
 
     function draw(p5: p5Types) {
 
-        p5.background(255);
+        p5.background(0); // black
         p5.noStroke();
 
-        p5.fill(0);
+        p5.fill(255); // white
         p5.textSize(24);
         p5.textAlign(p5.CENTER, p5.TOP);
         p5.text(`${score.left} - ${score.right}`, gameConst.PLAYGROUND_WIDTH / 8, 10);
@@ -640,7 +640,7 @@ const Game: React.FC = () => {
         }
 
         // paddles
-        p5.fill("black");
+        p5.fill(255); // white
         p5.rect(gameConst.PADDLE_OFFSET / 4, paddle.leftPos / 4 - gameConst.PADDLE_HEIGHT / 8, gameConst.PADDLE_WIDTH / 4, gameConst.PADDLE_HEIGHT / 4);
         p5.rect(
             gameConst.PLAYGROUND_WIDTH / 4 - gameConst.PADDLE_WIDTH / 4 - gameConst.PADDLE_OFFSET / 4,

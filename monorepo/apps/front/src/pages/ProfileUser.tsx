@@ -163,7 +163,7 @@ const ProfileUser: React.FC = () => {
       );
       if (response.status === 201) { window.location.reload(); }
     }
-    catch (error) {
+    catch (error:any) {
       setError(error.response.data.message);
       setShowPopup(true);
       console.log(error.response.data.message);
