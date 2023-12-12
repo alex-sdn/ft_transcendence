@@ -60,3 +60,36 @@
   color: black;
   width: 268px;
 }
+
+.image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.blurred-image {
+    width: 100px;
+    height: 100px;
+    transition: filter 0.3s ease-in-out;
+}
+
+.overlay-text {
+    font-size: 0.5em;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.image-container:hover .blurred-image {
+  filter: opacity(50%);
+   filter: blur(5px);
+
+}
+
+.image-container:hover .overlay-text {
+    color :  black;
+    font-weight: bold;
+    opacity: 1;
+}

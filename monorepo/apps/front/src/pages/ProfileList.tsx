@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Cookies from "js-cookie";
-import axios from 'axios'
-// import ProfileFriends from './Profilefriends';
-// import ProfileUser from './ProfileUser';
+import axios from 'axios';
 
 const ProfileList: React.FC = () => {
 
@@ -38,7 +36,7 @@ const ProfileList: React.FC = () => {
                 <ul>
                     {lists.map((list, index) =>
                         <li key ={index + 1}>
-                          <button onClick={() => handleValidation(list.user2.id)}>{list.user2.nickname}</button>
+                          <button onClick={() => handleValidation(list.user2.id)}>{list.user2.nickname}</button><span style={{ fontSize: '0.5em' }}>&emsp;{list.user2.status}</span>
                         </li>
                     )}
                 </ul>
