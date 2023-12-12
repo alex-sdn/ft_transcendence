@@ -276,15 +276,18 @@ const Game: React.FC = () => {
         const handleKeyPress = (event: any) => {
             if (event.type === 'keydown') {
                 if (event.key === 'ArrowUp') {
-                    socket?.emit('keys', { action: 'upPressed', roomName: roomName, role: role });
+                    if (!Coolcat)
+                        socket?.emit('keys', { action: 'upPressed', roomName: roomName, role: role });
                 }
                 if (event.key === 'ArrowDown') {
-                    socket?.emit('keys', { action: 'downPressed', roomName: roomName, role: role });
+                    if (!Coolcat)
+                        socket?.emit('keys', { action: 'downPressed', roomName: roomName, role: role });
                 }
             }
             else if (event.type === 'keyup') {
                 if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-                    socket?.emit('keys', { action: 'released', roomName: roomName, role: role });
+                    if (!Coolcat)
+                        socket?.emit('keys', { action: 'released', roomName: roomName, role: role });
                 }
             }
         };
@@ -295,6 +298,7 @@ const Game: React.FC = () => {
             window.removeEventListener('keyup', handleKeyPress);
         };
     }, [roomName]);
+
 
     /******************************************************************************
     *                               GAME OPTIONS                                  *
@@ -544,13 +548,17 @@ const Game: React.FC = () => {
         }
     }, [puckPos]);
 
+    const canvasX = (window.innerWidth - gameConst.PLAYGROUND_WIDTH / 4) / 2;
+    const canvasY = (window.innerHeight - gameConst.PLAYGROUND_HEIGHT / 4) / 2;
+
     function setup(p5: p5Types) {
-        p5.createCanvas(gameConst.PLAYGROUND_WIDTH / 2, gameConst.PLAYGROUND_HEIGHT / 2);
+        p5.createCanvas(gameConst.PLAYGROUND_WIDTH / 4, gameConst.PLAYGROUND_HEIGHT / 4).position(canvasX, canvasY);
     }
 
-    function drawStar(p5: p5Types, x: any, y: any, radius1: any, radius2: any, npoints: any) {
+    function drawStar(p5: p5Types, x: any, y: any, radius1: any, radius2: any, npoints: any, color: any) {
         let angle = p5.TWO_PI / npoints;
         let halfAngle = angle / 2.0;
+        p5.fill(color);
         p5.beginShape();
         for (let a = 0; a < p5.TWO_PI; a += angle) {
             let sx = x + p5.cos(a) * radius2;
@@ -565,37 +573,63 @@ const Game: React.FC = () => {
 
     function draw(p5: p5Types) {
 
-        p5.background(255);
+        p5.background(0); // black
+        p5.fill(0);
+        if (score.left >= 4 || score.right >= 4)
+            p5.stroke('blue');
+        else
+            p5.stroke(255); //white
+        p5.rect(0.5, 0.5, gameConst.PLAYGROUND_WIDTH / 4, gameConst.PLAYGROUND_HEIGHT / 4);
+
         p5.noStroke();
 
-        // traînée filante
+        p5.fill(255); // white
+        p5.textSize(24);
+        p5.textAlign(p5.CENTER, p5.TOP);
+        p5.text(`${score.left} - ${score.right}`, gameConst.PLAYGROUND_WIDTH / 8, 10);
+
+        p5.textFont('Orbitron');
+        p5.textSize(16);
+        p5.textAlign(p5.CENTER, p5.BOTTOM);
+        p5.text(`${nickname.left} - ${nickname.right}`, gameConst.PLAYGROUND_WIDTH / 8, gameConst.PLAYGROUND_HEIGHT / 4 - 10);
+
+        let gradientColor: any;
+
+        // puck or star
         if (score.left >= 2 || score.right >= 2) {
+            gradientColor = p5.lerpColor(p5.color(255, 0, 0), p5.color(0, 0, 255), puckPos.x / gameConst.PLAYGROUND_WIDTH);
+            if (score.left >= 3 || score.right >= 3)
+                drawStar(p5, puckPos.x / 4, puckPos.y / 4, 5, 10, 5, gradientColor);
+            else
+                drawStar(p5, puckPos.x / 4, puckPos.y / 4, 5, 10, 5, p5.color(255, 255, 255));
+        }
+        else {
+            p5.ellipse(puckPos.x / 4, puckPos.y / 4, 10, 10);
+        }
+
+        // traînée filante
+        if (score.left >= 5 || score.right >= 5) {
             previousPuckPositions.forEach((position, index) => {
                 const alphaValue = p5.map(10 - index, 0, previousPuckPositions.length - 1, 255, 0);
-                p5.fill(0, alphaValue);
-                p5.ellipse(position.x / 2, position.y / 2, 20 - index, 20 - index);
+                p5.fill(gradientColor.levels[0], gradientColor.levels[1], gradientColor.levels[2], alphaValue);
+                p5.ellipse(position.x / 4, position.y / 4, 20 - index, 20 - index);
             });
         }
 
-        // puck
-        if (score.left >= 1 || score.right >= 1) {
-            drawStar(p5, puckPos.x / 2, puckPos.y / 2, 10, 20, 5);
-        }
-        else {
-            p5.ellipse(puckPos.x / 2, puckPos.y / 2, 20, 20);
-        }
         // paddles
+
         if (score.left >= 6 || score.right >= 6)
-            p5.fill("blue");
+            p5.fill('#A251FA'); // violet
         else
-            p5.fill("black");
-        p5.rect(gameConst.PADDLE_OFFSET / 2, paddle.leftPos / 2 - gameConst.PADDLE_HEIGHT / 4, gameConst.PADDLE_WIDTH / 2, gameConst.PADDLE_HEIGHT / 2);
+            p5.fill(255); // white
+        p5.rect(gameConst.PADDLE_OFFSET / 4, paddle.leftPos / 4 - gameConst.PADDLE_HEIGHT / 8, gameConst.PADDLE_WIDTH / 4, gameConst.PADDLE_HEIGHT / 4);
         p5.rect(
-            gameConst.PLAYGROUND_WIDTH / 2 - gameConst.PADDLE_WIDTH / 2 - gameConst.PADDLE_OFFSET / 2,
-            paddle.rightPos / 2 - gameConst.PADDLE_HEIGHT / 4,
-            gameConst.PADDLE_WIDTH / 2,
-            gameConst.PADDLE_HEIGHT / 2
+            gameConst.PLAYGROUND_WIDTH / 4 - gameConst.PADDLE_WIDTH / 4 - gameConst.PADDLE_OFFSET / 4,
+            paddle.rightPos / 4 - gameConst.PADDLE_HEIGHT / 8,
+            gameConst.PADDLE_WIDTH / 4,
+            gameConst.PADDLE_HEIGHT / 4
         );
+
 
         if (p5.keyIsPressed) {
             if (p5.keyCode == p5.UP_ARROW) {
@@ -622,9 +656,10 @@ const Game: React.FC = () => {
                             <button className="robot-button" />
                             {AskOption && showTextRobot &&
                                 <div className="info-text">
-                                    <p>• HUMAN VS MACHINE •</p>
+                                    <p><b> HUMAN VS MACHINE </b></p>
                                     <p>All alone?</p>
-                                    <p>Our robot will always be here for you!</p>
+                                    <p>Our robot will always </p>
+                                    <p>be there for you!</p>
                                 </div>
                             }
                         </div>
@@ -637,7 +672,7 @@ const Game: React.FC = () => {
                             <button className="retro-button" />
                             {AskOption && showTextRetro &&
                                 <div className="info-text">
-                                    <p>• RETRO MODE •</p>
+                                    <p><b> RETRO MODE </b></p>
                                     <p>Try our original version of pong</p>
                                     <p>as it was played in the 70s</p>
                                     <p>by Allan Alcorn himself!</p>
@@ -653,9 +688,10 @@ const Game: React.FC = () => {
                             <button className="coolcat-button" />
                             {AskOption && showTextCoolCat &&
                                 <div className="info-text">
-                                    <p>• COOL CAT EDITION •</p>
-                                    <p>Play a smoother version of pong</p>
-                                    <p>with some little surprises along the way...</p>
+                                    <p><b> COOL CAT EDITION </b></p>
+                                    <p>Wanna play it cool?</p>
+                                    <p>Try a smoother version of pong</p>
+                                    <p>with some surprises along the way...</p>
                                 </div>
                             }
                         </div>
@@ -668,9 +704,10 @@ const Game: React.FC = () => {
                             <button className="weirdcrowd-button" />
                             {AskOption && showTextWeirdCrowd &&
                                 <div className="info-text">
-                                    <p>• WEIRD CROWD VERSION •</p>
+                                    <p> <b>WEIRD CROWD VERSION </b></p>
                                     <p>What would be a tennis match</p>
-                                    <p>without its weird headshaking crowd?</p>
+                                    <p>without its weird crowd</p>
+                                    <p>following the ball</p>
                                 </div>
                             }
                         </div>
@@ -704,8 +741,10 @@ const Game: React.FC = () => {
                 }
 
                 {
-                    WaitingRoom &&
-                    (<div >WAITING ROOM</div>)
+                    WaitingRoom && (gameOption != OPTION.Robot) &&
+                    (<div id="waiting">WAITING ROOM
+                        <img src="waitingroom.png" />
+                    </div>)
                 }
 
                 {ScreenIssue &&
