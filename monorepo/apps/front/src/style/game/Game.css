@@ -41,6 +41,16 @@
     z-index: 2;
 }
 
+#waiting {
+    text-align: center;
+    font-size: 50px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
 .you-won {
     color: rgb(0, 168, 0);
     text-shadow: 0 0 10px #1eff00, 0 0 20px rgba(51, 255, 0, 0.431);
@@ -89,7 +99,7 @@
 }
 
 .robot-button {
-    background-image: url("/robot.png");
+    background-image: url("/smallrobot.png");
 }
 
 .retro-button {
@@ -101,7 +111,7 @@
 }
 
 .weirdcrowd-button {
-    background-image: url("/weirdcrowd.png");
+    background-image: url("/eyeball.png");
 }
 
 .info-text {
