@@ -86,16 +86,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     // Add user to maps if jwt OK, disconnect if not
     async handleConnection(client: any, ...args: any[]) {
-        console.log("New game WS connection attempted (" + client.id + ")");
 
         const user = await this.authService.validateToken(client.handshake.headers.authorization);
         if (!user) {
-            console.log('Connection to game WS refused');
             client.disconnect();
         }
         else {
-            console.log('Connection accepted for', user.nickname);
-
+            // console.log('Connection accepted for', user.nickname);
             // add to maps
             this.userToSocket.set(user.id, client);
             this.idToUser.set(client.id, user);
@@ -104,17 +101,21 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     async handleDisconnect(client: any) {
 
-        console.log(client.id, "disconnected");
-
         if (this.idToUser.has(client.id)) {
             //check if client was in a room if so set Game.End and send info to front of other player
             if (this.roomsParticipants.has(client.id)) {
                 const roomName = this.roomsParticipants.get(client.id).getName();
-				if (!this.roomsParticipants.get(client.id).getGameEnd()) {
+				if ((this.roomsParticipants.get(client.id).getReady() < 2 && this.roomsParticipants.get(client.id).getOption() != OPTION.Robot)
+					|| (this.roomsParticipants.get(client.id).getOption() == OPTION.Robot && this.roomsParticipants.get(client.id).getReady() < 1)) {
+					this.server.to(roomName).emit("Cancelled");
+					// verif game annule
+					this.roomsParticipants.delete(client.id);
+				}
+				else if (!this.roomsParticipants.get(client.id).getGameEnd()) {
 					this.server.to(roomName).emit("LogOut");
 					this.roomsParticipants.get(client.id).setGameEnd();
 				}
-                console.log('set game end bc deco')
+                // console.log('set game end bc deco')
             }
 
             //check if client was in a waiting room if so remove from it
@@ -602,14 +603,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 room.getPuck().checkPaddleRight(room.getRightPaddle());
                 room.getPuck().checkPaddleLeft(room.getLeftPaddle());
                 const point = room.getPuck().checkEdges();
-                if (point == POINT.Left) {
-                    room.leftPoint();
-                    this.server.to(roomName).emit('Score', { left: room.getLeftScore(), right: room.getRightScore() });
-                }
-                if (point == POINT.Right) {
-                    room.rightPoint();
-                    this.server.to(roomName).emit('Score', { left: room.getLeftScore(), right: room.getRightScore() });
-                }
+				if (point == POINT.Left || point == POINT.Right) {
+					if (point == POINT.Left) {
+						room.leftPoint();
+						this.server.to(roomName).emit('Score', { left: room.getLeftScore(), right: room.getRightScore() });
+					}
+					if (point == POINT.Right) {
+						room.rightPoint();
+						this.server.to(roomName).emit('Score', { left: room.getLeftScore(), right: room.getRightScore() });
+					}
+					room.getLeftPaddle().reset();
+					room.getRightPaddle().reset();
+				}
                 const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
                 const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
                 this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
@@ -637,7 +642,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.server.to(roomName).emit('GameEnd');
 
             // send results of match & status to db for profiles
-            await this.gameService.createMatch(room.getLeftUser().id, room.getRightUser().id, room.getLeftScore(), room.getRightScore(), "Robot");
+            await this.gameService.createMatch(room.getLeftUser().id, room.getRightUser().id, room.getLeftScore(), room.getRightScore(), OPTION[room.getOption()]);
             await this.gameService.statusOnline(room.getLeftUser().id);
             await this.gameService.statusOnline(room.getRightUser().id);
 
