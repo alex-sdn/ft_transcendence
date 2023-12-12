@@ -83,7 +83,7 @@ model Match {
 	user2     	User @relation("UserMatchesP2", fields: [user2Id], references: [id])
 	user2Id   	Int
 
-	p1LP		Int  //at start of game ? save gain/loss ?
+	p1LP		Int
 	p2LP		Int
 
 	p1score		Int
@@ -107,8 +107,6 @@ model Achievements {
 	win10		Boolean @default(false)
 	win20		Boolean @default(false)
 	win50		Boolean @default(false)
-
-	//add more ?
 }
 
 model Channel {
@@ -219,7 +217,6 @@ model Chanmsg {
 	isCommand	Boolean
 }
 
-// RELOU???????
 model Privmsg {
 	id			Int @id @default(autoincrement())
 	createdAt	DateTime @default(now())
