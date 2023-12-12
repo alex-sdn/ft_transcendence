@@ -41,11 +41,10 @@ export class AuthService {
 			});
 
 			const accessToken = tokenResponse.data.access_token;
-			const refreshToken = tokenResponse.data.refresh_token; //pour pas avoir a relog
+			// const refreshToken = tokenResponse.data.refresh_token; //pour pas avoir a relog
 
 			// GET USER INFO FROM 42API
 			const info42 = await this.getFortyTwoLogin(accessToken);
-			console.log('42 login=' + info42.login42);
 
 			// CHECK WITH DB IF EXISTS
 			const user = await this.prisma.user.findUnique({
@@ -54,7 +53,6 @@ export class AuthService {
 
 			// IF NOT -> First login page
 			if (!user) {
-				console.log('FIRST CONNECTION')
 				const avatar = await this.getFortyTwoAvatar(info42.login42, info42.image);
 				let nickname = info42.login42;
 				let newUser = await this.createUser(info42.login42, nickname, avatar);
@@ -70,7 +68,6 @@ export class AuthService {
 			}
 			// IF YES && has 2FA -> signin page
 			else if (user.has2fa === true) {
-				console.log('USER FOUND WITH 2FA');
 				return {
 					access_token: await this.sign2faToken(user.id, user.nickname),
 					newUser: false,
@@ -79,7 +76,6 @@ export class AuthService {
 			}
 			// IF YES && no 2FA -> home page
 			else {
-				console.log('USER FOUND, OK')
 				return {
 					access_token: await this.signToken(user.id, user.nickname),
 					newUser: false,
@@ -87,8 +83,6 @@ export class AuthService {
 				};
 			}
 		} catch (error) {
-			// console.error('Token exchange failed:', error);
-			// CHANGE ERROR STATUS ?????????????
 			throw new HttpException('TOKEN_EXCHANGE_FAILED', HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
