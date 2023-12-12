@@ -514,8 +514,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
                 this.server.to(roomName).emit('AreYouReady');
 
-                this.retroWaitingList.delete(firstId.value);
-                this.retroWaitingList.delete(secondId.value);
+                this.coolCatWaitingList.delete(firstId.value);
+                this.coolCatWaitingList.delete(secondId.value);
             }
 
         }
@@ -624,7 +624,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 if (room.getOption() != OPTION.CoolCat)
                     this.server.to(roomName).emit('Paddle', { leftPos: room.getLeftPaddle().getY(), rightPos: room.getRightPaddle().getY() });
 
-                //}
+                // }
                 await this.sleep(1000 / 60);
             }
 

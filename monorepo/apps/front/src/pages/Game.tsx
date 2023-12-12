@@ -462,7 +462,7 @@ const Game: React.FC = () => {
                 ctxt.fillText(nickname.right, canvas.width * 0.75, canvas.height - 30);
             }
         }
-    }, [paddle, puckPos, puckDir, score, AskReady, LogOut]);
+    }, [paddle, puckPos, puckDir, score, AskReady, LogOut, ScreenIssue]);
 
     /******************************************************************************
     *                                CROWD CANVA                                   *
@@ -579,7 +579,7 @@ const Game: React.FC = () => {
             p5.stroke('blue');
         else
             p5.stroke(255); //white
-        p5.rect(0.5, 0.5, gameConst.PLAYGROUND_WIDTH / 4, gameConst.PLAYGROUND_HEIGHT / 4);
+        p5.rect(0, 0, gameConst.PLAYGROUND_WIDTH / 4, gameConst.PLAYGROUND_HEIGHT / 4);
 
         p5.noStroke();
 
