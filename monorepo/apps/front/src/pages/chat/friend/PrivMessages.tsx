@@ -52,12 +52,8 @@ const PrivMessages: React.FC<PrivMessageProps> = ({ sender }) => {
 		}
 	};
 	useEffect(() => {
-		console.log("invite1");
 
 		socket?.on("invite", data => {
-			console.log("invite2");
-			console.log(sender);
-			console.log(data);
 			if (data.sender === sender) {
 				const inviteMessage = {
 					sender: data.sender,
@@ -65,7 +61,6 @@ const PrivMessages: React.FC<PrivMessageProps> = ({ sender }) => {
 					message: ` invited ${data.target} to ${data.channel}`,
 					isCommand: true
 				};
-				console.log("invite3");
 				setPrivmessages(prevMessages => [...prevMessages, inviteMessage]);
 			}
 		})

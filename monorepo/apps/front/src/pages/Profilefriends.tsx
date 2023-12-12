@@ -17,7 +17,6 @@ const ProfileFriends: React.FC = () => {
         if (response.status === 200) {
           const resp_req = response.data;
           setRequests(resp_req);
-          console.log(resp_req);
         }
       }
       catch (error) { console.log(error); }

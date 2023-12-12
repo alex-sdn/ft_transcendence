@@ -47,8 +47,6 @@ const ProfileBadges: React.FC = () => {
         },);
         if (response.status === 200) {
             const resp_Badges= response.data;
-            // setBadges(resp_Badges);
-            // console.log(resp_Badges);
             setFirstGame(resp_Badges.playOne);
             setThreeToZero(resp_Badges.win3to0);
             setThreeRow(resp_Badges.win3inRow);
@@ -57,7 +55,6 @@ const ProfileBadges: React.FC = () => {
             setTen(resp_Badges.win10);
             setTwenty(resp_Badges.win20);
             setFifty(resp_Badges.win50);
-
             }}
          catch (error)
             {console.log(error);}

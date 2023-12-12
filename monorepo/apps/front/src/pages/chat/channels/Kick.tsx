@@ -22,8 +22,6 @@ const Kick: React.FC<kickProps> = ({
     const socket = useContext(SocketContext);
     const [error, setError] = useState<string>("");
     const currentUrl = useLocation();
-    console.log("useLocation: " + currentUrl.pathname);
-    console.log(`/chat/channels/${selectedChannel}`);
 
     const handleKick = async () => {
         const createPromise = new Promise<{
@@ -40,12 +38,9 @@ const Kick: React.FC<kickProps> = ({
                 });
             }
         });
-        console.log(me);
 
         createPromise
             .then((data) => {
-                console.log("data.target: " + data.target)
-                console.log(me);
                 setError("");
                 onClose();
                 window.location.reload();
