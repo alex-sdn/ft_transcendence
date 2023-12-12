@@ -35,6 +35,11 @@ export class Paddle {
         }
     }
 
+	// test middle
+	reset(): void {
+		this.y = height / 2;
+	}
+
     move(steps: number): void {
         this.ychange = steps;
     }
