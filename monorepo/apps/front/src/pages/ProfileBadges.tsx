@@ -21,7 +21,6 @@ const ProfileBadges: React.FC = () => {
         if (response.status === 200) {
             const resp_Badges= response.data;
             setBadges(resp_Badges);
-            console.log(resp_Badges);
             }}
          catch (error)
             {console.log(error);}
