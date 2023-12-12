@@ -23,7 +23,7 @@ export class AppService implements OnModuleInit {
 				data: {userId: robot.id}
 			});
 		} catch (error) {
-			console.log('Failed to create Robot user');  // remove?
+			// console.log('Failed to create Robot user');
 		}
 	}
 }

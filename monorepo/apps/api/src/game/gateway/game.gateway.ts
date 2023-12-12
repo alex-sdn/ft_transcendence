@@ -86,16 +86,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     // Add user to maps if jwt OK, disconnect if not
     async handleConnection(client: any, ...args: any[]) {
-        console.log("New game WS connection attempted (" + client.id + ")");
 
         const user = await this.authService.validateToken(client.handshake.headers.authorization);
         if (!user) {
-            console.log('Connection to game WS refused');
             client.disconnect();
         }
         else {
-            console.log('Connection accepted for', user.nickname);
-
+            // console.log('Connection accepted for', user.nickname);
             // add to maps
             this.userToSocket.set(user.id, client);
             this.idToUser.set(client.id, user);
@@ -103,8 +100,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     async handleDisconnect(client: any) {
-
-        console.log(client.id, "disconnected");
 
         if (this.idToUser.has(client.id)) {
             //check if client was in a room if so set Game.End and send info to front of other player
@@ -114,7 +109,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					this.server.to(roomName).emit("LogOut");
 					this.roomsParticipants.get(client.id).setGameEnd();
 				}
-                console.log('set game end bc deco')
+                // console.log('set game end bc deco')
             }
 
             //check if client was in a waiting room if so remove from it
