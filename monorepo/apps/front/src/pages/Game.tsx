@@ -652,9 +652,10 @@ const Game: React.FC = () => {
                             <button className="robot-button" />
                             {AskOption && showTextRobot &&
                                 <div className="info-text">
-                                    <p>• HUMAN VS MACHINE •</p>
+                                    <p><b> HUMAN VS MACHINE </b></p>
                                     <p>All alone?</p>
-                                    <p>Our robot will always be here for you!</p>
+                                    <p>Our robot will always </p>
+                                    <p>be there for you!</p>
                                 </div>
                             }
                         </div>
@@ -667,7 +668,7 @@ const Game: React.FC = () => {
                             <button className="retro-button" />
                             {AskOption && showTextRetro &&
                                 <div className="info-text">
-                                    <p>• RETRO MODE •</p>
+                                    <p><b> RETRO MODE </b></p>
                                     <p>Try our original version of pong</p>
                                     <p>as it was played in the 70s</p>
                                     <p>by Allan Alcorn himself!</p>
@@ -683,9 +684,10 @@ const Game: React.FC = () => {
                             <button className="coolcat-button" />
                             {AskOption && showTextCoolCat &&
                                 <div className="info-text">
-                                    <p>• COOL CAT EDITION •</p>
-                                    <p>Play a smoother version of pong</p>
-                                    <p>with some little surprises along the way...</p>
+                                    <p><b> COOL CAT EDITION </b></p>
+                                    <p>Wanna play it cool?</p>
+                                    <p>Try a smoother version of pong</p>
+                                    <p>with some surprises along the way...</p>
                                 </div>
                             }
                         </div>
@@ -698,9 +700,10 @@ const Game: React.FC = () => {
                             <button className="weirdcrowd-button" />
                             {AskOption && showTextWeirdCrowd &&
                                 <div className="info-text">
-                                    <p>• WEIRD CROWD VERSION •</p>
+                                    <p> <b>WEIRD CROWD VERSION </b></p>
                                     <p>What would be a tennis match</p>
-                                    <p>without its weird headshaking crowd?</p>
+                                    <p>without its weird crowd</p>
+                                    <p>following the ball</p>
                                 </div>
                             }
                         </div>
@@ -722,7 +725,7 @@ const Game: React.FC = () => {
                 }
 
                 {Countdown && (Count == 0) &&
-                    (<div id="waiting">
+                    (<div id="countdown">
                         FIGHT !
                     </div>)
                 }
@@ -734,8 +737,8 @@ const Game: React.FC = () => {
                 }
 
                 {
-                    WaitingRoom &&
-                    (<div id="countdown">WAITING ROOM
+                    WaitingRoom && (gameOption != OPTION.Robot) &&
+                    (<div id="waiting">WAITING ROOM
                         <img src="waitingroom.png" />
                     </div>)
                 }
