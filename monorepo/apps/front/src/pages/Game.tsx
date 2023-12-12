@@ -199,7 +199,6 @@ const Game: React.FC = () => {
             socket.on(
                 "AreYouReady",
                 () => {
-                    console.log("Are you ready ?");
                     setAskReady(true);
                     setAskOption(false);
                     setWaitingRoom(false);
@@ -217,7 +216,6 @@ const Game: React.FC = () => {
             socket.on(
                 "LogOut",
                 () => {
-                    console.log("Oops, your competitor has just logged out...");
                     setLogOut(true);
                 }
             );
@@ -325,7 +323,6 @@ const Game: React.FC = () => {
     };
 
     const IAmReady = () => {
-        console.log('front emit READY');
         socket?.emit('ready', { roomName: roomName });
         setAskReady(false);
         setAskOption(false);
@@ -725,8 +722,8 @@ const Game: React.FC = () => {
                 }
 
                 {GameEnd &&
-                    (((score.left < score.right) && role == ROLE.Left) ||
-                        ((score.right < score.left) && role == ROLE.Right)) &&
+                    (((score.left < score.right) && role == ROLE.Left && !LogOut) ||
+                        ((score.right < score.left) && role == ROLE.Right && !LogOut)) &&
                     (<div className='you-lost' id="countdown">
                         You lost !
                     </div>)

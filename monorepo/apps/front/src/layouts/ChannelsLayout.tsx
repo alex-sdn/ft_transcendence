@@ -27,7 +27,6 @@ const ChannelsLayout: React.FC = () => {
                     },
                 },);
                 if (response.status === 200) {
-                    console.log("request")
                     if (Array.isArray(response.data)) {
                         const channels = response.data.map((channel) => channel.channel.name);
                         setMyChannels(channels);
@@ -61,7 +60,6 @@ const ChannelsLayout: React.FC = () => {
 
     useEffect(() => {
         if (socket) {
-            console.log("socket")
             socket.on("kick", (data) => {
                 
                 if (me == data.target) {

@@ -47,7 +47,6 @@ const Channel: React.FC = () => {
                 },);
                 if (membersResponse.status === 200 && meResponse.status === 200) {
                     const currentUserName = meResponse.data.nickname;
-                    console.log(membersResponse.status)
 
                     if (Array.isArray(membersResponse.data)) {
                         const members: user[] = membersResponse.data.map((member: any) => ({
@@ -110,7 +109,6 @@ const Channel: React.FC = () => {
         });
 
         socket?.on("kick", (data) => {
-            console.log("page channel kick")
             if (data.channel === channelName) {
                 setEventData(data.sender);
             }
