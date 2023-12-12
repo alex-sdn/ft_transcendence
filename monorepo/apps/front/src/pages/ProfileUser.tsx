@@ -115,7 +115,6 @@ const ProfileUser: React.FC = () => {
         })
         if (response.status === 200) { 
           setIsBlocked(response.data);
-          console.log("is blocked? ")
           console.log(response.data)
         }
       }

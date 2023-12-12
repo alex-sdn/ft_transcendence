@@ -57,7 +57,6 @@ const ChannelUsers: React.FC<channelUsersProps> = ({ me, members, currentChannel
 
     const inviteGame = async (event: React.FormEvent) => {
         event.preventDefault();
-        console.log("button pressed")
         if (socket && selectedMember) {
             socket.emit("inviteGame", { sender: me.name, target: selectedMember.name });
             socket.on("error", (data) => {
