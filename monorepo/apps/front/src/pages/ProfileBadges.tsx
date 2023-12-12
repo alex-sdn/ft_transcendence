@@ -16,14 +16,25 @@ const ProfileBadges: React.FC = () => {
   const [twenty, setTwenty] = useState<boolean>();
   const [fifty, setFifty] = useState<boolean>();
 
-  const img1 = '/achievements/1.jpg';
-  const img2 = '/achievements/2.jpg';
-  const img3 = '/achievements/3.jpg';
-  const img4 = '/achievements/4.jpg';
-  const img5 = '/achievements/5.jpg';
-  const img6 = '/achievements/6.jpg';
-  const img7 = '/achievements/7.jpg';
-  const img8 = '/achievements/8.jpg';
+  const img1 = '/achievements/img1.PNG';
+  const img2 = '/achievements/img2.PNG';
+  const img3 = '/achievements/img3.PNG';
+  const img4 = '/achievements/img4.PNG';
+  const img5 = '/achievements/img5.PNG';
+  const img6 = '/achievements/img6.PNG';
+  const img7 = '/achievements/img7.PNG';
+  const img8 = '/achievements/img8.PNG';
+  const or = '/achievements/or.png';
+  const orj = '/achievements/orj.png';
+  const brz = '/achievements/brz.png';
+  let achv1 = "Play your first game";
+  let achv2 = "Win 3 to 0";
+  let achv3 = "Win 3 games in a row";
+  let achv4 = "reach 500 LP";
+  let achv5 = "win 5 games total";
+  let achv6 = "win 10 games total";
+  let achv7 = "win 20 games total";
+  let achv8 = "win 50 games total";
 
     
   useEffect(() => {
@@ -54,31 +65,53 @@ const ProfileBadges: React.FC = () => {
       getBadges();
     }, []);
 
+
   return (
       <div>
-          <div className='_info' style={{ textAlign: 'center' }}>
-            <span>{firstgame === true ? <img src={img1} alt="firstgame" style={{width: '100px', height: '100px', }}/>
-                   : <img src={img1} alt="firstgame" style={{width: '100px', height: '100px', filter: 'grayscale(100%)'}}/>  }</span>
-            <span>{threetozero === true ? <img src={img2} alt="threetozero" style={{width: '100px', height: '100px', }}/> 
-                    :<img src={img2} alt="threetozero" style={{width: '100px', height: '100px', filter: 'grayscale(100%)'}}/>}</span>
-            <span>{threerow === true ? <img src={img3} alt="threerow" style={{width: '100px', height: '100px', }}/> 
-                    :<img src={img3} alt="threerow" style={{width: '100px', height: '100px', filter: 'grayscale(100%)'}}/>}</span>
-            <span>{fivehundred === true ? <img src={img4} alt="fivehundred" style={{width: '100px', height: '100px', }}/> 
-                    :<img src={img4} alt="fivehundred" style={{width: '100px', height: '100px', filter: 'grayscale(100%)'}}/>}</span>
-            <span>{five === true ? <img src={img5} alt="five" style={{width: '100px', height: '100px', }}/> 
-                    :<img src={img5} alt="five" style={{width: '100px', height: '100px', filter: 'grayscale(100%)'}}/>}</span>
-            <span>{ten === true ? <img src={img6} alt="ten" style={{width: '100px', height: '100px', }}/> 
-                    :<img src={img6} alt="ten" style={{width: '100px', height: '100px', filter: 'grayscale(100%)'}}/>}</span>
-            <span>{twenty === true ? <img src={img7} alt="twenty" style={{width: '100px', height: '100px', }}/> 
-                    :<img src={img7} alt="twenty" style={{width: '100px', height: '100px', filter: 'grayscale(100%)'}}/> }</span>
-            <span>{fifty === true ? <img src={img8} alt="fifty" style={{width: '100px', height: '100px', }}/> 
-                    :<img src={img8} alt="fifty" style={{width: '100px', height: '100px', filter: 'grayscale(100%)'}}/>}</span>
+            <div className='_info' style={{ textAlign: 'center' }}>
+            {firstgame === true ? <span className="image-container">    <img src={img1} alt="firstgame" className="blurred-image"/> 
+                                                                        <div className="overlay-text">{achv1}</div> 
+                  </span>        :  <span className="image-container">  <img src={orj} alt="firstgame" className="blurred-image" /> 
+                                                                        <div className="overlay-text">{achv1}</div> </span> }&nbsp;
+
+            {threetozero === true ? <span className="image-container">  <img src={img2} alt="threetozero" className="blurred-image"/> 
+                                                                        <div className="overlay-text">{achv2}</div>
+                        </span> : <span className="image-container">    <img src={or} alt="threetozero" className="blurred-image" />
+                                                                        <div className="overlay-text">{achv2}</div> </span> }&nbsp;
+
+            {threerow === true ? <span className="image-container">     <img src={img3} alt="threerow" className="blurred-image"/> 
+                                                                        <div className="overlay-text">{achv3}</div>
+                        </span> : <span className="image-container">    <img src={orj} alt="threerow" className="blurred-image" />
+                                                                        <div className="overlay-text">{achv3}</div> </span> }&nbsp;
+
+            {fivehundred === true ? <span className="image-container">  <img src={img4} alt="fivehundred" className="blurred-image"/> 
+                                                                        <div className="overlay-text">{achv4}</div>
+                        </span> : <span className="image-container">    <img src={or} alt="fivehundred" className="blurred-image" />
+                                                                        <div className="overlay-text">{achv4}</div> </span> }&nbsp;
+
+            {five === true ? <span className="image-container">         <img src={img5} alt="five" className="blurred-image"/> 
+                                                                        <div className="overlay-text">{achv5}</div>
+                        </span> : <span className="image-container">    <img src={orj} alt="five" className="blurred-image" />
+                                                                        <div className="overlay-text">{achv5}</div> </span> }&nbsp;
+
+                                                                        
+             {ten === true ? <span className="image-container">         <img src={img6} alt="ten" className="blurred-image"/> 
+                                                                        <div className="overlay-text">{achv6}</div>
+                        </span> : <span className="image-container">    <img src={brz} alt="ten" className="blurred-image" />
+                                                                        <div className="overlay-text">{achv6}</div> </span> }&nbsp;
+
+              {twenty === true ? <span className="image-container">     <img src={img7} alt="twenty" className="blurred-image"/> 
+                                                                        <div className="overlay-text">{achv7}</div>
+                        </span> : <span className="image-container">    <img src={brz} alt="twenty" className="blurred-image" />
+                                                                        <div className="overlay-text">{achv7}</div> </span> }&nbsp;
+
+              {fifty === true ? <span className="image-container">      <img src={img8} alt="fifty" className="blurred-image"/> 
+                                                                        <div className="overlay-text">{achv8}</div>
+                        </span> : <span className="image-container">    <img src={or} alt="fifty" className="blurred-image" />
+                                                                        <div className="overlay-text">{achv8}</div> </span> }&nbsp;
           </div>
       </div>
   )
 }
 
 export default ProfileBadges;
-
-// style={{width: '40px', height: '40px', }}
-// style={{width: '40px', height: '40px', filter: 'grayscale(100%)'}}
