@@ -23,7 +23,6 @@ export class AuthService {
 		newUser: boolean,
 		has2fa: boolean
 	}> {
-		console.log('Query=' + code);
 		const tokenEndpoint = 'https://api.intra.42.fr/oauth/token';
 
 		const redirectUri = this.config.get('FORTYTWO_REDIRECT');
