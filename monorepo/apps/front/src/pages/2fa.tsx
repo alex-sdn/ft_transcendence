@@ -55,7 +55,7 @@ const Twofa: React.FC = () => {
         window.location.reload();
       }
     }
-    catch (error) {
+    catch (error: any) {
       console.log(error.response.data.message);
       setError(error.response.data.message);
     }
