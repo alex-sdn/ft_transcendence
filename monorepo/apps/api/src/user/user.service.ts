@@ -20,7 +20,7 @@ export class UserService {
 		const fullUser = await this.prisma.user.findUnique({
 			where: {id: user.id},
 			include: {
-				friends1: true,   //remove includes here?
+				friends1: true,
 				matchesP1: true
 			}
 		});
@@ -115,7 +115,6 @@ export class UserService {
 			});
 			return;
 		} catch(error) {
-			// do something with error ?
 			throw new HttpException('FAILED TO CHANGE AVATAR', HttpStatus.INTERNAL_SERVER_ERROR);
 		}		
 	}
@@ -455,12 +454,12 @@ export class UserService {
 		});
 	}
 
-	/**  MATCHES  **/  //keep here?
+	/**  MATCHES  **/
 	async myMatches(user) {
 		const matches = await this.prisma.match.findMany({
 			where: { user1Id: user.id },
 			include: {
-				user1: true,  // necessaire ?
+				user1: true,
 				user2: true
 			}
 		});
