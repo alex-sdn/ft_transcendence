@@ -105,7 +105,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             //check if client was in a room if so set Game.End and send info to front of other player
             if (this.roomsParticipants.has(client.id)) {
                 const roomName = this.roomsParticipants.get(client.id).getName();
-				if (this.roomsParticipants.get(client.id).getReady() < 2) {
+				if ((this.roomsParticipants.get(client.id).getReady() < 2 && this.roomsParticipants.get(client.id).getOption() != OPTION.Robot)
+					|| (this.roomsParticipants.get(client.id).getOption() == OPTION.Robot && this.roomsParticipants.get(client.id).getReady() < 1)) {
 					this.server.to(roomName).emit("Cancelled");
 					// verif game annule
 					this.roomsParticipants.delete(client.id);
@@ -581,23 +582,21 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 this.server.to(roomName).emit('Countdown', i);
             }
 
-			if (!room.getGameEnd()) {
-				room.setGameStart();
-	
-				const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
-				const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
-				this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
-	
-				// launch robot loop
-				if (room.getOption() == OPTION.Robot) {
-					if (!this.robotInterval.has(roomName))
-						this.robotInterval.set(roomName, setInterval(this.robotLoop, 30, room));
-				}
-			}
+            room.setGameStart();
+
+            const newPuckPos = { x: room.getPuck().getX(), y: room.getPuck().getY() };
+            const newPuckDir = { x: room.getPuck().getXSpeed(), y: room.getPuck().getYSpeed() };
+            this.server.to(roomName).emit('Puck', { puckPos: newPuckPos, puckDir: newPuckDir });
+
+            // launch robot loop
+            if (room.getOption() == OPTION.Robot) {
+                if (!this.robotInterval.has(roomName))
+                    this.robotInterval.set(roomName, setInterval(this.robotLoop, 30, room));
+            }
 
             await this.sleep(300);
 
-            while (room.getGameStart() && !room.getGameEnd()) {
+            while (!room.getGameEnd()) {
                 //const updatePuckInterval = setInterval(() => {
                 room.getPuck().update();
                 //if (room.getPuck().checkPaddleRight(room.getRightPaddle()) || room.getPuck().checkPaddleLeft(room.getLeftPaddle()) || room.getPuck().checkEdges() == POINT.Left || room.getPuck().checkEdges() == POINT.Right) {
