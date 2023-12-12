@@ -29,6 +29,7 @@ export class Room {
     private leftNickname: string;
     private rightNickname: string;
 
+	private gameStart: boolean;
     private gameEnd: boolean;
 
     private gameOption: OPTION;
@@ -61,6 +62,7 @@ export class Room {
 
         this.ready = 0;
 
+		this.gameStart = false;
         this.gameEnd = false;
 
         this.gameOption = option;
@@ -117,6 +119,10 @@ export class Room {
         return this.gameEnd;
     }
 
+	getGameStart(): boolean {
+		return this.gameStart;
+	}
+
     getLeftNickname(): string {
         return this.leftNickname;
     }
@@ -144,7 +150,7 @@ export class Room {
     }
 
     setGameStart(): void {
-        this.gameEnd = false;
+        this.gameStart = true;
     }
 
     setLeftAsWinner(): void {

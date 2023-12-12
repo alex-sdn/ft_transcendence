@@ -92,6 +92,8 @@ const Game: React.FC = () => {
 
     const [LogOut, setLogOut] = useState(false);
 
+	const [cancelled, setCancelled] = useState<boolean>(false);
+
     const [ScreenIssue, setScreenIssue] = useState(false);
 
     const [ThereIsCrowd, setThereIsCrowd] = useState(false);
@@ -115,6 +117,12 @@ const Game: React.FC = () => {
     const [backgroundImg, setBackgroundImg] = useState(null);
 
     const [previousPuckPositions, setPreviousPuckPositions] = useState<PuckPos[]>([]);
+
+	useEffect(() => {
+		socket?.on("Cancelled", () => {
+            setCancelled(true);
+		})
+	})
 
     useEffect(() => {
         if (socket) {
@@ -359,6 +367,7 @@ const Game: React.FC = () => {
         setCoolcat(false);
         setWaitingRoom(false);
         setThereIsCrowd(false);
+		setCancelled(false);
     };
 
     /******************************************************************************
@@ -603,7 +612,7 @@ const Game: React.FC = () => {
     return (
         <div>
             <div>
-                {Coolcat && !AskOption && !AskReady && !ScreenIssue && !Countdown && (Count <= 0) &&
+                {Coolcat && !AskOption && !AskReady && !ScreenIssue && !Countdown && !LogOut && (Count <= 0) &&
                     <Sketch setup={setup} draw={draw} />
                 }
                 {AskOption && (
@@ -671,7 +680,7 @@ const Game: React.FC = () => {
                     </div>)
                 }
 
-                {AskReady &&
+                {AskReady && !cancelled &&
                     <button className="ready-button"
                         onClick={IAmReady}
                     >
@@ -691,7 +700,7 @@ const Game: React.FC = () => {
                     </div>)
                 }
 
-                {!Coolcat && !AskOption && !AskReady && !ScreenIssue && !Countdown && (Count <= 0) &&
+                {!Coolcat && !AskOption && !AskReady && !ScreenIssue && !Countdown && !LogOut && (Count <= 0) &&
                     (<div id="retro">
                         <canvas id="responsive-canvas" ref={canvasRef}></canvas>
                     </div>)
@@ -705,6 +714,10 @@ const Game: React.FC = () => {
                 {ScreenIssue &&
                     (<div style={{ textAlign: 'center' }}>Please increase the size of your screen. The minimum required is: 600 * 400. Thank you!</div>)
                 }
+
+				{cancelled && 
+					(<div style={{ display: 'flex', justifyContent: 'center', textAlign: 'center', fontSize: '30px' }}>Oops, your competitor just cancelled the match...</div>)
+				}
 
                 {LogOut &&
                     (<div style={{ textAlign: 'center' }}>Oops, your competitor has just logged out... So you've just won!</div>)
@@ -733,7 +746,7 @@ const Game: React.FC = () => {
                 }
 
 
-                {(LogOut || GameEnd) &&
+                {(LogOut || GameEnd || cancelled) &&
                     (<button className="newgame-button" onClick={NewGame}>New Game</button>)
                 }
 
