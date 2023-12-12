@@ -393,7 +393,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             room.getRightPaddle().update();
         }
         this.server.to(roomName).emit('Paddle', { leftPos: room.getLeftPaddle().getY(), rightPos: room.getRightPaddle().getY() });
-        console.log(room.getLeftPaddle().getY());
+        //console.log(room.getLeftPaddle().getY());
 
     }
 
