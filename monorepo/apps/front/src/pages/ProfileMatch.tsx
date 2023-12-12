@@ -50,15 +50,15 @@ const ProfileMatch: React.FC = () => {
                 <ul>
                     {matches.map((match, index) =>
                         <div>
-                            {match.p1score < match.p2score ? <span className='_defeat'> {match.p1score} / {match.p2score} : &nbsp;DEFEAT</span> : <span className='_victory'>  {match.p1score} / {match.p2score} : &nbsp; VICTORY</span>}
-                            &nbsp;against&nbsp;<span className='_nickname'> {match.user2.nickname}</span>
-                            &nbsp;<span className='_date'> {new Date(match.date).toLocaleDateString(undefined, {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                            })} </span>
+							{match.p1score < match.p2score ? <span className='_defeat'> {match.p1score} / {match.p2score} : &nbsp;{match.type}&nbsp;DEFEAT</span> : <span className='_victory'>  {match.p1score} / {match.p2score} : &nbsp;{match.type}&nbsp; VICTORY</span>}
+							&nbsp;against&nbsp;<span className='_nickname'> {match.user2.nickname}</span>
+							&nbsp;<span className='_date'> {new Date(match.date).toLocaleDateString(undefined, {
+								year: 'numeric',
+								month: 'long',
+								day: 'numeric',
+							})} </span>
 
-                        </div>
+						</div>
                     )}
                 </ul>
                 :
