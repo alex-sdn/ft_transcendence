@@ -753,8 +753,8 @@ export class ChatService {
 				}
 			}
 		});
-		if (!member) //dont have to verify
-			console.log('PAS MEMBER?? IMPOSSIBLE');
+		if (!member)
+			console.log('PAS MEMBER??');
 		if (member.muted === true) {
 			//check if still muted
 			const currTime = new Date();
