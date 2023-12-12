@@ -22,15 +22,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	// Add user to maps if jwt OK, disconnect if not
 	async handleConnection(client: any, ...args: any[]) {
-		console.log("New chat WS connection attempted (" + client.id + ")");
 
 		const user = await this.authService.validateToken(client.handshake.headers.authorization);
 		if (!user) {
-			console.log('Connection to chat WS refused');
 			client.disconnect();
 		}
 		else {
-			console.log('Connection accepted for', user.nickname);
+			// console.log('Connection accepted for', user.nickname);
 			// status Online
 			await this.chatService.statusOnline(user.id);
 			// add to maps
@@ -40,7 +38,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	async handleDisconnect(client: any) {
-		console.log(client.id, "disconnected");
 
 		if (this.idToUser.has(client.id)) {
 			// status Offline
