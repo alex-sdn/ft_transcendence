@@ -19,7 +19,7 @@ services:
       - ./monorepo:/app/monorepo
     ports:
       - "3000:3000"
-      # - "5555:5555"  # for prisma studio
+      # - "5555:5555"  #for prisma studio
     env_file: .env
     depends_on:
       - postgres-db
